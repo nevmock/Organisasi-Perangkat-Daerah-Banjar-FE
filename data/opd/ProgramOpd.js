@@ -1,0 +1,67 @@
+export const programOpd = [
+  {
+    id: 1,
+    nama_program: 'Program Peningkatan Infrastruktur Jalan',
+    nama_pelaksana: 'Dinas Pekerjaan Umum dan Penataan Ruang',
+    tgl_mulai: '2025-02-01',
+    target: '100 km jalan diperbaiki',
+    indikator: [
+      'Survey dan pemetaan jalan rusak',
+      'Pengadaan material konstruksi',
+      'Pelaksanaan proyek perbaikan',
+      'Monitoring dan evaluasi hasil perbaikan',
+    ],
+  },
+  {
+    id: 2,
+    nama_program: 'Program Peningkatan Kualitas Pendidikan',
+    nama_pelaksana: 'Dinas Pendidikan',
+    tgl_mulai: '2025-03-15',
+    target: '500 guru dilatih',
+    indikator: [
+      'Identifikasi guru sasaran',
+      'Penyusunan modul pelatihan',
+      'Pelaksanaan pelatihan guru',
+      'Evaluasi hasil pelatihan',
+    ],
+  },
+  {
+    id: 3,
+    nama_program: 'Program Ketahanan Pangan Daerah',
+    nama_pelaksana: 'Dinas Ketahanan Pangan',
+    tgl_mulai: '2025-01-20',
+    target: 'Pembangunan 10 lumbung pangan',
+    indikator: [
+      'Penentuan lokasi strategis',
+      'Perencanaan desain lumbung',
+      'Pelaksanaan pembangunan fisik',
+      'Distribusi dan pengisian cadangan pangan',
+    ],
+  },
+  {
+    id: 4,
+    nama_program: 'Program Layanan Kesehatan Gratis',
+    nama_pelaksana: 'Dinas Kesehatan',
+    tgl_mulai: '2025-04-10',
+    target: '15.000 warga menerima layanan',
+    indikator: [
+      'Pendataan warga tidak mampu',
+      'Penyediaan layanan medis keliling',
+      'Koordinasi dengan puskesmas dan rumah sakit',
+      'Monitoring jumlah layanan yang diberikan',
+    ],
+  },
+  {
+    id: 5,
+    nama_program: 'Program Digitalisasi Layanan Publik',
+    nama_pelaksana: 'Dinas Komunikasi dan Informatika',
+    tgl_mulai: '2025-05-01',
+    target: '10 aplikasi layanan publik diluncurkan',
+    indikator: [
+      'Identifikasi layanan publik yang diprioritaskan',
+      'Pengembangan dan pengujian aplikasi',
+      'Sosialisasi penggunaan ke masyarakat',
+      'Evaluasi efektivitas layanan digital',
+    ],
+  },
+];
