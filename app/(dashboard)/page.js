@@ -33,6 +33,7 @@ const Home = () => {
             <LineChart />
           </Col>
         </Row>
+        <ActiveProjects />
       </Container>
     </Fragment>
   );

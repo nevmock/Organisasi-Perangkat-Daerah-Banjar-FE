@@ -65,9 +65,6 @@ const Laporan = () => {
                       className="me-2"
                       style={{ minWidth: '200px' }}
                     />
-                    <Button variant="primary" href="/opd/perencanaan/tambah">
-                      Tambah
-                    </Button>
                   </div>
                 </div>
               </Card.Header>

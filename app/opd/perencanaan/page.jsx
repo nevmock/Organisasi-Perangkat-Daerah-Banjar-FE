@@ -100,12 +100,20 @@ const Perencanaan = () => {
                             {/* <td>{program.target}</td>
                             <td>Sedang Beralngsung</td> */}
                             <td>
-                              <Button
-                                variant="primary"
-                                href={`/opd/perencanaan/${program.id}`}
-                              >
-                                Detail
-                              </Button>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="outline-primary"
+                                  href={`/opd/perencanaan/${program.id}`}
+                                >
+                                  Ubah
+                                </Button>
+                                <Button
+                                  variant="outline-danger"
+                                  href={`/opd/perencanaan/${program.id}`}
+                                >
+                                  Hapus
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}

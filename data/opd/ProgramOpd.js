@@ -5,6 +5,7 @@ export const programOpd = [
     nama_pelaksana: 'Dinas Pekerjaan Umum dan Penataan Ruang',
     tgl_mulai: '2025-02-01',
     target: '100 km jalan diperbaiki',
+    progress: 15,
     indikator: [
       'Survey dan pemetaan jalan rusak',
       'Pengadaan material konstruksi',
@@ -18,6 +19,7 @@ export const programOpd = [
     nama_pelaksana: 'Dinas Pendidikan',
     tgl_mulai: '2025-03-15',
     target: '500 guru dilatih',
+    progress: 35,
     indikator: [
       'Identifikasi guru sasaran',
       'Penyusunan modul pelatihan',
@@ -31,6 +33,7 @@ export const programOpd = [
     nama_pelaksana: 'Dinas Ketahanan Pangan',
     tgl_mulai: '2025-01-20',
     target: 'Pembangunan 10 lumbung pangan',
+    progress: 75,
     indikator: [
       'Penentuan lokasi strategis',
       'Perencanaan desain lumbung',
@@ -44,6 +47,7 @@ export const programOpd = [
     nama_pelaksana: 'Dinas Kesehatan',
     tgl_mulai: '2025-04-10',
     target: '15.000 warga menerima layanan',
+    progress: 63,
     indikator: [
       'Pendataan warga tidak mampu',
       'Penyediaan layanan medis keliling',
@@ -57,6 +61,7 @@ export const programOpd = [
     nama_pelaksana: 'Dinas Komunikasi dan Informatika',
     tgl_mulai: '2025-05-01',
     target: '10 aplikasi layanan publik diluncurkan',
+    progress: 100,
     indikator: [
       'Identifikasi layanan publik yang diprioritaskan',
       'Pengembangan dan pengujian aplikasi',
