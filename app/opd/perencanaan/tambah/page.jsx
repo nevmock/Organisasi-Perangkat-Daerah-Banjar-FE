@@ -13,6 +13,7 @@ import {
 
 import React, { useState } from "react";
 import axios from "axios";
+import weekToDate from "utils/weekToDate";
 
 const TambahPerancanaan = () => {
   const handleSubmit = async (e) => {
@@ -21,7 +22,7 @@ const TambahPerancanaan = () => {
     const newData = {
       nama_program: e.target.namaProgram.value,
       opd_pelaksana: e.target.pelaksana.value,
-      tgl_mulai: e.target.tglMulai.value,
+      tgl_mulai: weekToDate(e.target.tglMulai.value),
       target: e.target.target.value,
       indikator_labels: indikators,
     };

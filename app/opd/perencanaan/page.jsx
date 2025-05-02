@@ -24,6 +24,7 @@ import axios from "axios";
 // import { programOpd } from "data/opd/ProgramOpd";
 import { formatWeekLabel } from "utils/formatWeekLabel";
 import getElapsedTime from "utils/getElapsedTime";
+import getWeekFromDate from "utils/getWeekFromDate";
 
 const Perencanaan = () => {
   const [programOpd, setProgramOpd] = useState([]);
@@ -62,6 +63,24 @@ const Perencanaan = () => {
 
     return () => clearInterval(interval);
   }, [programOpd]);
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Apakah Anda yakin ingin menghapus data ini?"
+    );
+    if (!confirm) return;
+
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
+      );
+      // Hapus data dari state setelah berhasil
+      setProgramOpd((prev) => prev.filter((item) => item._id !== id));
+    } catch (err) {
+      console.error("Gagal menghapus data:", err);
+      alert("Terjadi kesalahan saat menghapus data.");
+    }
+  };
 
   return (
     <Container fluid className="p-6">
@@ -127,7 +146,7 @@ const Perencanaan = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.opd_pelaksana}</td>
-                            <td>{formatWeekLabel(program.tgl_mulai)}</td>
+                            <td>{getWeekFromDate(program.tgl_mulai)}</td>
                             <td>
                               {waktuPelaksanaan[program._id] || "Memuat..."}
                             </td>
@@ -141,7 +160,7 @@ const Perencanaan = () => {
                                 </Button>
                                 <Button
                                   variant="outline-danger"
-                                  href={`/opd/perencanaan/${program._id}`}
+                                  onClick={() => handleDelete(program._id)}
                                 >
                                   Hapus
                                 </Button>

@@ -23,33 +23,32 @@ import axios from "axios";
 import { programOpd } from "data/opd/ProgramOpd";
 import { formatWeekLabel } from "utils/formatWeekLabel";
 import getElapsedTimeFromWeek from "utils/getElapsedTime";
+import getWeekFromDate from "utils/getWeekFromDate";
 
 const Laporan = () => {
-  // const [laporans, setLaporans] = useState([]);
+  const [laporans, setLaporans] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await axios.get(
-  //         `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
-  //       );
-  //       setLaporans(res.data);
-  //     } catch (err) {
-  //       console.error('Gagal fetch data perencanaan:', err);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
+        );
+        setLaporans(res.data);
+      } catch (err) {
+        console.error("Gagal fetch data perencanaan:", err);
+      }
+    };
 
-  //   fetchData();
-  // }, []);
-
-  const laporans = programOpd;
+    fetchData();
+  }, []);
 
   const [waktuPelaksanaan, setWaktuPelaksanaan] = useState({});
 
   useEffect(() => {
     const interval = setInterval(() => {
       const newTimes = {};
-      programOpd.forEach((p) => {
+      laporans.forEach((p) => {
         newTimes[p._id] = getElapsedTime(p.tgl_mulai);
       });
       setWaktuPelaksanaan(newTimes);
@@ -57,13 +56,13 @@ const Laporan = () => {
 
     // initial update
     const initTimes = {};
-    programOpd.forEach((p) => {
+    laporans.forEach((p) => {
       initTimes[p._id] = getElapsedTimeFromWeek(p.tgl_mulai);
     });
     setWaktuPelaksanaan(initTimes);
 
     return () => clearInterval(interval);
-  }, [programOpd]);
+  }, [laporans]);
 
   return (
     <Container fluid className="p-6">
@@ -121,7 +120,7 @@ const Laporan = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.opd_pelaksana}</td>
-                            <td>{formatWeekLabel(program.tgl_mulai)}</td>
+                            <td>{getWeekFromDate(program.tgl_mulai)}</td>
                             <td>
                               {waktuPelaksanaan[program._id] || "Memuat..."}
                             </td>

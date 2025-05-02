@@ -1,8 +1,5 @@
-import weekToDate from "./weekToDate";
-
-export default function getElapsedTimeFromWeek(weekStr) {
-  const startDate = weekToDate(weekStr);
-  console.log(startDate);
+export default function getElapsedTimeFromDate(dateStr) {
+  const startDate = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - startDate.getTime();
 
