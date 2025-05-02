@@ -96,7 +96,7 @@ const Perencanaan = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.nama_pelaksana}</td>
-                            <td>{program.tgl_mulai}</td>
+                            <td>Pekan 1 | {program.tgl_mulai}</td>
                             {/* <td>{program.target}</td>
                             <td>Sedang Beralngsung</td> */}
                             <td>

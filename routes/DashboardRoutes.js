@@ -37,7 +37,7 @@ export const DashboardMenu = [
   },
   {
     id: uuid(),
-    title: 'OPD',
+    title: 'DEX',
     icon: 'layers',
     children: [
       { id: uuid(), link: '/opd/perencanaan', name: 'Perencanaan' },
