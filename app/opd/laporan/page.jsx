@@ -17,31 +17,20 @@ import {
 import { HighlightCode } from 'widgets';
 
 // import react code data file
-import {
-  BasicTableCode,
-  DarkTableCode,
-  TableHeadCode,
-  StripedTableCode,
-  TableVariantCode,
-  BorderedTableCode,
-  BorderlessTableCode,
-  HoverableRowsCode,
-  SmallTableCode,
-  ContextualClassesCode,
-  ResponsiveTableCode,
-} from 'data/code/TablesCode';
+import { ResponsiveTableCode } from 'data/code/TablesCode';
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Laporan = () => {
-
   const [laporans, setLaporans] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
+        );
         setLaporans(res.data);
       } catch (err) {
         console.error('Gagal fetch data perencanaan:', err);
