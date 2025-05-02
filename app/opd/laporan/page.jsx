@@ -1,44 +1,69 @@
-'use client';
+"use client";
 // import node module libraries
-import { Fragment } from 'react';
+import { Fragment } from "react";
 import {
   Col,
   Row,
   Card,
   Table,
-  Nav,
   Tab,
   Container,
   Form,
   Button,
-} from 'react-bootstrap';
+} from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from 'widgets';
+import { HighlightCode } from "widgets";
 
 // import react code data file
-import { ResponsiveTableCode } from 'data/code/TablesCode';
+import { ResponsiveTableCode } from "data/code/TablesCode";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { programOpd } from "data/opd/ProgramOpd";
+import { formatWeekLabel } from "utils/formatWeekLabel";
+import getElapsedTimeFromWeek from "utils/getElapsedTime";
 
 const Laporan = () => {
-  const [laporans, setLaporans] = useState([]);
+  // const [laporans, setLaporans] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
+  //       );
+  //       setLaporans(res.data);
+  //     } catch (err) {
+  //       console.error('Gagal fetch data perencanaan:', err);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  const laporans = programOpd;
+
+  const [waktuPelaksanaan, setWaktuPelaksanaan] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
-        );
-        setLaporans(res.data);
-      } catch (err) {
-        console.error('Gagal fetch data perencanaan:', err);
-      }
-    };
+    const interval = setInterval(() => {
+      const newTimes = {};
+      programOpd.forEach((p) => {
+        newTimes[p._id] = getElapsedTime(p.tgl_mulai);
+      });
+      setWaktuPelaksanaan(newTimes);
+    }, 60000); // update tiap 1 menit
 
-    fetchData();
-  }, []);
+    // initial update
+    const initTimes = {};
+    programOpd.forEach((p) => {
+      initTimes[p._id] = getElapsedTimeFromWeek(p.tgl_mulai);
+    });
+    setWaktuPelaksanaan(initTimes);
+
+    return () => clearInterval(interval);
+  }, [programOpd]);
 
   return (
     <Container fluid className="p-6">
@@ -70,7 +95,7 @@ const Laporan = () => {
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
-                      style={{ minWidth: '200px' }}
+                      style={{ minWidth: "200px" }}
                     />
                   </div>
                 </div>
@@ -85,9 +110,8 @@ const Laporan = () => {
                           <th scope="col">#</th>
                           <th scope="col">Nama Program</th>
                           <th scope="col">Pelaksana</th>
-                          <th scope="col">Tgl Mulai</th>
-                          <th scope="col">Target</th>
-                          <th scope="col">Status</th>
+                          <th scope="col">Tgl Pelaksanaan</th>
+                          <th scope="col">Waktu Penyelesaian</th>
                           <th scope="col">Aksi</th>
                         </tr>
                       </thead>
@@ -97,13 +121,14 @@ const Laporan = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.opd_pelaksana}</td>
-                            <td>{program.tgl_mulai}</td>
-                            <td>{program.target}</td>
-                            <td>Sedang Beralngsung</td>
+                            <td>{formatWeekLabel(program.tgl_mulai)}</td>
+                            <td>
+                              {waktuPelaksanaan[program._id] || "Memuat..."}
+                            </td>
                             <td>
                               <Button
-                                variant="primary"
-                                href={`/opd/laporan/${program.id}`}
+                                variant="outline-primary"
+                                href={`/opd/laporan/${program._id}`}
                               >
                                 Detail
                               </Button>

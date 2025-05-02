@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Col,
   Row,
@@ -9,10 +9,10 @@ import {
   Container,
   Form,
   Button,
-} from 'react-bootstrap';
+} from "react-bootstrap";
 
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const TambahPerancanaan = () => {
   const handleSubmit = async (e) => {
@@ -23,20 +23,24 @@ const TambahPerancanaan = () => {
       opd_pelaksana: e.target.pelaksana.value,
       tgl_mulai: e.target.tglMulai.value,
       target: e.target.target.value,
-      indikators: indikators,
+      indikator_labels: indikators,
     };
+    console.log(e.target.tglMulai.value);
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`, newData);
-      alert('Data berhasil disimpan!');
-      window.location.href = '/opd/perencanaan'; // Redirect ke list
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`,
+        newData
+      );
+      alert("Data berhasil disimpan!");
+      window.location.href = "/opd/perencanaan"; // Redirect ke list
     } catch (err) {
       console.error(err);
-      alert('Gagal menyimpan data.');
+      alert("Gagal menyimpan data.");
     }
   };
 
-  const [indikators, setIndikators] = useState(['']); // Awal 1 input
+  const [indikators, setIndikators] = useState([""]); // Awal 1 input
 
   const handleChange = (index, value) => {
     const updated = [...indikators];
@@ -45,7 +49,7 @@ const TambahPerancanaan = () => {
   };
 
   const handleAddField = () => {
-    setIndikators([...indikators, '']);
+    setIndikators([...indikators, ""]);
   };
 
   const handleRemoveField = (index) => {
@@ -85,8 +89,8 @@ const TambahPerancanaan = () => {
 
             <Col className="mb-3">
               <Form.Group controlId="tglMulai">
-                <Form.Label>Tanggal Mulai</Form.Label>
-                <Form.Control type="date" required />
+                <Form.Label>Tanggal Pelaksanaan</Form.Label>
+                <Form.Control type="week" required />
               </Form.Group>
             </Col>
 

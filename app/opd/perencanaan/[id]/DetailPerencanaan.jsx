@@ -14,7 +14,7 @@ import {
 import { GeneralSetting } from "sub-components";
 import { DropFiles, PageHeading } from "widgets";
 
-const DetailLaporan = ({ id }) => {
+const DetailPerencanaan = ({ id }) => {
   const hasMounted = useMounted();
 
   function getProgramById(id) {
@@ -22,7 +22,6 @@ const DetailLaporan = ({ id }) => {
   }
 
   const program = getProgramById(id);
-  console.log(program);
 
   const [openIndexes, setOpenIndexes] = useState([]);
 
@@ -35,7 +34,7 @@ const DetailLaporan = ({ id }) => {
   return (
     <Container fluid className="p-6">
       {/* Page Heading */}
-      <PageHeading heading="Laporan Program OPD" />
+      <PageHeading heading="Detail Program OPD" />
 
       {/* General Settings */}
       <Row className="mb-8">
@@ -45,7 +44,7 @@ const DetailLaporan = ({ id }) => {
             <Card.Body>
               <div>
                 <div className="mb-6">
-                  <h4 className="mb-1">Informasi Umum</h4>
+                  <h4 className="mb-1">Informasi Program </h4>
                 </div>
                 {hasMounted && (
                   <Form>
@@ -85,7 +84,7 @@ const DetailLaporan = ({ id }) => {
                     {/* row */}
                     <Row className="mb-3">
                       <Form.Label className="col-sm-4" htmlFor="phone">
-                        Tanggal Mulai
+                        Tanggal Pelaksanaan
                       </Form.Label>
                       <Col md={8} xs={12}>
                         <Form.Control
@@ -111,12 +110,30 @@ const DetailLaporan = ({ id }) => {
                         />
                       </Col>
                     </Row>
+
+                    <Row className="mb-3">
+                      <Form.Label className="col-sm-4" htmlFor="addressLine">
+                        Indikator
+                      </Form.Label>
+                      <Col md={8} xs={12}>
+                        {program.indikators.map((indikator, index) => (
+                          <Form.Control
+                            key={index}
+                            type="text"
+                            placeholder="Masukan nama pelaksana"
+                            value={`${index + 1}. ${indikator}`}
+                            readOnly
+                            className="mb-4"
+                          />
+                        ))}
+                      </Col>
+                    </Row>
                   </Form>
                 )}
               </div>
             </Card.Body>
           </Card>
-          <Card className="mb-4">
+          {/* <Card className="mb-4">
             <Card.Body>
               <div className="mb-6">
                 <h4 className="mb-1">Laporan Indikator</h4>
@@ -142,15 +159,26 @@ const DetailLaporan = ({ id }) => {
                           <div className="mt-3">
                             <Row className="mb-3">
                               <Form.Label className="col-sm-4 col-form-label">
-                                Sudah Dilakukan
+                                Assessment Keberhasilan (%)
+                              </Form.Label>
+                              <Col md={8} xs={12}>
+                                <Form.Control
+                                  type="number"
+                                  placeholder="Contoh: 80"
+                                  min={0}
+                                  max={100}
+                                />
+                              </Col>
+                            </Row>
+
+                            <Row className="mb-3">
+                              <Form.Label className="col-sm-4 col-form-label">
+                                Checklist
                               </Form.Label>
                               <Col md={8} xs={12}>
                                 <Form.Check
                                   type="checkbox"
-                                  style={{
-                                    transform: "scale(1.5)",
-                                    transformOrigin: "top left",
-                                  }}
+                                  label="Sudah dilakukan"
                                 />
                               </Col>
                             </Row>
@@ -193,35 +221,27 @@ const DetailLaporan = ({ id }) => {
                                 />
                               </Col>
                             </Row>
-
-                            <Row className="mt-3">
-                              <Col className="text-end">
-                                <Button variant="primary" type="submit">
-                                  Simpan Perubahan
-                                </Button>
-                              </Col>
-                            </Row>
                           </div>
                         )}
                       </div>
                     );
                   })}
 
-                  {/* <Row className="align-items-center">
+                  <Row className="align-items-center">
                     <Col className="mt-4 text-end">
                       <Button variant="primary" type="submit">
                         Simpan Perubahan
                       </Button>
                     </Col>
-                  </Row> */}
+                  </Row>
                 </Form>
               )}
             </Card.Body>
-          </Card>
+          </Card> */}
         </Col>
       </Row>
     </Container>
   );
 };
 
-export default DetailLaporan;
+export default DetailPerencanaan;
