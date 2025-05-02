@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios"; // perbaikan impor axios
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import axios from "axios";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Modal,
+  Row,
+} from "react-bootstrap";
 import { getISOWeek } from "utils/getISOWeek";
 import { PageHeading } from "widgets";
 import useMounted from "hooks/useMounted";
@@ -10,6 +18,10 @@ const DetailLaporan = ({ id }) => {
   const hasMounted = useMounted();
   const [dataProgram, setDataProgram] = useState({});
   const [openIndexes, setOpenIndexes] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const baseURL = "http://localhost:5050/";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +29,6 @@ const DetailLaporan = ({ id }) => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
         );
-        console.log("Data dari API:", res.data);
         setDataProgram(res.data);
       } catch (err) {
         console.error("Gagal fetch data perencanaan:", err);
@@ -33,44 +44,71 @@ const DetailLaporan = ({ id }) => {
     );
   };
 
-  const handleSubmit = async (e, index, id) => {
-    e.preventDefault();
+  const handlePreview = (src) => {
+    setPreviewImage(src);
+    setShowPreview(true);
+  };
 
+  const handleSubmit = async (e, index, indikatorId) => {
+    e.preventDefault();
     const form = e.target;
-    const formData = new FormData();
 
     const sudahSelesai = form[`finish[${index}]`]?.checked;
     const kendala = form[`kendala[${index}]`]?.value;
     const tindakan = form[`tindakan[${index}]`]?.value;
-    const evidences = form[`evidence[${index}][]`]?.files;
+    const evidenceFiles = form[`evidence[${index}][]`]?.files;
 
-    formData.append("sudah_selesai", sudahSelesai ? "true" : "false");
-    formData.append("kendala", kendala);
-    formData.append("kesimpulan_tindakan", tindakan);
+    // Siapkan payload indikator
+    const payload = {
+      sudah_selesai: !!sudahSelesai,
+      kendala,
+      kesimpulan_tindakan: tindakan,
+    };
 
-    // Multiple file evidence
-    if (evidences && evidences.length > 0) {
-      for (let i = 0; i < evidences.length; i++) {
-        formData.append("evidence[]", evidences[i]);
+    // Hanya tambahkan field evidence jika ada file
+    if (evidenceFiles && evidenceFiles.length > 0) {
+      payload.evidence = [];
+    }
+
+    // 1. Update indikator
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/indikator/${indikatorId}`,
+        payload
+      );
+    } catch (err) {
+      console.error("Gagal update indikator:", err);
+      alert("Gagal update indikator.");
+      return;
+    }
+
+    // 2. Upload evidence jika ada file
+    if (evidenceFiles && evidenceFiles.length > 0) {
+      const uploadData = new FormData();
+      uploadData.append("id_perencanaan", dataProgram._id);
+      for (let i = 0; i < evidenceFiles.length; i++) {
+        uploadData.append("evidence", evidenceFiles[i]);
+      }
+
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/indikator/${indikatorId}/upload-evidence`,
+          uploadData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      } catch (err) {
+        console.error("Gagal upload evidence:", err);
+        alert("Gagal upload evidence.");
+        return;
       }
     }
 
-    try {
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/indikator/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      alert("Data laporan berhasil disimpan!");
-      window.location.href = `/opd/laporan/${dataProgram?._id}`;
-    } catch (err) {
-      console.error(err);
-      alert("Gagal menyimpan data.");
-    }
+    alert("Laporan berhasil disimpan!");
+    window.location.reload();
   };
 
   return (
@@ -79,7 +117,6 @@ const DetailLaporan = ({ id }) => {
 
       <Row className="mb-8">
         <Col>
-          {/* Informasi Program */}
           <Card className="mb-4">
             <Card.Body>
               <div className="mb-6">
@@ -89,7 +126,7 @@ const DetailLaporan = ({ id }) => {
                 <Form>
                   <Row className="mb-3">
                     <Form.Label
-                      className="col-sm-4 col-form-label form-label"
+                      className="col-sm-4 col-form-label"
                       htmlFor="namaProgram"
                     >
                       Nama Program
@@ -155,6 +192,14 @@ const DetailLaporan = ({ id }) => {
                       />
                     </Col>
                   </Row>
+
+                  <Row className="mt-3">
+                    <Col className="text-end">
+                      <Button variant="outline-white" href="/opd/laporan">
+                        Kembali
+                      </Button>
+                    </Col>
+                  </Row>
                 </Form>
               )}
             </Card.Body>
@@ -168,7 +213,6 @@ const DetailLaporan = ({ id }) => {
               {hasMounted &&
                 (dataProgram?.indikators || []).map((item, index) => {
                   const isOpen = openIndexes.includes(index);
-
                   return (
                     <Form
                       key={index}
@@ -196,10 +240,6 @@ const DetailLaporan = ({ id }) => {
                                 <Form.Check
                                   type="checkbox"
                                   name={`finish[${index}]`}
-                                  style={{
-                                    transform: "scale(1.5)",
-                                    transformOrigin: "top left",
-                                  }}
                                   defaultChecked={item.sudah_selesai === true}
                                 />
                               </Col>
@@ -216,6 +256,33 @@ const DetailLaporan = ({ id }) => {
                                   multiple
                                   name={`evidence[${index}][]`}
                                 />
+
+                                {item.evidence?.length > 0 && (
+                                  <div className="mt-2 d-flex flex-wrap gap-2">
+                                    {item.evidence.map((imgPath, i) => (
+                                      <img
+                                        key={i}
+                                        src={
+                                          baseURL + imgPath.replace(/\\/g, "/")
+                                        }
+                                        alt={`evidence-${i}`}
+                                        style={{
+                                          width: 80,
+                                          height: 80,
+                                          objectFit: "cover",
+                                          cursor: "pointer",
+                                          borderRadius: 4,
+                                        }}
+                                        onClick={() =>
+                                          handlePreview(
+                                            baseURL +
+                                              imgPath.replace(/\\/g, "/")
+                                          )
+                                        }
+                                      />
+                                    ))}
+                                  </div>
+                                )}
                               </Col>
                             </Row>
 
@@ -228,7 +295,6 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`kendala[${index}]`}
-                                  placeholder="Masukkan kendala yang dihadapi"
                                   defaultValue={item.kendala || ""}
                                 />
                               </Col>
@@ -243,7 +309,6 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`tindakan[${index}]`}
-                                  placeholder="Tindakan/solusi yang diambil"
                                   defaultValue={item.kesimpulan_tindakan || ""}
                                 />
                               </Col>
@@ -266,6 +331,16 @@ const DetailLaporan = ({ id }) => {
           </Card>
         </Col>
       </Row>
+      {/* Modal Preview */}
+      <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
+        <Modal.Body className="p-0">
+          <img
+            src={previewImage}
+            alt="Preview"
+            style={{ width: "100%", height: "auto" }}
+          />
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
