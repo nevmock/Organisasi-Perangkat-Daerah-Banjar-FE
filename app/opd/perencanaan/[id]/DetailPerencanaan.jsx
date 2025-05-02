@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import useMounted from "hooks/useMounted";
 import { PageHeading } from "widgets";
 import { getISOWeek } from "utils/getISOWeek";
@@ -128,6 +128,18 @@ const DetailPerencanaan = ({ id }) => {
                             className="mb-3"
                           />
                         ))}
+                      </Col>
+                    </Row>
+
+                    <Row className="mt-3">
+                      <Col className="text-end">
+                        <Button
+                          variant="outline-white"
+                          type="link"
+                          href="/opd/perencanaan"
+                        >
+                          Kembali
+                        </Button>
                       </Col>
                     </Row>
                   </Form>
