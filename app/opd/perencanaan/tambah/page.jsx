@@ -10,12 +10,30 @@ import {
   Form,
   Button,
 } from 'react-bootstrap';
+
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const TambahPerancanaan = () => {
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // handle form submit here
+
+    const newData = {
+      nama_program: e.target.namaProgram.value,
+      opd_pelaksana: e.target.pelaksana.value,
+      tgl_mulai: e.target.tglMulai.value,
+      target: e.target.target.value,
+      indikators: indikators,
+    };
+
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`, newData);
+      alert('Data berhasil disimpan!');
+      window.location.href = '/opd/perencanaan'; // Redirect ke list
+    } catch (err) {
+      console.error(err);
+      alert('Gagal menyimpan data.');
+    }
   };
 
   const [indikators, setIndikators] = useState(['']); // Awal 1 input

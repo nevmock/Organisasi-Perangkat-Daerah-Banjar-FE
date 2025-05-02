@@ -21,7 +21,7 @@
     "nextjs-template",
     "react-dashboard",
     "bootstrap 5"
-    ],
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -31,10 +31,11 @@
   "dependencies": {
     "@vercel/analytics": "^1.0.1",
     "apexcharts": "^3.41.1",
+    "axios": "^1.9.0",
     "bootstrap": "^5.3.1",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
-    "next": "13.4.12",
+    "next": "^15.3.1",
     "node-sass": "^9.0.0",
     "prism-react-renderer": "^2.0.6",
     "react": "18.2.0",
@@ -46,7 +47,7 @@
     "react-dropzone": "^14.2.3",
     "react-feather": "^2.0.10",
     "react-responsive": "^9.0.2",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.1",
     "sass": "^1.64.2",
     "sass-loader": "^13.3.2",
     "simplebar": "^6.2.5",

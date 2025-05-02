@@ -30,9 +30,27 @@ import {
   ContextualClassesCode,
   ResponsiveTableCode,
 } from 'data/code/TablesCode';
-import { programOpd } from 'data/opd/ProgramOpd';
+
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Laporan = () => {
+
+  const [laporans, setLaporans] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`);
+        setLaporans(res.data);
+      } catch (err) {
+        console.error('Gagal fetch data perencanaan:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Container fluid className="p-6">
       <Row>
@@ -85,11 +103,11 @@ const Laporan = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {programOpd.map((program, index) => (
+                        {laporans.map((program, index) => (
                           <tr key={index}>
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
-                            <td>{program.nama_pelaksana}</td>
+                            <td>{program.opd_pelaksana}</td>
                             <td>{program.tgl_mulai}</td>
                             <td>{program.target}</td>
                             <td>Sedang Beralngsung</td>

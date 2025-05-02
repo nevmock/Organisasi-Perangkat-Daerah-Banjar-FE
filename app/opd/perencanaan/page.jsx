@@ -30,9 +30,27 @@ import {
   ContextualClassesCode,
   ResponsiveTableCode,
 } from 'data/code/TablesCode';
-import { programOpd } from 'data/opd/ProgramOpd';
+
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Perencanaan = () => {
+
+  const [perencanaans, setPerencanaans] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`);
+        setPerencanaans(res.data);
+      } catch (err) {
+        console.error('Gagal fetch data perencanaan:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Container fluid className="p-6">
       <Row>
@@ -91,25 +109,23 @@ const Perencanaan = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {programOpd.map((program, index) => (
-                          <tr key={index}>
+                        {perencanaans.map((program, index) => (
+                          <tr key={program._id}>
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
-                            <td>{program.nama_pelaksana}</td>
-                            <td>Pekan 1 | {program.tgl_mulai}</td>
-                            {/* <td>{program.target}</td>
-                            <td>Sedang Beralngsung</td> */}
+                            <td>{program.opd_pelaksana}</td>
+                            <td>Pekan 1 | {new Date(program.tgl_mulai).toLocaleDateString()}</td>
                             <td>
                               <div className="d-flex gap-2">
                                 <Button
                                   variant="outline-primary"
-                                  href={`/opd/perencanaan/${program.id}`}
+                                  href={`/opd/perencanaan/${program._id}`}
                                 >
                                   Ubah
                                 </Button>
                                 <Button
                                   variant="outline-danger"
-                                  href={`/opd/perencanaan/${program.id}`}
+                                  href={`/opd/perencanaan/${program._id}`}
                                 >
                                   Hapus
                                 </Button>
