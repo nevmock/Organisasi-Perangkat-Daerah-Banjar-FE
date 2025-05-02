@@ -1,6 +1,6 @@
-'use client';
+"use client";
 // import node module libraries
-import { Fragment } from 'react';
+import { Fragment } from "react";
 import {
   Col,
   Row,
@@ -11,45 +11,76 @@ import {
   Container,
   Form,
   Button,
-} from 'react-bootstrap';
+} from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from 'widgets';
+import { HighlightCode } from "widgets";
 
 // import react code data file
-import {
-  BasicTableCode,
-  DarkTableCode,
-  TableHeadCode,
-  StripedTableCode,
-  TableVariantCode,
-  BorderedTableCode,
-  BorderlessTableCode,
-  HoverableRowsCode,
-  SmallTableCode,
-  ContextualClassesCode,
-  ResponsiveTableCode,
-} from 'data/code/TablesCode';
+import { ResponsiveTableCode } from "data/code/TablesCode";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+// import { programOpd } from "data/opd/ProgramOpd";
+import { formatWeekLabel } from "utils/formatWeekLabel";
+import getElapsedTime from "utils/getElapsedTime";
+import getWeekFromDate from "utils/getWeekFromDate";
 
 const Perencanaan = () => {
-
-  const [perencanaans, setPerencanaans] = useState([]);
+  const [programOpd, setProgramOpd] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`);
-        setPerencanaans(res.data);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
+        );
+        setProgramOpd(res.data);
       } catch (err) {
-        console.error('Gagal fetch data perencanaan:', err);
+        console.error("Gagal fetch data perencanaan:", err);
       }
     };
 
     fetchData();
   }, []);
+  const [waktuPelaksanaan, setWaktuPelaksanaan] = useState({});
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newTimes = {};
+      programOpd.forEach((p) => {
+        newTimes[p._id] = getElapsedTime(p.tgl_mulai);
+      });
+      setWaktuPelaksanaan(newTimes);
+    }, 60000); // update tiap 1 menit
+
+    // initial update
+    const initTimes = {};
+    programOpd.forEach((p) => {
+      initTimes[p._id] = getElapsedTime(p.tgl_mulai);
+    });
+    setWaktuPelaksanaan(initTimes);
+
+    return () => clearInterval(interval);
+  }, [programOpd]);
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Apakah Anda yakin ingin menghapus data ini?"
+    );
+    if (!confirm) return;
+
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
+      );
+      // Hapus data dari state setelah berhasil
+      setProgramOpd((prev) => prev.filter((item) => item._id !== id));
+    } catch (err) {
+      console.error("Gagal menghapus data:", err);
+      alert("Terjadi kesalahan saat menghapus data.");
+    }
+  };
 
   return (
     <Container fluid className="p-6">
@@ -84,7 +115,7 @@ const Perencanaan = () => {
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
-                      style={{ minWidth: '200px' }}
+                      style={{ minWidth: "200px" }}
                     />
                     <Button variant="primary" href="/opd/perencanaan/tambah">
                       Tambah
@@ -102,30 +133,34 @@ const Perencanaan = () => {
                           <th scope="col">#</th>
                           <th scope="col">Nama Program</th>
                           <th scope="col">Pelaksana</th>
-                          <th scope="col">Tgl Mulai</th>
+                          <th scope="col">Tgl Pelaksanaan</th>
+                          <th scope="col">Waktu Penyelesaian</th>
                           {/* <th scope="col">Target</th>
                           <th scope="col">Status</th> */}
                           <th scope="col">Aksi</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {perencanaans.map((program, index) => (
+                        {programOpd.map((program, index) => (
                           <tr key={program._id}>
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.opd_pelaksana}</td>
-                            <td>Pekan 1 | {new Date(program.tgl_mulai).toLocaleDateString()}</td>
+                            <td>{getWeekFromDate(program.tgl_mulai)}</td>
+                            <td>
+                              {waktuPelaksanaan[program._id] || "Memuat..."}
+                            </td>
                             <td>
                               <div className="d-flex gap-2">
                                 <Button
                                   variant="outline-primary"
                                   href={`/opd/perencanaan/${program._id}`}
                                 >
-                                  Ubah
+                                  Detail
                                 </Button>
                                 <Button
                                   variant="outline-danger"
-                                  href={`/opd/perencanaan/${program._id}`}
+                                  onClick={() => handleDelete(program._id)}
                                 >
                                   Hapus
                                 </Button>
