@@ -1,7 +1,7 @@
 export const programOpd = [
   {
     _id: 1,
-    nama_program: "Program Peningkatan Infrastruktur Jalan",
+    nama_program: "Program Peningkatan Infrastruktur Jalan2",
     opd_pelaksana: "Dinas Pekerjaan Umum dan Penataan Ruang",
     tgl_mulai: "2025-W17",
     target: "100 km jalan diperbaiki",
