@@ -42,8 +42,10 @@ export const DashboardMenu = [
     children: [
       { id: uuid(), link: '/opd/perencanaan', name: 'Perencanaan' },
       { id: uuid(), link: '/opd/laporan', name: 'Laporan' },
+      { id: uuid(), link: '/opd/amplifikasi', name: 'Amplifikasi' },
     ],
   },
+
   // {
   //   id: uuid(),
   //   title: 'LAYOUTS & PAGES',
