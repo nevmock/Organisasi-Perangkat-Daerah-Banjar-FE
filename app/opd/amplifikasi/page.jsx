@@ -33,7 +33,7 @@ const Amplifikasi = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/amplifikasi`
         );
         setProgramOpd(res.data);
       } catch (err) {
@@ -140,7 +140,7 @@ const Amplifikasi = () => {
                             <th scope="row">{index + 1}</th>
                             <td>{program.nama_program}</td>
                             <td>{program.opd_pelaksana}</td>
-                            <td>{program.indikators.length} Indikator</td>
+                            <td>{program.id_indikator.length} Indikator</td>
                             <td>
                               <div className="d-flex gap-2">
                                 <Button

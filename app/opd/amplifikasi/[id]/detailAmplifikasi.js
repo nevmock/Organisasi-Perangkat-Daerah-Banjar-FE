@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Button,
@@ -27,23 +27,37 @@ const DeatailAmplifikasi = ({ id }) => {
     { value: 'X', label: 'X' },
     { value: 'Instagram', label: 'Instagram' },
   ];
+  const typeDatas = [
+    { value: 'singgle', label: 'Singgle' },
+    { value: 'corousel', label: 'Corousel' },
+  ];
 
   const baseURL = 'http://localhost:5050/';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
-        );
-        setDataProgram(res.data);
-      } catch (err) {
-        console.error('Gagal fetch data perencanaan:', err);
-      }
-    };
-
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
+      );
+      setDataProgram(res.data);
+    } catch (err) {
+      console.error('Gagal fetch data perencanaan:', err);
+    }
   }, [id]);
+
+  // const fetchData = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
+  //     );
+  //     setDataProgram(res.data);
+  //   } catch (err) {
+  //     console.error('Gagal fetch data perencanaan:', err);
+  //   }
+  // };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const toggleDropdown = (index) => {
     setOpenIndexes((prev) =>
@@ -56,51 +70,97 @@ const DeatailAmplifikasi = ({ id }) => {
     setShowPreview(true);
   };
 
-  const handleSubmit = async (e, index, indikatorId) => {
+  const handleSubmit = async (e, index, amplifikasiId) => {
     e.preventDefault();
     const form = e.target;
 
-    const sudahSelesai = form[`finish[${index}]`]?.checked;
-    const kendala = form[`kendala[${index}]`]?.value;
-    const tindakan = form[`tindakan[${index}]`]?.value;
+    const sudahPost = form[`finish[${index}]`]?.checked;
+    const caption = form[`caption[${index}]`]?.value;
+    const platform = form[`platform[${index}][]`]?.value;
+    const type = form[`type[${index}]`]?.value;
+    const thumbnailFile = form[`thumbnail[${index}][]`]?.files;
     const evidenceFiles = form[`evidence[${index}][]`]?.files;
 
-    // Siapkan payload indikator
     const payload = {
-      sudah_selesai: !!sudahSelesai,
-      kendala,
-      kesimpulan_tindakan: tindakan,
+      sudah_dipost: !!sudahPost,
+      caption: caption || '',
+      platform: platform || '',
+      type: type || '',
     };
 
-    // Hanya tambahkan field evidence jika ada file
     if (evidenceFiles && evidenceFiles.length > 0) {
       payload.evidence = [];
     }
+    if (thumbnailFile && thumbnailFile.length > 0) {
+      payload.thumbnail = [];
+    }
 
-    // 1. Update indikator
     try {
+      // 1. Update teks (PUT)
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/indikator/${indikatorId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}`,
         payload
       );
     } catch (err) {
-      console.error('Gagal update indikator:', err);
-      alert('Gagal update indikator.');
-      return;
+      console.error('Gagal menyimpan:', err);
+      alert('Gagal menyimpan data.');
     }
 
-    // 2. Upload evidence jika ada file
-    if (evidenceFiles && evidenceFiles.length > 0) {
-      const uploadData = new FormData();
-      uploadData.append('id_perencanaan', dataProgram._id);
-      for (let i = 0; i < evidenceFiles.length; i++) {
-        uploadData.append('evidence', evidenceFiles[i]);
+    // 2. Upload thumbnail
+    if (thumbnailFile && thumbnailFile.length > 0) {
+      const thumbnailForm = new FormData();
+      for (let i = 0; i < thumbnailFile.length; i++) {
+        thumbnailForm.append('thumbnail', thumbnailFile[i]);
       }
 
       try {
         await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/indikator/${indikatorId}/upload-evidence`,
-          uploadData,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-thumbnail`,
+          thumbnailForm,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+      } catch (err) {
+        console.error('Gagal upload thumbnail:', err);
+        alert('Gagal upload thumbnail.');
+        return;
+      }
+    }
+    // if (thumbnailFile) {
+    //   const thumbnailForm = new FormData();
+    //   thumbnailForm.append('thumbnail', thumbnailFile);
+
+    //   try {
+    //     await axios.post(
+    //       `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-thumbnail`,
+    //       thumbnailForm,
+    //       {
+    //         headers: {
+    //           'Content-Type': 'multipart/form-data',
+    //         },
+    //       }
+    //     );
+    //   } catch (err) {
+    //     console.error('Gagal upload thumbnail:', err);
+    //     alert('Gagal upload thumbnail.');
+    //     return;
+    //   }
+    // }
+
+    // 3. Upload evidence
+    if (evidenceFiles && evidenceFiles.length > 0) {
+      const evidenceForm = new FormData();
+      for (let i = 0; i < evidenceFiles.length; i++) {
+        evidenceForm.append('evidence', evidenceFiles[i]);
+      }
+
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-evidence`,
+          evidenceForm,
           {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -114,8 +174,8 @@ const DeatailAmplifikasi = ({ id }) => {
       }
     }
 
-    alert('Laporan berhasil disimpan!');
-    window.location.reload();
+    alert('Amplifikasi berhasil disimpan!');
+    fetchData();
   };
 
   return (
@@ -218,12 +278,14 @@ const DeatailAmplifikasi = ({ id }) => {
               <h4 className="mb-3">Amplifikasi Indikator</h4>
 
               {hasMounted &&
-                (dataProgram?.indikators || []).map((item, index) => {
+                (dataProgram?.id_indikator || []).map((item, index) => {
                   const isOpen = openIndexes.includes(index);
                   return (
                     <Form
                       key={index}
-                      onSubmit={(e) => handleSubmit(e, index, item._id)}
+                      onSubmit={(e) =>
+                        handleSubmit(e, index, item.id_amplifikasi._id)
+                      }
                     >
                       <div className="mb-4 border rounded p-3">
                         <div
@@ -241,13 +303,15 @@ const DeatailAmplifikasi = ({ id }) => {
                           <div className="mt-3">
                             <Row className="mb-3">
                               <Form.Label className="col-sm-4 col-form-label">
-                                Sudah Dilakukan
+                                Sudah Posting
                               </Form.Label>
                               <Col md={8}>
                                 <Form.Check
                                   type="checkbox"
                                   name={`finish[${index}]`}
-                                  defaultChecked={item.sudah_selesai === true}
+                                  defaultChecked={
+                                    item.id_amplifikasi.sudah_dipost === true
+                                  }
                                 />
                               </Col>
                             </Row>
@@ -266,9 +330,56 @@ const DeatailAmplifikasi = ({ id }) => {
                                   id="platform"
                                   options={platformsDatas}
                                   name={`platform[${index}][]`}
+                                  defaultselected={item.id_amplifikasi.platform}
                                 />
                               </Col>
                             </Row>
+
+                            {/* <Row className="mb-3">
+                              <Form.Label className="col-sm-4 col-form-label">
+                                Thumbnail
+                              </Form.Label>
+                              <Col md={8}>
+                                <Form.Control
+                                  type="file"
+                                  accept="image/*"
+                                  name={`thumbnail[${index}]`}
+                                />
+
+                                {item.id_amplifikasi.thumbnail && (
+                                  <div className="mt-2 d-flex flex-wrap gap-2">
+                                    <img
+                                      src={
+                                        process.env.NEXT_PUBLIC_API_URL +
+                                        '/' +
+                                        item.id_amplifikasi.thumbnail.replace(
+                                          /\\/g,
+                                          '/'
+                                        )
+                                      }
+                                      alt="thumbnail"
+                                      style={{
+                                        width: 80,
+                                        height: 80,
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: 4,
+                                      }}
+                                      onClick={() =>
+                                        handlePreview(
+                                          process.env.NEXT_PUBLIC_API_URL +
+                                            '/' +
+                                            item.id_amplifikasi.thumbnail.replace(
+                                              /\\/g,
+                                              '/'
+                                            )
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                )}
+                              </Col>
+                            </Row> */}
 
                             <Row className="mb-3">
                               <Form.Label className="col-sm-4 col-form-label">
@@ -282,32 +393,29 @@ const DeatailAmplifikasi = ({ id }) => {
                                   name={`thumbnail[${index}][]`}
                                 />
 
-                                {item.evidence?.length > 0 && (
+                                {item.id_amplifikasi.thumbnail?.length > 0 && (
                                   <div className="mt-2 d-flex flex-wrap gap-2">
-                                    {item.evidence.map((imgPath, i) => (
-                                      <img
-                                        key={i}
-                                        src={
-                                          process.env.NEXT_PUBLIC_API_URL +
-                                          '/' +
-                                          imgPath.replace(/\\/g, '/')
-                                        }
-                                        alt={`evidence-${i}`}
-                                        style={{
-                                          width: 80,
-                                          height: 80,
-                                          objectFit: 'cover',
-                                          cursor: 'pointer',
-                                          borderRadius: 4,
-                                        }}
-                                        onClick={() =>
-                                          handlePreview(
-                                            baseURL +
+                                    {item.id_amplifikasi.thumbnail
+                                      .filter((imgPath) => imgPath !== '') // Menyaring imgPath yang kosong
+                                      .map((imgPath, i) => (
+                                        <img
+                                          key={i}
+                                          src={imgPath.replace(/\\/g, '/')}
+                                          alt={`evidence-${i}`}
+                                          style={{
+                                            width: 80,
+                                            height: 80,
+                                            objectFit: 'cover',
+                                            cursor: 'pointer',
+                                            borderRadius: 4,
+                                          }}
+                                          onClick={() =>
+                                            handlePreview(
                                               imgPath.replace(/\\/g, '/')
-                                          )
-                                        }
-                                      />
-                                    ))}
+                                            )
+                                          }
+                                        />
+                                      ))}
                                   </div>
                                 )}
                               </Col>
@@ -322,35 +430,32 @@ const DeatailAmplifikasi = ({ id }) => {
                                   type="file"
                                   accept="image/*"
                                   multiple
-                                  name={`videoOrGambar[${index}][]`}
+                                  name={`evidence[${index}][]`}
                                 />
 
-                                {item.evidence?.length > 0 && (
+                                {item.id_amplifikasi.evidence?.length > 0 && (
                                   <div className="mt-2 d-flex flex-wrap gap-2">
-                                    {item.evidence.map((imgPath, i) => (
-                                      <img
-                                        key={i}
-                                        src={
-                                          process.env.NEXT_PUBLIC_API_URL +
-                                          '/' +
-                                          imgPath.replace(/\\/g, '/')
-                                        }
-                                        alt={`evidence-${i}`}
-                                        style={{
-                                          width: 80,
-                                          height: 80,
-                                          objectFit: 'cover',
-                                          cursor: 'pointer',
-                                          borderRadius: 4,
-                                        }}
-                                        onClick={() =>
-                                          handlePreview(
-                                            baseURL +
+                                    {item.id_amplifikasi.evidence.map(
+                                      (imgPath, i) => (
+                                        <img
+                                          key={i}
+                                          src={imgPath.replace(/\\/g, '/')}
+                                          alt={`evidence-${i}`}
+                                          style={{
+                                            width: 80,
+                                            height: 80,
+                                            objectFit: 'cover',
+                                            cursor: 'pointer',
+                                            borderRadius: 4,
+                                          }}
+                                          onClick={() =>
+                                            handlePreview(
                                               imgPath.replace(/\\/g, '/')
-                                          )
-                                        }
-                                      />
-                                    ))}
+                                            )
+                                          }
+                                        />
+                                      )
+                                    )}
                                   </div>
                                 )}
                               </Col>
@@ -365,20 +470,24 @@ const DeatailAmplifikasi = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`caption[${index}]`}
-                                  defaultValue={item.kendala || ''}
+                                  defaultValue={
+                                    item.id_amplifikasi.caption || ''
+                                  }
                                 />
                               </Col>
                             </Row>
 
                             <Row className="mb-3">
                               <Form.Label className="col-sm-4 col-form-label">
-                                type
+                                Type
                               </Form.Label>
                               <Col md={8}>
                                 <Form.Control
-                                  type="text"
-                                  placeholder="Masukkan type"
+                                  as={FormSelect}
                                   name={`type[${index}]`}
+                                  placeholder="Select Type"
+                                  options={typeDatas}
+                                  defaultselected={item.id_amplifikasi.type}
                                 />
                               </Col>
                             </Row>
