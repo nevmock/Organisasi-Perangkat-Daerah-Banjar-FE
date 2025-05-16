@@ -1,6 +1,6 @@
-"use client";
-import { useEffect, useState } from "react";
-import axios from "axios";
+'use client';
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Button,
   Card,
@@ -9,10 +9,10 @@ import {
   Form,
   Modal,
   Row,
-} from "react-bootstrap";
-import { getISOWeek } from "utils/getISOWeek";
-import { PageHeading } from "widgets";
-import useMounted from "hooks/useMounted";
+} from 'react-bootstrap';
+import { getISOWeek } from 'utils/getISOWeek';
+import { PageHeading } from 'widgets';
+import useMounted from 'hooks/useMounted';
 
 const DetailLaporan = ({ id }) => {
   const hasMounted = useMounted();
@@ -21,22 +21,32 @@ const DetailLaporan = ({ id }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const baseURL = "http://localhost:5050/";
+  const baseURL = 'http://localhost:5050/';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
-        );
-        setDataProgram(res.data);
-      } catch (err) {
-        console.error("Gagal fetch data perencanaan:", err);
-      }
-    };
-
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
+      );
+      setDataProgram(res.data);
+    } catch (err) {
+      console.error('Gagal fetch data perencanaan:', err);
+    }
   }, [id]);
+
+  // const fetchData = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
+  //     );
+  //     setDataProgram(res.data);
+  //   } catch (err) {
+  //     console.error('Gagal fetch data perencanaan:', err);
+  //   }
+  // };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const toggleDropdown = (index) => {
     setOpenIndexes((prev) =>
@@ -77,17 +87,17 @@ const DetailLaporan = ({ id }) => {
         payload
       );
     } catch (err) {
-      console.error("Gagal update indikator:", err);
-      alert("Gagal update indikator.");
+      console.error('Gagal update indikator:', err);
+      alert('Gagal update indikator.');
       return;
     }
 
     // 2. Upload evidence jika ada file
     if (evidenceFiles && evidenceFiles.length > 0) {
       const uploadData = new FormData();
-      uploadData.append("id_perencanaan", dataProgram._id);
+      uploadData.append('id_perencanaan', dataProgram._id);
       for (let i = 0; i < evidenceFiles.length; i++) {
-        uploadData.append("evidence", evidenceFiles[i]);
+        uploadData.append('evidence', evidenceFiles[i]);
       }
 
       try {
@@ -96,19 +106,19 @@ const DetailLaporan = ({ id }) => {
           uploadData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
       } catch (err) {
-        console.error("Gagal upload evidence:", err);
-        alert("Gagal upload evidence.");
+        console.error('Gagal upload evidence:', err);
+        alert('Gagal upload evidence.');
         return;
       }
     }
 
-    alert("Laporan berhasil disimpan!");
-    window.location.reload();
+    alert('Laporan berhasil disimpan!');
+    fetchData();
   };
 
   return (
@@ -135,7 +145,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="namaProgram"
                         type="text"
-                        value={dataProgram?.nama_program || ""}
+                        value={dataProgram?.nama_program || ''}
                         readOnly
                       />
                     </Col>
@@ -152,7 +162,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="namaPelaksana"
                         type="text"
-                        value={dataProgram?.opd_pelaksana || ""}
+                        value={dataProgram?.opd_pelaksana || ''}
                         readOnly
                       />
                     </Col>
@@ -169,7 +179,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="tglPelaksanaan"
                         type="week"
-                        value={getISOWeek(dataProgram?.tgl_mulai || "")}
+                        value={getISOWeek(dataProgram?.tgl_mulai || '')}
                         readOnly
                       />
                     </Col>
@@ -187,7 +197,7 @@ const DetailLaporan = ({ id }) => {
                         id="target"
                         as="textarea"
                         rows={3}
-                        value={dataProgram?.target || ""}
+                        value={dataProgram?.target || ''}
                         readOnly
                       />
                     </Col>
@@ -211,7 +221,7 @@ const DetailLaporan = ({ id }) => {
               <h4 className="mb-3">Laporan Indikator</h4>
 
               {hasMounted &&
-                (dataProgram?.indikators || []).map((item, index) => {
+                (dataProgram?.id_indikator || []).map((item, index) => {
                   const isOpen = openIndexes.includes(index);
                   return (
                     <Form
@@ -221,13 +231,13 @@ const DetailLaporan = ({ id }) => {
                       <div className="mb-4 border rounded p-3">
                         <div
                           className="d-flex justify-content-between align-items-center"
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: 'pointer' }}
                           onClick={() => toggleDropdown(index)}
                         >
                           <h5 className="mb-0">
                             {index + 1}. {item.indikator_label}
                           </h5>
-                          <span>{isOpen ? "▲ Tutup" : "▼ Lihat"}</span>
+                          <span>{isOpen ? '▲ Tutup' : '▼ Lihat'}</span>
                         </div>
 
                         {isOpen && (
@@ -263,20 +273,20 @@ const DetailLaporan = ({ id }) => {
                                       <img
                                         key={i}
                                         src={
-                                          baseURL + imgPath.replace(/\\/g, "/")
+                                          baseURL + imgPath.replace(/\\/g, '/')
                                         }
                                         alt={`evidence-${i}`}
                                         style={{
                                           width: 80,
                                           height: 80,
-                                          objectFit: "cover",
-                                          cursor: "pointer",
+                                          objectFit: 'cover',
+                                          cursor: 'pointer',
                                           borderRadius: 4,
                                         }}
                                         onClick={() =>
                                           handlePreview(
                                             baseURL +
-                                              imgPath.replace(/\\/g, "/")
+                                              imgPath.replace(/\\/g, '/')
                                           )
                                         }
                                       />
@@ -295,7 +305,7 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`kendala[${index}]`}
-                                  defaultValue={item.kendala || ""}
+                                  defaultValue={item.kendala || ''}
                                 />
                               </Col>
                             </Row>
@@ -309,7 +319,7 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`tindakan[${index}]`}
-                                  defaultValue={item.kesimpulan_tindakan || ""}
+                                  defaultValue={item.kesimpulan_tindakan || ''}
                                 />
                               </Col>
                             </Row>
@@ -337,7 +347,7 @@ const DetailLaporan = ({ id }) => {
           <img
             src={previewImage}
             alt="Preview"
-            style={{ width: "100%", height: "auto" }}
+            style={{ width: '100%', height: 'auto' }}
           />
         </Modal.Body>
       </Modal>
