@@ -1,12 +1,29 @@
 // import node module libraries
-import Link from 'next/link';
-import { ProgressBar, Col, Row, Card, Table, Image } from 'react-bootstrap';
+import Link from "next/link";
+import { ProgressBar, Col, Row, Card, Table, Image } from "react-bootstrap";
 
 // import required data files
-import ActiveProjectsData from 'data/dashboard/ActiveProjectsData';
-import { programOpd } from 'data/opd/ProgramOpd';
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const ActiveProjects = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchDataMonitoring = async () => {
+      try {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/monitoring`;
+        const res = await axios.get(url);
+        setData(res.data);
+      } catch (err) {
+        console.error("Gagal fetch data sumary:", err);
+        console.log("Detail error:", err.response?.data || err.message);
+      }
+    };
+
+    fetchDataMonitoring();
+  }, []);
+  console.log(data);
   return (
     <Row className="mt-6">
       <Col md={12} xs={12}>
@@ -24,7 +41,7 @@ const ActiveProjects = () => {
               </tr>
             </thead>
             <tbody>
-              {programOpd.map((item, index) => {
+              {data.map((item, index) => {
                 return (
                   <tr key={index}>
                     <td className="align-middle">
@@ -38,15 +55,17 @@ const ActiveProjects = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="align-middle">{item.nama_pelaksana}</td>
-                    <td className="align-middle">{item.tgl_mulai}</td>
+                    <td className="align-middle">{item.opd}</td>
+                    <td className="align-middle">{item.waktu_penyelesaian}</td>
 
                     <td className="align-middle text-dark">
-                      <div className="float-start me-3">{item.progress}%</div>
+                      <div className="float-start me-3">
+                        {item.persen_selesai}%
+                      </div>
                       <div className="mt-2">
                         <ProgressBar
-                          now={item.progress}
-                          style={{ height: '5px' }}
+                          now={item.persen_selesai}
+                          style={{ height: "5px" }}
                         />
                       </div>
                     </td>

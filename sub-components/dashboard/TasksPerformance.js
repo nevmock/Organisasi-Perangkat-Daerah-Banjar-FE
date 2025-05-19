@@ -28,15 +28,11 @@ const Charts = () => {
   }, []);
   console.log(data);
 
-  const perfomanceChartSeries = [
-    data?.indikator_selesai,
-    data?.indikator_belum,
-    data?.persen_selesai,
-  ];
+  const perfomanceChartSeries = [data?.persen_selesai];
   const perfomanceChartOptions = {
     dataLabels: { enabled: !1 },
-    labels: ["Direct", "Referral", "Organic"],
-    colors: ["#28a745", "#ffc107", "#dc3545"],
+    labels: ["persen_selesai"],
+    colors: ["#28a745"],
     plotOptions: {
       radialBar: {
         startAngle: 0,
@@ -114,30 +110,36 @@ const Charts = () => {
           </div>
           <ActionMenu />
         </div>
-        <div className="mb-8">
+        <div className="mb-4  position-relative">
           <Chart
             options={perfomanceChartOptions}
             series={perfomanceChartSeries}
             type="radialBar"
             width="100%"
           />
+          <h1 className="position-absolute top-50 start-50 translate-middle fw-bold">
+            {data?.persen_selesai}%
+          </h1>
         </div>
         {/* icon with content  */}
         <div className="d-flex align-items-center justify-content-around">
           <div className="text-center">
             <i className="fe fe-check-circle text-success fs-3"></i>
-            <h1 className="mt-3  mb-1 fw-bold">76%</h1>
-            <p>Completed</p>
+            <h1 className="mt-3  mb-1 fw-bold">{data?.indikator_selesai}</h1>
+            <p>Indikator Selesai</p>
           </div>
           <div className="text-center">
             <i className="fe fe-trending-up text-warning fs-3"></i>
-            <h1 className="mt-3  mb-1 fw-bold">32%</h1>
-            <p>In-Progress</p>
+            <h1 className="mt-3  mb-1 fw-bold">{data?.indikator_belum}</h1>
+            <p>Indikator Belum</p>
           </div>
           <div className="text-center">
-            <i className="fe fe-trending-down text-danger fs-3"></i>
-            <h1 className="mt-3  mb-1 fw-bold">13%</h1>
-            <p>Behind</p>
+            <i
+              className="fe fe-bar-chart-2 fs-3"
+              style={{ color: "#007bff" }}
+            ></i>
+            <h1 className="mt-3  mb-1 fw-bold">{data?.total_indikator}</h1>
+            <p>Total Indikator</p>
           </div>
         </div>
       </Card.Body>
