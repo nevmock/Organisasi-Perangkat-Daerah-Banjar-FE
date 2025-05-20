@@ -1,41 +1,99 @@
-'use client';
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Card, Dropdown, Form, Row, Col } from 'react-bootstrap';
-import { MoreVertical } from 'react-feather';
-import dynamic from 'next/dynamic';
+"use client";
+import React, { useEffect, useState } from "react";
+import { parseISO, getMonth, getYear, getDate } from "date-fns";
+import Link from "next/link";
+import { Card, Dropdown, Form, Row, Col } from "react-bootstrap";
+import { MoreVertical } from "react-feather";
+import axios from "axios";
+import dynamic from "next/dynamic";
 
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const LineChart = () => {
-  const [bulan, setBulan] = useState('Jan');
-  const [tahun, setTahun] = useState('2024');
+  const [bulan, setBulan] = useState("May");
+  const [tahun, setTahun] = useState("2025");
+  const [sampleData, setSampleData] = useState([]);
+
+  useEffect(() => {
+    const fetchDataPerformance = async () => {
+      try {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/monitoring/performance`;
+        console.log("Requesting URL:", url);
+        const res = await axios.get(url);
+        console.log("Fetched data:", res.data);
+        setSampleData(res.data);
+      } catch (err) {
+        console.error("Gagal fetch data sumary:", err);
+        console.log("Detail error:", err.response?.data || err.message);
+      }
+    };
+
+    fetchDataPerformance();
+  }, []);
+
+  const getWeekOfMonth = (date) => {
+    const day = getDate(date);
+    return Math.ceil(day / 7);
+  };
+
+  const groupDataByWeek = (data, selectedMonth, selectedYear) => {
+    const filtered = data.filter((d) => {
+      const date = parseISO(d.date);
+      return (
+        getMonth(date) === selectedMonth &&
+        getYear(date) === parseInt(selectedYear)
+      );
+    });
+
+    const weeklyData = Array(5)
+      .fill(0)
+      .map(() => ({
+        completed: 0,
+        inProgress: 0,
+        behind: 0,
+      }));
+
+    filtered.forEach((item) => {
+      const date = parseISO(item.date);
+      const week = getWeekOfMonth(date) - 1;
+      if (weeklyData[week]) {
+        weeklyData[week].completed += item.completed;
+        weeklyData[week].inProgress += item.inProgress;
+        weeklyData[week].behind += item.behind;
+      }
+    });
+
+    return weeklyData;
+  };
+
+  const monthIndex = new Date(`${bulan} 1, ${tahun}`).getMonth();
+  const weeklyGrouped = groupDataByWeek(sampleData, monthIndex, tahun);
 
   const perfomanceChartSeries = [
     {
-      name: 'Completed',
-      data: [76, 80, 85, 90],
+      name: "Completed",
+      data: weeklyGrouped.map((item) => item.completed),
     },
     {
-      name: 'In-Progress',
-      data: [32, 40, 45, 50],
+      name: "In-Progress",
+      data: weeklyGrouped.map((item) => item.inProgress),
     },
     {
-      name: 'Behind',
-      data: [13, 15, 10, 8],
+      name: "Behind",
+      data: weeklyGrouped.map((item) => item.behind),
     },
   ];
 
   const perfomanceChartOptions = {
     chart: {
-      type: 'line',
+      type: "line",
       height: 320,
       zoom: { enabled: false },
       toolbar: { show: false },
     },
-    colors: ['#28a745', '#ffc107', '#dc3545'],
+    colors: ["#28a745", "#ffc107", "#dc3545"],
     stroke: {
-      curve: 'smooth',
+      curve: "smooth",
       width: 3,
     },
     markers: {
@@ -45,13 +103,13 @@ const LineChart = () => {
       },
     },
     xaxis: {
-      categories: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+      categories: ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5"],
     },
     dataLabels: {
       enabled: false,
     },
     legend: {
-      position: 'top',
+      position: "top",
     },
     responsive: [
       {
@@ -78,15 +136,14 @@ const LineChart = () => {
       {children}
     </Link>
   ));
-
-  CustomToggle.displayName = 'CustomToggle';
+  CustomToggle.displayName = "CustomToggle";
 
   const ActionMenu = () => (
     <Dropdown>
       <Dropdown.Toggle as={CustomToggle}>
         <MoreVertical size="15px" className="text-muted" />
       </Dropdown.Toggle>
-      <Dropdown.Menu align={'end'}>
+      <Dropdown.Menu align={"end"}>
         <Dropdown.Item eventKey="1">Action</Dropdown.Item>
         <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
         <Dropdown.Item eventKey="3">Something else here</Dropdown.Item>
@@ -110,18 +167,18 @@ const LineChart = () => {
               onChange={(e) => setBulan(e.target.value)}
             >
               {[
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
               ].map((b) => (
                 <option key={b} value={b}>
                   {b}
