@@ -10,8 +10,16 @@ import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const LineChart = () => {
-  const [bulan, setBulan] = useState("May");
-  const [tahun, setTahun] = useState("2025");
+  const today = new Date();
+
+  // Ambil nama bulan dalam format "January", "February", dst.
+  const defaultBulan = today.toLocaleString("en-US", { month: "long" });
+  // Ambil tahun saat ini dalam format string
+  const defaultTahun = today.getFullYear().toString();
+
+  const [bulan, setBulan] = useState(defaultBulan);
+  const [tahun, setTahun] = useState(defaultTahun);
+
   const [sampleData, setSampleData] = useState([]);
 
   useEffect(() => {
