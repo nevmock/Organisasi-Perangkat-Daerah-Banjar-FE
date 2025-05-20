@@ -36,7 +36,7 @@ const ActiveProjects = () => {
               <tr>
                 <th>Nama Program</th>
                 <th>Pelaksana</th>
-                <th>Tanggal Mulai</th>
+                <th>Waktu Selesai</th>
                 <th>Progress</th>
               </tr>
             </thead>
