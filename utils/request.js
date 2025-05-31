@@ -35,20 +35,21 @@ const expiredTokenHandler = () => {
   // return error;
 };
 
-// const errorHandler = (error) => {
-//   if (error.response && error.response.status === 401) {
-//     expiredTokenHandler();
-//   } else if (error.code === "ERR_NETWORK") {
-//     window.history.pushState({}, "Redirect Network Error", "/sign-in");
-//     console.log(error);
-//     if (error.response?.status === 401) {
-//         expiredTokenHandler();
-//     }
-//   }
+const errorHandler = (error) => {
+  // if (error.response && error.response.status === 401) {
+  //   expiredTokenHandler();
+  // } else
+  if (error.code === "ERR_NETWORK") {
+    window.history.pushState({}, "Redirect Network Error", "/sign-in");
+    console.log(error);
+    if (error.response?.status === 401) {
+      expiredTokenHandler();
+    }
+  }
 
-//   // Tambahkan ini agar error bisa tertangkap di .catch()
-//   return Promise.reject(error);
-// };
+  // Tambahkan ini agar error bisa tertangkap di .catch()
+  return Promise.reject(error);
+};
 
 const buildMultipart = (data) => {
   const formData = new FormData();
