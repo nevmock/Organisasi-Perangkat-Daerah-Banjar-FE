@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import toast from "node_modules/react-hot-toast/dist";
 
 const request = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
@@ -31,15 +32,19 @@ const expiredTokenHandler = () => {
   // store.dispatch(getLoginData({}))
   localStorage.clear();
   Cookies.remove("token");
-  window.location.href = "/sign-in"; //di uncomment saat sudah integrasi api login
+  setTimeout(() => {
+    window.location.href = "/sign-in";
+  }, 2000);
+
   // return error;
 };
 
 const errorHandler = (error) => {
-  // if (error.response && error.response.status === 401) {
-  //   expiredTokenHandler();
-  // } else
-  if (error.code === "ERR_NETWORK") {
+  console.log(error);
+  if (error.response && error.response.status === 401) {
+    expiredTokenHandler();
+    toast.error(error?.response?.data?.message);
+  } else if (error.code === "ERR_NETWORK") {
     window.history.pushState({}, "Redirect Network Error", "/sign-in");
     console.log(error);
     if (error.response?.status === 401) {
