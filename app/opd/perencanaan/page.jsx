@@ -28,6 +28,16 @@ import request from "utils/request";
 
 const Perencanaan = () => {
   const [programOpd, setProgramOpd] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = async () => {
+    try {
+      const res = await request.get(`/perencanaan/search?q=${searchQuery}`);
+      setProgramOpd(res.data);
+    } catch (err) {
+      console.error("Gagal fetch data pencarian:", err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,17 +116,28 @@ const Perencanaan = () => {
               <Card.Header className="border-bottom-0 p-0">
                 <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
                   {/* Search + Add Button */}
-                  <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
-                    {/* <Form.Control
+                  <Form
+                    className="d-flex align-items-center gap-2 mt-2 mt-md-0"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSearch();
+                    }}
+                  >
+                    <Form.Control
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
                       style={{ minWidth: "200px" }}
-                    /> */}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <Button variant="secondary" type="submit">
+                      Cari
+                    </Button>
                     <Button variant="primary" href="/opd/perencanaan/tambah">
                       Tambah
                     </Button>
-                  </div>
+                  </Form>
                 </div>
               </Card.Header>
               <Card.Body className="p-0">

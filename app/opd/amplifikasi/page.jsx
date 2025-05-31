@@ -20,15 +20,21 @@ import { HighlightCode } from "widgets";
 import { ResponsiveTableCode } from "data/code/TablesCode";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-// import { programOpd } from "data/opd/ProgramOpd";
-import { formatWeekLabel } from "utils/formatWeekLabel";
 import getElapsedTime from "utils/getElapsedTime";
-import getWeekFromDate from "utils/getWeekFromDate";
 import request from "utils/request";
 
 const Amplifikasi = () => {
   const [programOpd, setProgramOpd] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = async () => {
+    try {
+      const res = await request.get(`/perencanaan/search?q=${searchQuery}`);
+      setProgramOpd(res.data);
+    } catch (err) {
+      console.error("Gagal fetch data pencarian:", err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,21 +107,29 @@ const Amplifikasi = () => {
         <Col xl={12} lg={12} md={12} sm={12}>
           <Tab.Container id="tab-container-11" defaultActiveKey="design">
             <Card>
-              {/* <Card.Header className="border-bottom-0 p-0">
+              <Card.Header className="border-bottom-0 p-0">
                 <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
-                  <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                  <Form
+                    className="d-flex align-items-center gap-2 mt-2 mt-md-0"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSearch();
+                    }}
+                  >
                     <Form.Control
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
                       style={{ minWidth: "200px" }}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <Button variant="primary" href="/opd/perencanaan/tambah">
-                      Tambah
+                    <Button variant="secondary" type="submit">
+                      Cari
                     </Button>
-                  </div>
+                  </Form>
                 </div>
-              </Card.Header> */}
+              </Card.Header>
               <Card.Body className="p-0">
                 <Tab.Content>
                   <Tab.Pane eventKey="design" className="pb-4 p-4">
@@ -145,12 +159,6 @@ const Amplifikasi = () => {
                                 >
                                   Detail
                                 </Button>
-                                {/* <Button
-                                  variant="outline-danger"
-                                  onClick={() => handleDelete(program._id)}
-                                >
-                                  Hapus
-                                </Button> */}
                               </div>
                             </td>
                           </tr>
