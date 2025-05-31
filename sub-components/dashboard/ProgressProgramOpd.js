@@ -4,8 +4,8 @@ import { parseISO, getMonth, getYear, getDate } from "date-fns";
 import Link from "next/link";
 import { Card, Dropdown, Form, Row, Col } from "react-bootstrap";
 import { MoreVertical } from "react-feather";
-import axios from "axios";
 import dynamic from "next/dynamic";
+import request from "utils/request";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -25,10 +25,7 @@ const LineChart = () => {
   useEffect(() => {
     const fetchDataPerformance = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/monitoring/performance`;
-        console.log("Requesting URL:", url);
-        const res = await axios.get(url);
-        console.log("Fetched data:", res.data);
+        const res = await request.get(`/monitoring/performance`);
         setSampleData(res.data);
       } catch (err) {
         console.error("Gagal fetch data sumary:", err);
@@ -164,7 +161,7 @@ const LineChart = () => {
       <Card.Body>
         <div className="d-flex align-items-center justify-content-between mb-3">
           <h4 className="mb-0">Tasks Performance</h4>
-          <ActionMenu />
+          {/* <ActionMenu /> */}
         </div>
 
         {/* Filter Section */}

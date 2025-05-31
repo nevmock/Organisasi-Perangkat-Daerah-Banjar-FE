@@ -1,6 +1,6 @@
-'use client';
+"use client";
 // import node module libraries
-import { Fragment } from 'react';
+import { Fragment } from "react";
 import {
   Col,
   Row,
@@ -11,20 +11,21 @@ import {
   Container,
   Form,
   Button,
-} from 'react-bootstrap';
+} from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from 'widgets';
+import { HighlightCode } from "widgets";
 
 // import react code data file
-import { ResponsiveTableCode } from 'data/code/TablesCode';
+import { ResponsiveTableCode } from "data/code/TablesCode";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
 // import { programOpd } from "data/opd/ProgramOpd";
-import { formatWeekLabel } from 'utils/formatWeekLabel';
-import getElapsedTime from 'utils/getElapsedTime';
-import getWeekFromDate from 'utils/getWeekFromDate';
+import { formatWeekLabel } from "utils/formatWeekLabel";
+import getElapsedTime from "utils/getElapsedTime";
+import getWeekFromDate from "utils/getWeekFromDate";
+import request from "utils/request";
 
 const Amplifikasi = () => {
   const [programOpd, setProgramOpd] = useState([]);
@@ -32,12 +33,10 @@ const Amplifikasi = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/amplifikasi`
-        );
+        const res = await request.get(`/perencanaan/amplifikasi`);
         setProgramOpd(res.data);
       } catch (err) {
-        console.error('Gagal fetch data perencanaan:', err);
+        console.error("Gagal fetch data perencanaan:", err);
       }
     };
 
@@ -66,19 +65,17 @@ const Amplifikasi = () => {
 
   const handleDelete = async (id) => {
     const confirm = window.confirm(
-      'Apakah Anda yakin ingin menghapus data ini?'
+      "Apakah Anda yakin ingin menghapus data ini?"
     );
     if (!confirm) return;
 
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
-      );
+      await request.delete(`/perencanaan/${id}`);
       // Hapus data dari state setelah berhasil
       setProgramOpd((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
-      console.error('Gagal menghapus data:', err);
-      alert('Terjadi kesalahan saat menghapus data.');
+      console.error("Gagal menghapus data:", err);
+      alert("Terjadi kesalahan saat menghapus data.");
     }
   };
 
@@ -104,22 +101,21 @@ const Amplifikasi = () => {
         <Col xl={12} lg={12} md={12} sm={12}>
           <Tab.Container id="tab-container-11" defaultActiveKey="design">
             <Card>
-              <Card.Header className="border-bottom-0 p-0">
+              {/* <Card.Header className="border-bottom-0 p-0">
                 <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
-                  {/* Search + Add Button */}
                   <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
                     <Form.Control
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
-                      style={{ minWidth: '200px' }}
+                      style={{ minWidth: "200px" }}
                     />
                     <Button variant="primary" href="/opd/perencanaan/tambah">
                       Tambah
                     </Button>
                   </div>
                 </div>
-              </Card.Header>
+              </Card.Header> */}
               <Card.Body className="p-0">
                 <Tab.Content>
                   <Tab.Pane eventKey="design" className="pb-4 p-4">
@@ -149,12 +145,12 @@ const Amplifikasi = () => {
                                 >
                                   Detail
                                 </Button>
-                                <Button
+                                {/* <Button
                                   variant="outline-danger"
                                   onClick={() => handleDelete(program._id)}
                                 >
                                   Hapus
-                                </Button>
+                                </Button> */}
                               </div>
                             </td>
                           </tr>

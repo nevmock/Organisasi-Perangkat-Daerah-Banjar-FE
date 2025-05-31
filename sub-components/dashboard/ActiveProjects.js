@@ -4,7 +4,7 @@ import { ProgressBar, Col, Row, Card, Table, Image } from "react-bootstrap";
 
 // import required data files
 import { useEffect, useState } from "react";
-import axios from "axios";
+import request from "utils/request";
 
 const ActiveProjects = () => {
   const [data, setData] = useState([]);
@@ -12,8 +12,7 @@ const ActiveProjects = () => {
   useEffect(() => {
     const fetchDataMonitoring = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/monitoring`;
-        const res = await axios.get(url);
+        const res = await request.get(`/monitoring`);
         setData(res.data);
       } catch (err) {
         console.error("Gagal fetch data sumary:", err);
