@@ -5,7 +5,7 @@ import { Card, Dropdown } from "react-bootstrap";
 import { MoreVertical } from "react-feather";
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
-import axios from "axios";
+import request from "utils/request";
 
 const Charts = () => {
   const [data, setData] = useState();
@@ -13,10 +13,7 @@ const Charts = () => {
   useEffect(() => {
     const fetchDataSumary = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/monitoring/summary`;
-        console.log("Requesting URL:", url);
-        const res = await axios.get(url);
-        console.log("Fetched data:", res.data);
+        const res = await request.get(`/monitoring/summary`);
         setData(res.data);
       } catch (err) {
         console.error("Gagal fetch data sumary:", err);
@@ -108,7 +105,7 @@ const Charts = () => {
           <div>
             <h4 className="mb-0">Tasks Performance </h4>
           </div>
-          <ActionMenu />
+          {/* <ActionMenu /> */}
         </div>
         <div className="mb-4  position-relative">
           <Chart

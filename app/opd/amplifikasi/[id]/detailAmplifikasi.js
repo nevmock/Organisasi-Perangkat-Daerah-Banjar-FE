@@ -1,6 +1,6 @@
-'use client';
-import { useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -9,11 +9,12 @@ import {
   Form,
   Modal,
   Row,
-} from 'react-bootstrap';
-import { getISOWeek } from 'utils/getISOWeek';
-import { PageHeading } from 'widgets';
-import useMounted from 'hooks/useMounted';
-import { FormSelect, DropFiles } from 'widgets';
+} from "react-bootstrap";
+import { getISOWeek } from "utils/getISOWeek";
+import { PageHeading } from "widgets";
+import useMounted from "hooks/useMounted";
+import { FormSelect, DropFiles } from "widgets";
+import request from "utils/request";
 
 const DeatailAmplifikasi = ({ id }) => {
   const hasMounted = useMounted();
@@ -22,39 +23,27 @@ const DeatailAmplifikasi = ({ id }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const platformsDatas = [
-    { value: 'Tiktok', label: 'Tiktok' },
-    { value: 'Facebook', label: 'Facebook' },
-    { value: 'X', label: 'X' },
-    { value: 'Instagram', label: 'Instagram' },
+    { value: "Tiktok", label: "Tiktok" },
+    { value: "Facebook", label: "Facebook" },
+    { value: "X", label: "X" },
+    { value: "Instagram", label: "Instagram" },
   ];
   const typeDatas = [
-    { value: 'singgle', label: 'Singgle' },
-    { value: 'corousel', label: 'Corousel' },
+    { value: "singgle", label: "Singgle" },
+    { value: "corousel", label: "Corousel" },
   ];
 
-  const baseURL = 'http://localhost:5050/';
+  const baseURL = "http://localhost:5050/";
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
-      );
+      const res = await request.get(`/perencanaan/getById/${id}`);
       setDataProgram(res.data);
     } catch (err) {
-      console.error('Gagal fetch data perencanaan:', err);
+      console.error("Gagal fetch data perencanaan:", err);
     }
   }, [id]);
 
-  // const fetchData = async () => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById/${id}`
-  //     );
-  //     setDataProgram(res.data);
-  //   } catch (err) {
-  //     console.error('Gagal fetch data perencanaan:', err);
-  //   }
-  // };
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -83,9 +72,9 @@ const DeatailAmplifikasi = ({ id }) => {
 
     const payload = {
       sudah_dipost: !!sudahPost,
-      caption: caption || '',
-      platform: platform || '',
-      type: type || '',
+      caption: caption || "",
+      platform: platform || "",
+      type: type || "",
     };
 
     if (evidenceFiles && evidenceFiles.length > 0) {
@@ -97,84 +86,50 @@ const DeatailAmplifikasi = ({ id }) => {
 
     try {
       // 1. Update teks (PUT)
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}`,
-        payload
-      );
+      await request.put(`/amplifikasi/${amplifikasiId}`, payload);
     } catch (err) {
-      console.error('Gagal menyimpan:', err);
-      alert('Gagal menyimpan data.');
+      console.error("Gagal menyimpan:", err);
+      alert("Gagal menyimpan data.");
     }
 
     // 2. Upload thumbnail
     if (thumbnailFile && thumbnailFile.length > 0) {
       const thumbnailForm = new FormData();
       for (let i = 0; i < thumbnailFile.length; i++) {
-        thumbnailForm.append('thumbnail', thumbnailFile[i]);
+        thumbnailForm.append("thumbnail", thumbnailFile[i]);
       }
 
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-thumbnail`,
-          thumbnailForm,
+        await request.postMultipart(
+          `/amplifikasi/${amplifikasiId}/upload-thumbnail`,
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+            thumbnail: Array.from(thumbnailFile),
           }
         );
       } catch (err) {
-        console.error('Gagal upload thumbnail:', err);
-        alert('Gagal upload thumbnail.');
+        console.error("Gagal upload thumbnail:", err);
+        alert("Gagal upload thumbnail.");
         return;
       }
     }
-    // if (thumbnailFile) {
-    //   const thumbnailForm = new FormData();
-    //   thumbnailForm.append('thumbnail', thumbnailFile);
-
-    //   try {
-    //     await axios.post(
-    //       `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-thumbnail`,
-    //       thumbnailForm,
-    //       {
-    //         headers: {
-    //           'Content-Type': 'multipart/form-data',
-    //         },
-    //       }
-    //     );
-    //   } catch (err) {
-    //     console.error('Gagal upload thumbnail:', err);
-    //     alert('Gagal upload thumbnail.');
-    //     return;
-    //   }
-    // }
 
     // 3. Upload evidence
     if (evidenceFiles && evidenceFiles.length > 0) {
-      const evidenceForm = new FormData();
-      for (let i = 0; i < evidenceFiles.length; i++) {
-        evidenceForm.append('evidence', evidenceFiles[i]);
-      }
-
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/amplifikasi/${amplifikasiId}/upload-evidence`,
-          evidenceForm,
+        await request.postMultipart(
+          `/amplifikasi/${amplifikasiId}/upload-evidence`,
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+            evidence: Array.from(evidenceFiles),
           }
         );
       } catch (err) {
-        console.error('Gagal upload evidence:', err);
-        alert('Gagal upload evidence.');
+        console.error("Gagal upload evidence:", err);
+        alert("Gagal upload evidence.");
         return;
       }
     }
 
-    alert('Amplifikasi berhasil disimpan!');
+    alert("Amplifikasi berhasil disimpan!");
     fetchData();
   };
 
@@ -202,7 +157,7 @@ const DeatailAmplifikasi = ({ id }) => {
                       <Form.Control
                         id="namaProgram"
                         type="text"
-                        value={dataProgram?.nama_program || ''}
+                        value={dataProgram?.nama_program || ""}
                         readOnly
                       />
                     </Col>
@@ -219,7 +174,7 @@ const DeatailAmplifikasi = ({ id }) => {
                       <Form.Control
                         id="namaPelaksana"
                         type="text"
-                        value={dataProgram?.opd_pelaksana || ''}
+                        value={dataProgram?.opd_pelaksana || ""}
                         readOnly
                       />
                     </Col>
@@ -236,7 +191,7 @@ const DeatailAmplifikasi = ({ id }) => {
                       <Form.Control
                         id="tglPelaksanaan"
                         type="week"
-                        value={getISOWeek(dataProgram?.tgl_mulai || '')}
+                        value={getISOWeek(dataProgram?.tgl_mulai || "")}
                         readOnly
                       />
                     </Col>
@@ -254,7 +209,7 @@ const DeatailAmplifikasi = ({ id }) => {
                         id="target"
                         as="textarea"
                         rows={3}
-                        value={dataProgram?.target || ''}
+                        value={dataProgram?.target || ""}
                         readOnly
                       />
                     </Col>
@@ -290,13 +245,13 @@ const DeatailAmplifikasi = ({ id }) => {
                       <div className="mb-4 border rounded p-3">
                         <div
                           className="d-flex justify-content-between align-items-center"
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: "pointer" }}
                           onClick={() => toggleDropdown(index)}
                         >
                           <h5 className="mb-0">
                             {index + 1}. {item.indikator_label}
                           </h5>
-                          <span>{isOpen ? '▲ Tutup' : '▼ Lihat'}</span>
+                          <span>{isOpen ? "▲ Tutup" : "▼ Lihat"}</span>
                         </div>
 
                         {isOpen && (
@@ -335,52 +290,6 @@ const DeatailAmplifikasi = ({ id }) => {
                               </Col>
                             </Row>
 
-                            {/* <Row className="mb-3">
-                              <Form.Label className="col-sm-4 col-form-label">
-                                Thumbnail
-                              </Form.Label>
-                              <Col md={8}>
-                                <Form.Control
-                                  type="file"
-                                  accept="image/*"
-                                  name={`thumbnail[${index}]`}
-                                />
-
-                                {item.id_amplifikasi.thumbnail && (
-                                  <div className="mt-2 d-flex flex-wrap gap-2">
-                                    <img
-                                      src={
-                                        process.env.NEXT_PUBLIC_API_URL +
-                                        '/' +
-                                        item.id_amplifikasi.thumbnail.replace(
-                                          /\\/g,
-                                          '/'
-                                        )
-                                      }
-                                      alt="thumbnail"
-                                      style={{
-                                        width: 80,
-                                        height: 80,
-                                        objectFit: 'cover',
-                                        cursor: 'pointer',
-                                        borderRadius: 4,
-                                      }}
-                                      onClick={() =>
-                                        handlePreview(
-                                          process.env.NEXT_PUBLIC_API_URL +
-                                            '/' +
-                                            item.id_amplifikasi.thumbnail.replace(
-                                              /\\/g,
-                                              '/'
-                                            )
-                                        )
-                                      }
-                                    />
-                                  </div>
-                                )}
-                              </Col>
-                            </Row> */}
-
                             <Row className="mb-3">
                               <Form.Label className="col-sm-4 col-form-label">
                                 Thumbnail
@@ -396,22 +305,22 @@ const DeatailAmplifikasi = ({ id }) => {
                                 {item.id_amplifikasi.thumbnail?.length > 0 && (
                                   <div className="mt-2 d-flex flex-wrap gap-2">
                                     {item.id_amplifikasi.thumbnail
-                                      .filter((imgPath) => imgPath !== '') // Menyaring imgPath yang kosong
+                                      .filter((imgPath) => imgPath !== "") // Menyaring imgPath yang kosong
                                       .map((imgPath, i) => (
                                         <img
                                           key={i}
-                                          src={imgPath.replace(/\\/g, '/')}
+                                          src={imgPath.replace(/\\/g, "/")}
                                           alt={`evidence-${i}`}
                                           style={{
                                             width: 80,
                                             height: 80,
-                                            objectFit: 'cover',
-                                            cursor: 'pointer',
+                                            objectFit: "cover",
+                                            cursor: "pointer",
                                             borderRadius: 4,
                                           }}
                                           onClick={() =>
                                             handlePreview(
-                                              imgPath.replace(/\\/g, '/')
+                                              imgPath.replace(/\\/g, "/")
                                             )
                                           }
                                         />
@@ -428,33 +337,65 @@ const DeatailAmplifikasi = ({ id }) => {
                               <Col md={8}>
                                 <Form.Control
                                   type="file"
-                                  accept="image/*"
                                   multiple
+                                  accept="image/*,video/*"
                                   name={`evidence[${index}][]`}
                                 />
 
                                 {item.id_amplifikasi.evidence?.length > 0 && (
                                   <div className="mt-2 d-flex flex-wrap gap-2">
                                     {item.id_amplifikasi.evidence.map(
-                                      (imgPath, i) => (
-                                        <img
-                                          key={i}
-                                          src={imgPath.replace(/\\/g, '/')}
-                                          alt={`evidence-${i}`}
-                                          style={{
-                                            width: 80,
-                                            height: 80,
-                                            objectFit: 'cover',
-                                            cursor: 'pointer',
-                                            borderRadius: 4,
-                                          }}
-                                          onClick={() =>
-                                            handlePreview(
-                                              imgPath.replace(/\\/g, '/')
-                                            )
-                                          }
-                                        />
-                                      )
+                                      (filePath, i) => {
+                                        const fixedPath = filePath.replace(
+                                          /\\/g,
+                                          "/"
+                                        );
+                                        const ext = fixedPath
+                                          .split(".")
+                                          .pop()
+                                          ?.toLowerCase();
+                                        const isVideo = [
+                                          "mp4",
+                                          "webm",
+                                          "ogg",
+                                          "mov",
+                                        ].includes(ext);
+
+                                        return (
+                                          <div
+                                            key={i}
+                                            style={{ position: "relative" }}
+                                          >
+                                            {isVideo ? (
+                                              <video
+                                                controls
+                                                src={fixedPath}
+                                                style={{
+                                                  width: 150,
+                                                  height: 100,
+                                                  objectFit: "cover",
+                                                  borderRadius: 4,
+                                                }}
+                                              />
+                                            ) : (
+                                              <img
+                                                src={fixedPath}
+                                                alt={`evidence-${i}`}
+                                                style={{
+                                                  width: 100,
+                                                  height: 100,
+                                                  objectFit: "cover",
+                                                  cursor: "pointer",
+                                                  borderRadius: 4,
+                                                }}
+                                                onClick={() =>
+                                                  handlePreview(fixedPath)
+                                                }
+                                              />
+                                            )}
+                                          </div>
+                                        );
+                                      }
                                     )}
                                   </div>
                                 )}
@@ -471,7 +412,7 @@ const DeatailAmplifikasi = ({ id }) => {
                                   rows={2}
                                   name={`caption[${index}]`}
                                   defaultValue={
-                                    item.id_amplifikasi.caption || ''
+                                    item.id_amplifikasi.caption || ""
                                   }
                                 />
                               </Col>
@@ -515,7 +456,7 @@ const DeatailAmplifikasi = ({ id }) => {
           <img
             src={previewImage}
             alt="Preview"
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: "100%", height: "auto" }}
           />
         </Modal.Body>
       </Modal>

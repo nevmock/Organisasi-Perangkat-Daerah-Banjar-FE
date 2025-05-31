@@ -20,11 +20,11 @@ import { HighlightCode } from "widgets";
 import { ResponsiveTableCode } from "data/code/TablesCode";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 // import { programOpd } from "data/opd/ProgramOpd";
 import { formatWeekLabel } from "utils/formatWeekLabel";
 import getElapsedTime from "utils/getElapsedTime";
 import getWeekFromDate from "utils/getWeekFromDate";
+import request from "utils/request";
 
 const Perencanaan = () => {
   const [programOpd, setProgramOpd] = useState([]);
@@ -32,9 +32,7 @@ const Perencanaan = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
-        );
+        const res = await request.get(`/perencanaan`);
         setProgramOpd(res.data);
       } catch (err) {
         console.error("Gagal fetch data perencanaan:", err);
@@ -71,9 +69,7 @@ const Perencanaan = () => {
     if (!confirm) return;
 
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/${id}`
-      );
+      await request.delete(`/perencanaan/${id}`);
       // Hapus data dari state setelah berhasil
       setProgramOpd((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
@@ -111,12 +107,12 @@ const Perencanaan = () => {
                 <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
                   {/* Search + Add Button */}
                   <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
-                    <Form.Control
+                    {/* <Form.Control
                       type="text"
                       placeholder="Cari program..."
                       className="me-2"
                       style={{ minWidth: "200px" }}
-                    />
+                    /> */}
                     <Button variant="primary" href="/opd/perencanaan/tambah">
                       Tambah
                     </Button>

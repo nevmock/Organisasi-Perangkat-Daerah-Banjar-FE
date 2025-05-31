@@ -14,6 +14,7 @@ import {
 import React, { useState } from "react";
 import axios from "axios";
 import weekToDate from "utils/weekToDate";
+import request from "utils/request";
 
 const TambahPerancanaan = () => {
   const handleSubmit = async (e) => {
@@ -29,10 +30,7 @@ const TambahPerancanaan = () => {
     console.log(e.target.tglMulai.value);
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`,
-        newData
-      );
+      await request.post(`/perencanaan`, newData);
       alert("Data berhasil disimpan!");
       window.location.href = "/opd/perencanaan"; // Redirect ke list
     } catch (err) {

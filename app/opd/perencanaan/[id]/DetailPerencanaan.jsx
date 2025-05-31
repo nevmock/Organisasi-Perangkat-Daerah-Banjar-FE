@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import useMounted from 'hooks/useMounted';
-import { PageHeading } from 'widgets';
-import { getISOWeek } from 'utils/getISOWeek';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import useMounted from "hooks/useMounted";
+import { PageHeading } from "widgets";
+import { getISOWeek } from "utils/getISOWeek";
+import request from "utils/request";
 
 const DetailPerencanaan = ({ id }) => {
   const hasMounted = useMounted();
@@ -15,13 +16,11 @@ const DetailPerencanaan = ({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan/getById${id}`
-        );
-        console.log('Data dari API:', res.data);
+        const res = await request.get(`/perencanaan/getById/${id}`);
+        console.log("Data dari API:", res.data);
         setDataProgram(res.data);
       } catch (err) {
-        console.error('Gagal fetch data perencanaan:', err);
+        console.error("Gagal fetch data perencanaan:", err);
       }
     };
 
@@ -54,7 +53,7 @@ const DetailPerencanaan = ({ id }) => {
                           id="namaProgram"
                           type="text"
                           placeholder="Masukkan nama program"
-                          value={dataProgram?.nama_program || ''}
+                          value={dataProgram?.nama_program || ""}
                           readOnly
                         />
                       </Col>
@@ -72,7 +71,7 @@ const DetailPerencanaan = ({ id }) => {
                           id="namaPelaksana"
                           type="text"
                           placeholder="Masukkan nama pelaksana"
-                          value={dataProgram?.opd_pelaksana || ''}
+                          value={dataProgram?.opd_pelaksana || ""}
                           readOnly
                         />
                       </Col>
@@ -89,7 +88,7 @@ const DetailPerencanaan = ({ id }) => {
                         <Form.Control
                           id="tglPelaksanaan"
                           type="week"
-                          value={getISOWeek(dataProgram?.tgl_mulai || '')}
+                          value={getISOWeek(dataProgram?.tgl_mulai || "")}
                           readOnly
                         />
                       </Col>
@@ -108,7 +107,7 @@ const DetailPerencanaan = ({ id }) => {
                           as="textarea"
                           rows={3}
                           placeholder="Masukkan target"
-                          value={dataProgram?.target || ''}
+                          value={dataProgram?.target || ""}
                           readOnly
                         />
                       </Col>
@@ -119,15 +118,17 @@ const DetailPerencanaan = ({ id }) => {
                         Indikator
                       </Form.Label>
                       <Col md={8} xs={12}>
-                        {(dataProgram?.indikators || []).map((item, index) => (
-                          <Form.Control
-                            key={index}
-                            type="text"
-                            value={`${index + 1}. ${item.indikator_label}`}
-                            readOnly
-                            className="mb-3"
-                          />
-                        ))}
+                        {(dataProgram?.id_indikator || []).map(
+                          (item, index) => (
+                            <Form.Control
+                              key={index}
+                              type="text"
+                              value={`${index + 1}. ${item.indikator_label}`}
+                              readOnly
+                              className="mb-3"
+                            />
+                          )
+                        )}
                       </Col>
                     </Row>
 

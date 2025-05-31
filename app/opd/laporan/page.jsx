@@ -24,6 +24,7 @@ import { programOpd } from "data/opd/ProgramOpd";
 import { formatWeekLabel } from "utils/formatWeekLabel";
 import getElapsedTimeFromWeek from "utils/getElapsedTime";
 import getWeekFromDate from "utils/getWeekFromDate";
+import request from "utils/request";
 
 const Laporan = () => {
   const [laporans, setLaporans] = useState([]);
@@ -31,9 +32,7 @@ const Laporan = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/perencanaan`
-        );
+        const res = await request.get(`/perencanaan`);
         setLaporans(res.data);
       } catch (err) {
         console.error("Gagal fetch data perencanaan:", err);
@@ -86,9 +85,8 @@ const Laporan = () => {
         <Col xl={12} lg={12} md={12} sm={12}>
           <Tab.Container id="tab-container-11" defaultActiveKey="design">
             <Card>
-              <Card.Header className="border-bottom-0 p-0">
+              {/* <Card.Header className="border-bottom-0 p-0">
                 <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
-                  {/* Search + Add Button */}
                   <div className="d-flex align-items-center gap-2 mt-2 mt-md-0">
                     <Form.Control
                       type="text"
@@ -98,7 +96,7 @@ const Laporan = () => {
                     />
                   </div>
                 </div>
-              </Card.Header>
+              </Card.Header> */}
               <Card.Body className="p-0">
                 <Tab.Content>
                   <Tab.Pane eventKey="design" className="pb-4 p-4">
