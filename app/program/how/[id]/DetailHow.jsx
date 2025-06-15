@@ -1,7 +1,7 @@
-"use client";
-import { fetchHows } from "app/api/get-all-how";
-import useMounted from "hooks/useMounted";
-import { useEffect, useState } from "react";
+'use client';
+import { fetchHows } from 'app/api/get-all-how';
+import useMounted from 'hooks/useMounted';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -10,35 +10,35 @@ import {
   Form,
   Row,
   InputGroup,
-} from "react-bootstrap";
-import { PageHeading } from "widgets";
+} from 'react-bootstrap';
+import { PageHeading } from 'widgets';
 
 const sumberDanaOptions = [
-  { value: "APBD Murni", label: "APBD Murni" },
-  { value: "CSR Swasta", label: "CSR Swasta" },
-  { value: "Lainnya", label: "Lainnya" },
+  { value: 'APBD Murni', label: 'APBD Murni' },
+  { value: 'CSR Swasta', label: 'CSR Swasta' },
+  { value: 'Lainnya', label: 'Lainnya' },
 ];
 
 const InputProgram = ({ id }) => {
   const hasMounted = useMounted();
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
-    nama_program: "",
-    tujuan_program: "",
-    sasaran_program: "",
-    rencana_output_kuantitatif: [""],
-    rencana_output_kualitatif: [""],
-    jumlah_peserta: "",
-    jumlah_pelatihan: "",
-    tingkat_kepuasan: "",
-    lokasi_kelurahan: "",
-    lokasi_kecamatan: "",
-    lokasi_kota: "",
-    anggaran_jumlah: "",
-    anggaran_sumber_dana: [{ jenis: "", persentase: "" }],
-    opd_pengusul_utama: "",
-    opd_kolaborator: [""],
-    status: ""
+    nama_program: '',
+    tujuan_program: '',
+    sasaran_program: '',
+    rencana_output_kuantitatif: [''],
+    rencana_output_kualitatif: [''],
+    jumlah_peserta: '',
+    jumlah_pelatihan: '',
+    tingkat_kepuasan: '',
+    lokasi_kelurahan: '',
+    lokasi_kecamatan: '',
+    lokasi_kota: '',
+    anggaran_jumlah: '',
+    anggaran_sumber_dana: [{ jenis: '', persentase: '' }],
+    opd_pengusul_utama: '',
+    opd_kolaborator: [''],
+    status: '',
   });
 
   useEffect(() => {
@@ -50,21 +50,25 @@ const InputProgram = ({ id }) => {
         .map((item) => {
           const indikator = item.target_indikator_kinerja || {};
           return {
-            nama_program: item.nama_program || "",
-            tujuan_program: item.tujuan_program || "",
-            sasaran_program: item.sasaran_program || "",
-            rencana_output_kuantitatif: item?.rencana_output?.kuantitatif || [""],
-            rencana_output_kualitatif: item?.rencana_output?.kualitatif || [""],
-            jumlah_peserta: indikator.jumlah_peserta || "",
-            jumlah_pelatihan: indikator.jumlah_pelatihan || "",
-            tingkat_kepuasan: indikator.tingkat_kepuasan || "",
-            lokasi_kelurahan: item?.rencana_lokasi?.kelurahan || "",
-            lokasi_kecamatan: item?.rencana_lokasi?.kecamatan || "",
-            lokasi_kota: item?.rencana_lokasi?.kota || "",
-            anggaran_jumlah: item?.rencana_anggaran?.jumlah || "",
-            anggaran_sumber_dana: item?.rencana_anggaran?.sumber_dana || [{ jenis: "", persentase: "" }],
-            opd_pengusul_utama: item.opd_pengusul_utama || "",
-            opd_kolaborator: item.opd_kolaborator || [""],
+            nama_program: item.nama_program || '',
+            tujuan_program: item.tujuan_program || '',
+            sasaran_program: item.sasaran_program || '',
+            rencana_output_kuantitatif: item?.rencana_output?.kuantitatif || [
+              '',
+            ],
+            rencana_output_kualitatif: item?.rencana_output?.kualitatif || [''],
+            jumlah_peserta: indikator.jumlah_peserta || '',
+            jumlah_pelatihan: indikator.jumlah_pelatihan || '',
+            tingkat_kepuasan: indikator.tingkat_kepuasan || '',
+            lokasi_kelurahan: item?.rencana_lokasi?.kelurahan || '',
+            lokasi_kecamatan: item?.rencana_lokasi?.kecamatan || '',
+            lokasi_kota: item?.rencana_lokasi?.kota || '',
+            anggaran_jumlah: item?.rencana_anggaran?.jumlah || '',
+            anggaran_sumber_dana: item?.rencana_anggaran?.sumber_dana || [
+              { jenis: '', persentase: '' },
+            ],
+            opd_pengusul_utama: item.opd_pengusul_utama || '',
+            opd_kolaborator: item.opd_kolaborator || [''],
           };
         });
 
@@ -107,7 +111,7 @@ const InputProgram = ({ id }) => {
   const addArrayItem = (name) => {
     setForm((prev) => ({
       ...prev,
-      [name]: [...prev[name], ""],
+      [name]: [...prev[name], ''],
     }));
   };
   const removeArrayItem = (name, idx) => {
@@ -123,7 +127,7 @@ const InputProgram = ({ id }) => {
       ...prev,
       anggaran_sumber_dana: [
         ...prev.anggaran_sumber_dana,
-        { jenis: "", persentase: "" },
+        { jenis: '', persentase: '' },
       ],
     }));
   };
@@ -139,7 +143,7 @@ const InputProgram = ({ id }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // TODO: Kirim data ke backend
-    alert("Data program berhasil disimpan!\n" + JSON.stringify(form, null, 2));
+    alert('Data program berhasil disimpan!\n' + JSON.stringify(form, null, 2));
   };
 
   if (loading) return <p>Loading...</p>;
@@ -215,7 +219,7 @@ const InputProgram = ({ id }) => {
                               placeholder="Masukan rencana output kuantitatif"
                               onChange={(e) =>
                                 handleArrayChange(
-                                  "rencana_output_kuantitatif",
+                                  'rencana_output_kuantitatif',
                                   idx,
                                   e.target.value
                                 )
@@ -233,7 +237,7 @@ const InputProgram = ({ id }) => {
                               variant="outline-danger"
                               onClick={() =>
                                 removeArrayItem(
-                                  "rencana_output_kuantitatif",
+                                  'rencana_output_kuantitatif',
                                   idx
                                 )
                               }
@@ -246,7 +250,7 @@ const InputProgram = ({ id }) => {
                             <Button
                               variant="outline-primary"
                               onClick={() =>
-                                addArrayItem("rencana_output_kuantitatif")
+                                addArrayItem('rencana_output_kuantitatif')
                               }
                               disabled={
                                 idx !==
@@ -273,7 +277,7 @@ const InputProgram = ({ id }) => {
                               placeholder="Masukan rencana output kualitatif"
                               onChange={(e) =>
                                 handleArrayChange(
-                                  "rencana_output_kualitatif",
+                                  'rencana_output_kualitatif',
                                   idx,
                                   e.target.value
                                 )
@@ -291,7 +295,7 @@ const InputProgram = ({ id }) => {
                               variant="outline-danger"
                               onClick={() =>
                                 removeArrayItem(
-                                  "rencana_output_kualitatif",
+                                  'rencana_output_kualitatif',
                                   idx
                                 )
                               }
@@ -304,7 +308,7 @@ const InputProgram = ({ id }) => {
                             <Button
                               variant="outline-primary"
                               onClick={() =>
-                                addArrayItem("rencana_output_kualitatif")
+                                addArrayItem('rencana_output_kualitatif')
                               }
                               disabled={
                                 idx !==
@@ -404,7 +408,7 @@ const InputProgram = ({ id }) => {
                   </Row>
 
                   {/* Anggaran */}
-                  <Row className="mb-3">
+                  {/* <Row className="mb-3">
                     <Form.Label column md={3}>
                       Rencana Anggaran
                     </Form.Label>
@@ -426,7 +430,6 @@ const InputProgram = ({ id }) => {
                       </Row>
                       <Row className="align-items-start">
                         <Col>
-                          {/* <b>Sumber Dana</b> */}
                           {form.anggaran_sumber_dana.map((item, idx) => (
                             <Row className="mb-2" key={idx}>
                               <Col md={6}>
@@ -435,7 +438,7 @@ const InputProgram = ({ id }) => {
                                   onChange={(e) =>
                                     handleSumberDanaChange(
                                       idx,
-                                      "jenis",
+                                      'jenis',
                                       e.target.value
                                     )
                                   }
@@ -461,7 +464,7 @@ const InputProgram = ({ id }) => {
                                     onChange={(e) =>
                                       handleSumberDanaChange(
                                         idx,
-                                        "persentase",
+                                        'persentase',
                                         e.target.value
                                       )
                                     }
@@ -499,7 +502,7 @@ const InputProgram = ({ id }) => {
                         </Col>
                       </Row>
                     </Col>
-                  </Row>
+                  </Row> */}
 
                   {/* OPD */}
                   <Row className="mb-3">
@@ -529,7 +532,7 @@ const InputProgram = ({ id }) => {
                               value={val}
                               onChange={(e) =>
                                 handleArrayChange(
-                                  "opd_kolaborator",
+                                  'opd_kolaborator',
                                   idx,
                                   e.target.value
                                 )
@@ -546,7 +549,7 @@ const InputProgram = ({ id }) => {
                             <Button
                               variant="outline-danger"
                               onClick={() =>
-                                removeArrayItem("opd_kolaborator", idx)
+                                removeArrayItem('opd_kolaborator', idx)
                               }
                               disabled={form.opd_kolaborator.length === 1}
                             >
@@ -554,7 +557,7 @@ const InputProgram = ({ id }) => {
                             </Button>
                             <Button
                               variant="outline-primary"
-                              onClick={() => addArrayItem("opd_kolaborator")}
+                              onClick={() => addArrayItem('opd_kolaborator')}
                               disabled={idx !== form.opd_kolaborator.length - 1}
                             >
                               +
