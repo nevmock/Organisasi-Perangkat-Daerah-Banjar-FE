@@ -145,7 +145,7 @@ const InputProgram = ({ id }) => {
     try {
       await request.post(`/how`, form);
       alert('Data berhasil disimpan!');
-      window.location.href = '/produk/how';
+      window.location.href = '/program/how';
     } catch (err) {
       alert('Gagal menyimpan data.');
     }
