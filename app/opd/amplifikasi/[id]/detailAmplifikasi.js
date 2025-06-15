@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 import {
   Button,
   Card,

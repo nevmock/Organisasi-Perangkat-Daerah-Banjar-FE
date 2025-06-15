@@ -1,0 +1,143 @@
+"use client";
+
+import {
+    Col,
+    Row,
+    Card,
+    Table,
+    Nav,
+    Tab,
+    Container,
+    Form,
+    Button,
+} from "react-bootstrap";
+
+import { HighlightCode } from "widgets";
+
+import { ResponsiveTableCode } from "data/code/TablesCode";
+
+import { useEffect, useState } from "react";
+
+import { fetchDos } from "app/api/get-all-do";
+
+const DoPage = () => {
+    const [programs, setPrograms] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const getPrograms = async () => {
+            const data = await fetchDos();
+            setPrograms(data);
+            setLoading(false);
+        };
+
+        getPrograms();
+    }, []);
+
+    if (loading) return <p>Loading...</p>;
+
+    return (
+        <Container fluid className="p-6">
+            <Row>
+                <Col lg={12} md={12} sm={12}>
+                    <div className="border-bottom pb-4 mb-4 d-md-flex align-items-center justify-content-between">
+                        <div className="mb-3 mb-md-0">
+                            <h1 className="mb-1 h2 fw-bold">Daftar Program</h1>
+                        </div>
+                    </div>
+                </Col>
+            </Row>
+
+            {/* responsive-tables */}
+            <Row>
+                <Col xl={12} lg={12} md={12} sm={12}>
+                    <Tab.Container id="tab-container-11" defaultActiveKey="design">
+                        <Card>
+                            <Card.Header className="border-bottom-0 p-0">
+                                <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
+                                    {/* Search + Add Button */}
+                                    <Form
+                                        className="d-flex align-items-center gap-2 mt-2 mt-md-0"
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }}
+                                    >
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Cari program..."
+                                            className="me-2"
+                                            style={{ minWidth: "200px" }}
+                                        // value={searchQuery}
+                                        // onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                        <Button variant="secondary" type="submit">
+                                            Cari
+                                        </Button>
+                                        <Button variant="primary" href="/program/do/tambah">
+                                            Tambah
+                                        </Button>
+                                    </Form>
+                                </div>
+                            </Card.Header>
+                            <Card.Body className="p-0">
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="design" className="pb-4 p-4">
+                                        {/* code started */}
+                                        <Table responsive className="text-nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Nama Program</th>
+                                                    <th>Kolaborator</th>
+                                                    <th>Capaian Output</th>
+                                                    <th>Rincian Kegiatan</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {programs.map((program, index) => (
+                                                    <tr key={program.id}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{program.nama_program}</td>
+                                                        <td>{program.kolaborator.map((item) => item.nama).join(', ')}</td>
+                                                        <td>
+                                                            <div
+                                                                className="text-wrap"
+                                                                style={{ minWidth: "300px" }}
+                                                            >
+                                                                {program.capaian_output}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {program.rincian_kegiatan}
+                                                        </td>
+                                                        <td>
+                                                            <Button
+                                                                variant="outline-primary"
+                                                                href={`/program/do/${program.id}`}
+                                                            >
+                                                                Detail
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                        {/* end of code */}
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="react" className="pb-4 p-4 react-code">
+                                        <HighlightCode code={ResponsiveTableCode} />
+                                    </Tab.Pane>
+                                </Tab.Content>
+                            </Card.Body>
+                        </Card>
+                    </Tab.Container>
+                </Col>
+            </Row>
+            {/* end of responsive-tables */}
+        </Container>
+    );
+};
+
+export default DoPage;
