@@ -1,204 +1,118 @@
-"use client";
-// import node module libraries
-import { Fragment } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 import {
-  Col,
+  Container,
   Row,
+  Col,
   Card,
   Table,
-  Nav,
-  Tab,
-  Container,
   Form,
   Button,
-} from "react-bootstrap";
-
-// import widget/custom components
-import { HighlightCode } from "widgets";
-
-// import react code data file
-import { ResponsiveTableCode } from "data/code/TablesCode";
-
-import { useEffect, useState } from "react";
-// import { programOpd } from "data/opd/ProgramOpd";
-import { formatWeekLabel } from "utils/formatWeekLabel";
-import getElapsedTime from "utils/getElapsedTime";
-import getWeekFromDate from "utils/getWeekFromDate";
-import request from "utils/request";
+} from 'react-bootstrap';
+import Pagination from 'sub-components/Pagination';
+import request from 'utils/request';
 
 const Perencanaan = () => {
   const [programOpd, setProgramOpd] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]); // Data setelah search
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Bisa disesuaikan
 
-  const handleSearch = async () => {
-    try {
-      const res = await request.get(`/perencanaan/search?q=${searchQuery}`);
-      setProgramOpd(res.data);
-    } catch (err) {
-      console.error("Gagal fetch data pencarian:", err);
-    }
-  };
-
+  // Fetch data (tanpa pagination parameter)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await request.get(`/perencanaan`);
+        const res = await request.get('/perencanaan');
         setProgramOpd(res.data);
+        setFilteredData(res.data); // Initialize filtered data
       } catch (err) {
-        console.error("Gagal fetch data perencanaan:", err);
+        console.error('Gagal fetch data:', err);
       }
     };
-
     fetchData();
   }, []);
-  const [waktuPelaksanaan, setWaktuPelaksanaan] = useState({});
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newTimes = {};
-      programOpd.forEach((p) => {
-        newTimes[p._id] = getElapsedTime(p.tgl_mulai);
-      });
-      setWaktuPelaksanaan(newTimes);
-    }, 60000); // update tiap 1 menit
-
-    // initial update
-    const initTimes = {};
-    programOpd.forEach((p) => {
-      initTimes[p._id] = getElapsedTime(p.tgl_mulai);
-    });
-    setWaktuPelaksanaan(initTimes);
-
-    return () => clearInterval(interval);
-  }, [programOpd]);
-
-  const handleDelete = async (id) => {
-    const confirm = window.confirm(
-      "Apakah Anda yakin ingin menghapus data ini?"
+  // Handle search (client-side)
+  const handleSearch = () => {
+    const filtered = programOpd.filter(
+      (item) =>
+        item.nama_program.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.opd_pelaksana.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    if (!confirm) return;
-
-    try {
-      await request.delete(`/perencanaan/${id}`);
-      // Hapus data dari state setelah berhasil
-      setProgramOpd((prev) => prev.filter((item) => item._id !== id));
-    } catch (err) {
-      console.error("Gagal menghapus data:", err);
-      alert("Terjadi kesalahan saat menghapus data.");
-    }
+    setFilteredData(filtered);
+    setCurrentPage(1); // Reset ke halaman 1 saat search
   };
+
+  // Hitung data yang ditampilkan
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
     <Container fluid className="p-6">
-      <Row>
-        <Col lg={12} md={12} sm={12}>
-          <div className="border-bottom pb-4 mb-4 d-md-flex align-items-center justify-content-between">
-            <div className="mb-3 mb-md-0">
-              <h1 className="mb-1 h2 fw-bold">
-                Daftar Perancanaan Program OPD
-              </h1>
-              <p className="mb-0 ">
-                Perencanaan OPD (Organisasi Perangkat Daerah) merujuk pada
-                proses penyusunan dokumen perencanaan yang memuat visi, misi,
-                tujuan, strategi, kebijakan, program, dan kegiatan pembangunan
-                yang akan dilaksanakan oleh OPD selama periode tertentu.
-              </p>
-            </div>
-          </div>
-        </Col>
-      </Row>
+      {/* Search Form */}
+      <Form
+        className="d-flex align-items-center gap-2 mb-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
+      >
+        <Form.Control
+          type="text"
+          placeholder="Cari program..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Button variant="secondary" type="submit">
+          Cari
+        </Button>
+        <Button variant="primary" href="/opd/perencanaan/tambah">
+          Tambah
+        </Button>
+      </Form>
 
-      {/* responsive-tables */}
-      <Row>
-        <Col xl={12} lg={12} md={12} sm={12}>
-          <Tab.Container id="tab-container-11" defaultActiveKey="design">
-            <Card>
-              <Card.Header className="border-bottom-0 p-0">
-                <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
-                  {/* Search + Add Button */}
-                  <Form
-                    className="d-flex align-items-center gap-2 mt-2 mt-md-0"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSearch();
-                    }}
-                  >
-                    <Form.Control
-                      type="text"
-                      placeholder="Cari program..."
-                      className="me-2"
-                      style={{ minWidth: "200px" }}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <Button variant="secondary" type="submit">
-                      Cari
-                    </Button>
-                    <Button variant="primary" href="/opd/perencanaan/tambah">
-                      Tambah
-                    </Button>
-                  </Form>
-                </div>
-              </Card.Header>
-              <Card.Body className="p-0">
-                <Tab.Content>
-                  <Tab.Pane eventKey="design" className="pb-4 p-4">
-                    {/* code started */}
-                    <Table responsive className="text-nowrap">
-                      <thead>
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Nama Program</th>
-                          <th scope="col">Pelaksana</th>
-                          <th scope="col">Tgl Pelaksanaan</th>
-                          <th scope="col">Waktu Penyelesaian</th>
-                          {/* <th scope="col">Target</th>
-                          <th scope="col">Status</th> */}
-                          <th scope="col">Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {programOpd.map((program, index) => (
-                          <tr key={program._id}>
-                            <th scope="row">{index + 1}</th>
-                            <td>{program.nama_program}</td>
-                            <td>{program.opd_pelaksana}</td>
-                            <td>{getWeekFromDate(program.tgl_mulai)}</td>
-                            <td>
-                              {waktuPelaksanaan[program._id] || "Memuat..."}
-                            </td>
-                            <td>
-                              <div className="d-flex gap-2">
-                                <Button
-                                  variant="outline-primary"
-                                  href={`/opd/perencanaan/${program._id}`}
-                                >
-                                  Detail
-                                </Button>
-                                <Button
-                                  variant="outline-danger"
-                                  onClick={() => handleDelete(program._id)}
-                                >
-                                  Hapus
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                    {/* end of code */}
-                  </Tab.Pane>
-                  <Tab.Pane eventKey="react" className="pb-4 p-4 react-code">
-                    <HighlightCode code={ResponsiveTableCode} />
-                  </Tab.Pane>
-                </Tab.Content>
-              </Card.Body>
-            </Card>
-          </Tab.Container>
-        </Col>
-      </Row>
-      {/* end of responsive-tables */}
+      {/* Table */}
+      <Table responsive className="text-nowrap">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nama Program</th>
+            <th>Pelaksana</th>
+            <th>Tgl Pelaksanaan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentItems.map((program, index) => (
+            <tr key={program._id}>
+              <td>{indexOfFirstItem + index + 1}</td>
+              <td>{program.nama_program}</td>
+              <td>{program.opd_pelaksana}</td>
+              <td>{program.tgl_mulai}</td>
+              <td>
+                <Button
+                  variant="outline-primary"
+                  href={`/opd/perencanaan/${program._id}`}
+                >
+                  Detail
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      {/* Pagination */}
+      {filteredData.length > itemsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </Container>
   );
 };
