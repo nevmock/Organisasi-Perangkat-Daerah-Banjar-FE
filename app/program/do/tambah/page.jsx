@@ -78,7 +78,6 @@ export default function DoForm() {
         <Col>
           <Card>
             <Card.Body>
-              <h3 className="mb-4">Input Data DO</h3>
               <Form onSubmit={handleSubmit}>
                 <Row className="mb-3">
                   <Form.Label column md={3}>
@@ -223,11 +222,26 @@ export default function DoForm() {
                     />
                   </Col>
                 </Row>
-                <Row className="mt-4">
-                  <Col className="text-end">
-                    <Button type="submit" variant="primary">
-                      Simpan Data DO
-                    </Button>
+                <Row className="mt-8">
+                  <Col md={12}>
+                    <div className="d-flex align-items-center justify-content-end">
+                      <div>
+                        <Button
+                          variant="primary"
+                          className="me-2"
+                          type="submit"
+                        >
+                          Simpan
+                        </Button>
+                        <Button
+                          variant="outline-white"
+                          type="link"
+                          href="/program/do"
+                        >
+                          Kembali
+                        </Button>
+                      </div>
+                    </div>
                   </Col>
                 </Row>
               </Form>

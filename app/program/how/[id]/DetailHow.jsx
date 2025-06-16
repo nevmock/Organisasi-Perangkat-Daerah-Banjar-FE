@@ -1,96 +1,39 @@
 'use client';
-import { fetchHows } from 'app/api/get-all-how';
 import useMounted from 'hooks/useMounted';
 import { useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  InputGroup,
-} from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import request from 'utils/request';
 import { PageHeading } from 'widgets';
 
-const sumberDanaOptions = [
-  { value: 'APBD Murni', label: 'APBD Murni' },
-  { value: 'CSR Swasta', label: 'CSR Swasta' },
-  { value: 'Lainnya', label: 'Lainnya' },
-];
+const initialForm = {
+  nama_program: '',
+  tujuan_program: '',
+  sasaran_program: '',
+  rencana_output_kuantitatif: [''],
+  rencana_output_kualitatif: [''],
+  jumlah_peserta: '',
+  jumlah_pelatihan: '',
+  tingkat_kepuasan: '',
+  lokasi_kelurahan: '',
+  lokasi_kecamatan: '',
+  lokasi_kota: '',
+  anggaran_jumlah: '',
+  anggaran_sumber_dana: [{ jenis: '', persentase: '' }],
+  opd_pengusul_utama: '',
+  opd_kolaborator: [''],
+  status: '',
+};
 
 const InputProgram = ({ id }) => {
   const hasMounted = useMounted();
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({
-    nama_program: '',
-    tujuan_program: '',
-    sasaran_program: '',
-    rencana_output_kuantitatif: [''],
-    rencana_output_kualitatif: [''],
-    jumlah_peserta: '',
-    jumlah_pelatihan: '',
-    tingkat_kepuasan: '',
-    lokasi_kelurahan: '',
-    lokasi_kecamatan: '',
-    lokasi_kota: '',
-    anggaran_jumlah: '',
-    anggaran_sumber_dana: [{ jenis: '', persentase: '' }],
-    opd_pengusul_utama: '',
-    opd_kolaborator: [''],
-    status: '',
-  });
+  const [form, setForm] = useState(initialForm);
 
-  useEffect(() => {
-    const getPrograms = async () => {
-      const data = await fetchHows();
-
-      const filtered = data
-        .filter((item) => item.id === id)
-        .map((item) => {
-          const indikator = item.target_indikator_kinerja || {};
-          return {
-            nama_program: item.nama_program || '',
-            tujuan_program: item.tujuan_program || '',
-            sasaran_program: item.sasaran_program || '',
-            rencana_output_kuantitatif: item?.rencana_output?.kuantitatif || [
-              '',
-            ],
-            rencana_output_kualitatif: item?.rencana_output?.kualitatif || [''],
-            jumlah_peserta: indikator.jumlah_peserta || '',
-            jumlah_pelatihan: indikator.jumlah_pelatihan || '',
-            tingkat_kepuasan: indikator.tingkat_kepuasan || '',
-            lokasi_kelurahan: item?.rencana_lokasi?.kelurahan || '',
-            lokasi_kecamatan: item?.rencana_lokasi?.kecamatan || '',
-            lokasi_kota: item?.rencana_lokasi?.kota || '',
-            anggaran_jumlah: item?.rencana_anggaran?.jumlah || '',
-            anggaran_sumber_dana: item?.rencana_anggaran?.sumber_dana || [
-              { jenis: '', persentase: '' },
-            ],
-            opd_pengusul_utama: item.opd_pengusul_utama || '',
-            opd_kolaborator: item.opd_kolaborator || [''],
-          };
-        });
-
-      if (filtered.length > 0) {
-        setForm(filtered[0]);
-      }
-
-      setLoading(false);
-    };
-
-    getPrograms();
-  }, [id]);
-
-  console.log(form);
-
-  // Handler untuk perubahan input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handler untuk array (output, kolaborator, sumber dana)
   const handleArrayChange = (name, idx, val) => {
     setForm((prev) => {
       const arr = [...prev[name]];
@@ -99,21 +42,13 @@ const InputProgram = ({ id }) => {
     });
   };
 
-  const handleSumberDanaChange = (idx, field, val) => {
-    setForm((prev) => {
-      const arr = [...prev.anggaran_sumber_dana];
-      arr[idx][field] = val;
-      return { ...prev, anggaran_sumber_dana: arr };
-    });
-  };
-
-  // Handler tambah/hapus item array
   const addArrayItem = (name) => {
     setForm((prev) => ({
       ...prev,
       [name]: [...prev[name], ''],
     }));
   };
+
   const removeArrayItem = (name, idx) => {
     setForm((prev) => {
       const arr = [...prev[name]];
@@ -122,40 +57,92 @@ const InputProgram = ({ id }) => {
     });
   };
 
-  const addSumberDana = () => {
-    setForm((prev) => ({
-      ...prev,
-      anggaran_sumber_dana: [
-        ...prev.anggaran_sumber_dana,
-        { jenis: '', persentase: '' },
-      ],
-    }));
-  };
-  const removeSumberDana = (idx) => {
-    setForm((prev) => {
-      const arr = [...prev.anggaran_sumber_dana];
-      arr.splice(idx, 1);
-      return { ...prev, anggaran_sumber_dana: arr };
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newData = {
+      nama_program: form.nama_program,
+      tujuan_program: form.tujuan_program,
+      sasaran_program: form.sasaran_program,
+      rencana_output: {
+        kuantitatif: form.rencana_output_kuantitatif.filter(
+          (item) => item.trim() !== ''
+        ),
+        kualitatif: form.rencana_output_kualitatif.filter(
+          (item) => item.trim() !== ''
+        ),
+      },
+      target_indikator_kinerja: {
+        jumlah_peserta: parseInt(form.jumlah_peserta) || 0,
+        jumlah_pelatihan: parseInt(form.jumlah_pelatihan) || 0,
+        tingkat_kepuasan: form.tingkat_kepuasan,
+      },
+      rencana_lokasi: {
+        kelurahan: form.lokasi_kelurahan,
+        kecamatan: form.lokasi_kecamatan,
+        kota: form.lokasi_kota,
+      },
+      opd_pengusul_utama: form.opd_pengusul_utama,
+      opd_kolaborator: form.opd_kolaborator.filter(
+        (item) => item.trim() !== ''
+      ),
+    };
+    try {
+      await request.put(`/how/${id}`, newData);
+      alert('Data berhasil diperbarui!');
+      window.location.href = '/program/how';
+    } catch (err) {
+      console.error('Gagal memperbarui data:', err);
+      alert('Terjadi kesalahan saat memperbarui.');
+    }
   };
 
-  // Handler submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: Kirim data ke backend
-    alert('Data program berhasil disimpan!\n' + JSON.stringify(form, null, 2));
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await request.get(`/how/getById/${id}`);
+        const data = res.data;
+
+        setForm({
+          nama_program: data.nama_program || '',
+          tujuan_program: data.tujuan_program || '',
+          sasaran_program: data.sasaran_program || '',
+          rencana_output_kuantitatif: data.rencana_output?.kuantitatif || [''],
+          rencana_output_kualitatif: data.rencana_output?.kualitatif || [''],
+          jumlah_peserta: data.target_indikator_kinerja?.jumlah_peserta || '',
+          jumlah_pelatihan:
+            data.target_indikator_kinerja?.jumlah_pelatihan || '',
+          tingkat_kepuasan:
+            data.target_indikator_kinerja?.tingkat_kepuasan || '',
+          lokasi_kelurahan: data.rencana_lokasi?.kelurahan || '',
+          lokasi_kecamatan: data.rencana_lokasi?.kecamatan || '',
+          lokasi_kota: data.rencana_lokasi?.kota || '',
+          anggaran_jumlah: data.rencana_anggaran?.jumlah || '',
+          anggaran_sumber_dana: data.rencana_anggaran?.sumber_dana || [
+            { jenis: '', persentase: '' },
+          ],
+          opd_pengusul_utama: data.opd_pengusul_utama || '',
+          opd_kolaborator: data.opd_kolaborator || [''],
+          status: data.status || '',
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error('Gagal fetch data:', err);
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchData();
+  }, [id]);
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Program" />
+      <PageHeading heading="Update Data HOW" />
       <Row className="mb-8">
         <Col>
           <Card>
             <Card.Body>
-              <h3 className="mb-4">Input Program Baru</h3>
               {hasMounted && (
                 <Form onSubmit={handleSubmit}>
                   <Row className="mb-3">
@@ -599,11 +586,26 @@ const InputProgram = ({ id }) => {
                     </Col>
                   </Row>
 
-                  <Row className="mt-4">
-                    <Col className="text-end">
-                      <Button type="submit" variant="primary">
-                        Simpan Program
-                      </Button>
+                  <Row className="mt-8">
+                    <Col md={12}>
+                      <div className="d-flex align-items-center justify-content-end">
+                        <div>
+                          <Button
+                            variant="primary"
+                            className="me-2"
+                            type="submit"
+                          >
+                            Update
+                          </Button>
+                          <Button
+                            variant="outline-white"
+                            type="link"
+                            href="/program/how"
+                          >
+                            Kembali
+                          </Button>
+                        </div>
+                      </div>
                     </Col>
                   </Row>
                 </Form>

@@ -60,7 +60,7 @@ const DoPage = () => {
         <Col lg={12} md={12} sm={12}>
           <div className="border-bottom pb-4 mb-4 d-md-flex align-items-center justify-content-between">
             <div className="mb-3 mb-md-0">
-              <h1 className="mb-1 h2 fw-bold">Daftar Program</h1>
+              <h1 className="mb-1 h2 fw-bold">Daftar DO</h1>
             </div>
           </div>
         </Col>
@@ -115,7 +115,7 @@ const DoPage = () => {
                       </thead>
                       <tbody>
                         {programs.map((program, index) => (
-                          <tr key={program.id}>
+                          <tr key={program._id}>
                             <td>{index + 1}</td>
                             <td>{program.nama_program}</td>
                             <td>
@@ -135,7 +135,7 @@ const DoPage = () => {
                             <td>
                               <Button
                                 variant="outline-primary"
-                                href={`/program/do/${program.id}`}
+                                href={`/program/do/${program._id}`}
                               >
                                 Detail
                               </Button>
