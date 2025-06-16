@@ -40,11 +40,11 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
-            export NVM_DIR="/home/kanzen/.nvm"
+            export NVM_DIR="/home/laporaa2/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 20
 
-            cd /home/kanzen/Organisasi-Perangkat-Daerah-Banjar-FE
+            cd /home/laporaa2/Organisasi-Perangkat-Daerah-Banjar-FE
             git reset --hard HEAD
             git pull origin main --rebase
             npm install
