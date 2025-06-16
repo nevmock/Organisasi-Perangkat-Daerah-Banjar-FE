@@ -39,8 +39,8 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             docker pull kevinirawand/sia-banjar-fe-dev:latest
-            docker stop sia-banjar-fe-dev || true
-            docker rm sia-banjar-fe-dev || true
+            docker stop sia-banjar-fe-dev
+            docker rm sia-banjar-fe-dev
             docker run -d --name sia-banjar-fe-dev \
               -e MONGO_URI=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
               -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
