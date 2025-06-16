@@ -3,11 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - misc
-  pull_request:
-    branches: 
-      - misc  # Trigger on all branches
-
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
