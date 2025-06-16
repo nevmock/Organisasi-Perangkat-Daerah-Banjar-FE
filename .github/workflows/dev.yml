@@ -42,6 +42,7 @@ jobs:
             docker stop sia-banjar-fe-dev
             docker rm sia-banjar-fe-dev
             docker run -d --name sia-banjar-fe-dev \
-              -e MONGO_URI=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
-              -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
+              -e NEXT_PUBLIC_DEV_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
+              -e PORT=${{ secrets.DEV_PORT }} \
+              -p 3020:3020
               kevinirawand/sia-banjar-fe-dev:latest
