@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import { getAllHowByNamaProgram } from 'app/api/getAllHowByNamaProgram';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Row,
@@ -25,9 +26,33 @@ const initialForm = {
 
 export default function DoForm() {
   const [form, setForm] = useState(initialForm);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [programNames, setProgramNames] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const names = await getAllHowByNamaProgram();
+        setProgramNames(names);
+        setError(null);
+      } catch (err) {
+        setError('Gagal memuat data program');
+        setProgramNames([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(programNames);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleKolaboratorChange = (idx, field, value) => {
@@ -79,7 +104,7 @@ export default function DoForm() {
           <Card>
             <Card.Body>
               <Form onSubmit={handleSubmit}>
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                   <Form.Label column md={3}>
                     Nama Program
                   </Form.Label>
@@ -91,6 +116,26 @@ export default function DoForm() {
                       onChange={handleChange}
                       required
                     />
+                  </Col>
+                </Row> */}
+                <Row className="mb-3">
+                  <Form.Label column md={3}>
+                    Nama Program
+                  </Form.Label>
+                  <Col md={9}>
+                    <Form.Select
+                      name="nama_program"
+                      value={form.nama_program}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Pilih Nama Program</option>
+                      {programNames.map((opt, index) => (
+                        <option key={index} value={opt.nama_program}>
+                          {opt.nama_program}
+                        </option>
+                      ))}
+                    </Form.Select>
                   </Col>
                 </Row>
                 <Row className="mb-3">
@@ -176,7 +221,7 @@ export default function DoForm() {
                     />
                   </Col>
                 </Row>
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                   <Form.Label column md={3}>
                     Dokumentasi Kegiatan
                   </Form.Label>
@@ -188,6 +233,36 @@ export default function DoForm() {
                       onChange={handleChange}
                       required
                     />
+                  </Col>
+                </Row> */}
+                <Row className="mb-3">
+                  <Form.Label column md={3}>
+                    Laporan PDF
+                  </Form.Label>
+                  <Col md={9}>
+                    <Form.Control
+                      name="dokumentasi_kegiatan"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // Simpan nama file atau path relatif ke state
+                          setForm((prev) => ({
+                            ...prev,
+                            dokumentasi_kegiatan: `uploads/${file.name}`, // atau format path lain yang Anda butuhkan
+                          }));
+                        }
+                      }}
+                      required
+                    />
+                    {form.dokumentasi_kegiatan && (
+                      <div className="mt-2">
+                        <small>
+                          File terpilih: {form.dokumentasi_kegiatan}
+                        </small>
+                      </div>
+                    )}
                   </Col>
                 </Row>
                 <Row className="mb-3">

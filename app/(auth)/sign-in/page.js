@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 // import node module libraries
-import { Row, Col, Card, Form, Button, Image } from "react-bootstrap";
-import Link from "next/link";
+import { Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
+import Link from 'next/link';
 
 // import hooks
-import useMounted from "hooks/useMounted";
-import toast, { Toaster } from "node_modules/react-hot-toast/dist";
-import Cookies from "js-cookie";
-import request from "utils/request";
-import { useState } from "react";
-import { useRouter } from "node_modules/next/navigation";
+import useMounted from 'hooks/useMounted';
+import toast, { Toaster } from 'node_modules/react-hot-toast/dist';
+import Cookies from 'js-cookie';
+import request from 'utils/request';
+import { useState } from 'react';
+import { useRouter } from 'node_modules/next/navigation';
 
 const SignIn = () => {
   const router = useRouter();
@@ -24,21 +24,21 @@ const SignIn = () => {
       email: e.target.username.value,
       password: e.target.password.value,
     };
-    toast.loading("Loading...");
+    toast.loading('Loading...');
 
     try {
       request
-        .post("/auth/login", data)
+        .post('/auth/login', data)
         .then(function (response) {
-          console.log("Success:", response.data);
+          console.log('Success:', response.data);
           if (response.status === 200 || response.status === 201) {
-            Cookies.set("token", response.data.token);
+            Cookies.set('token', response.data.token);
             toast.dismiss();
-            toast.success("Success Login");
-            router.push("/");
+            toast.success('Success Login');
+            router.push('/');
           } else {
             toast.dismiss();
-            toast.error("Failed to login. Please try again.");
+            toast.error('Failed to login. Please try again.');
             setLoading(false);
           }
         })
@@ -83,18 +83,18 @@ const SignIn = () => {
                     />
                   </svg>
                 </Link>
-                <p className="mb-6">Please enter your user information.</p>
+                <p className="mb-6">Tolong masukan informasi anda.</p>
               </div>
               {/* Form */}
               {hasMounted && (
                 <Form onSubmit={handleSubmit}>
                   {/* Username */}
                   <Form.Group className="mb-3" controlId="username">
-                    <Form.Label>Username or email</Form.Label>
+                    <Form.Label>Email</Form.Label>
                     <Form.Control
                       type="email"
                       name="username"
-                      placeholder="Enter address here"
+                      placeholder="Masukan email anda"
                       required=""
                     />
                   </Form.Group>
@@ -121,13 +121,13 @@ const SignIn = () => {
                     {/* Button */}
                     <div className="d-grid">
                       <Button variant="primary" type="submit">
-                        Sign In
+                        Masuk
                       </Button>
                     </div>
                     <div className="d-md-flex justify-content-between mt-4">
                       <div className="mb-2 mb-md-0">
                         <Link href="/sign-up" className="fs-5">
-                          Create An Account{" "}
+                          Bekum punya akun? Register{' '}
                         </Link>
                       </div>
                     </div>
