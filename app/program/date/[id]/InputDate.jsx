@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import request from 'utils/request';
 import { PageHeading } from 'widgets';
@@ -10,7 +10,7 @@ const initialForm = {
   tanggal_mulai: '',
   tanggal_selesai: '',
   link_laporan_pdf: '',
-  status: '',
+  status_laporan: '',
 };
 
 const sumberDanaOptions = [
@@ -19,7 +19,7 @@ const sumberDanaOptions = [
   { value: 'revisi', label: 'Revisi' },
 ];
 
-export default function DateForm() {
+export default function DateForm({ id }) {
   const [form, setForm] = useState(initialForm);
 
   const handleChange = (e) => {
@@ -29,24 +29,54 @@ export default function DateForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const newData = { ...form };
-
-    console.log('Data to submit:', newData);
-
+    const newData = {
+      nama_program: form.nama_program,
+      tanggal_mulai: form.tanggal_mulai,
+      tanggal_selesai: form.tanggal_selesai,
+      link_laporan_pdf: form.link_laporan_pdf,
+      status_laporan: form.status_laporan,
+    };
     try {
-      await request.post(`/date`, newData);
-      alert('Data berhasil disimpan!');
+      await request.put(`/date/${id}`, newData);
+      alert('Data berhasil diperbarui!');
       window.location.href = '/program/date';
     } catch (err) {
-      console.error(err);
-      alert('Gagal menyimpan data.');
+      console.error('Gagal memperbarui data:', err);
+      alert('Terjadi kesalahan saat memperbarui.');
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await request.get(`/date/getById/${id}`);
+        // Menyaring hanya field yang dibutuhkan
+        const {
+          nama_program,
+          tanggal_mulai,
+          tanggal_selesai,
+          link_laporan_pdf,
+          status_laporan,
+        } = res.data;
+
+        setForm({
+          nama_program,
+          tanggal_mulai,
+          tanggal_selesai,
+          link_laporan_pdf,
+          status_laporan,
+        });
+      } catch (err) {
+        console.error('Gagal fetch data:', err);
+      }
+    };
+
+    if (id) fetchData();
+  }, [id]);
+
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Input Data DATE" />
+      <PageHeading heading="Update Data DATE" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -74,7 +104,7 @@ export default function DateForm() {
                     <Form.Control
                       type="date"
                       name="tanggal_mulai"
-                      value={form.tanggal_mulai}
+                      value={form.tanggal_mulai?.slice(0, 10) || ''}
                       onChange={handleChange}
                       required
                     />
@@ -88,7 +118,7 @@ export default function DateForm() {
                     <Form.Control
                       type="date"
                       name="tanggal_selesai"
-                      value={form.tanggal_selesai}
+                      value={form.tanggal_selesai?.slice(0, 10) || ''}
                       onChange={handleChange}
                       required
                     />
@@ -110,16 +140,16 @@ export default function DateForm() {
                 </Row>
                 <Row className="mb-3">
                   <Form.Label column md={3}>
-                    Status
+                    status_laporan
                   </Form.Label>
                   <Col md={9}>
                     <Form.Select
-                      name="status"
-                      value={form.status}
+                      name="status_laporan"
+                      value={form.status_laporan}
                       onChange={handleChange}
                       required
                     >
-                      <option value="">Pilih Status</option>
+                      <option value="">Pilih Status Laporan</option>
                       {sumberDanaOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -137,7 +167,7 @@ export default function DateForm() {
                           className="me-2"
                           type="submit"
                         >
-                          Simpan
+                          Update
                         </Button>
                         <Button
                           variant="outline-white"
