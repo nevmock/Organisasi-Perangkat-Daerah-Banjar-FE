@@ -95,7 +95,7 @@ const DatePage = () => {
                   <Button variant="secondary" type="submit">
                     Cari
                   </Button>
-                  <Button variant="primary" href="/opd/perencanaan/tambah">
+                  <Button variant="primary" href="/program/date/tambah">
                     Tambah
                   </Button>
                 </Form>

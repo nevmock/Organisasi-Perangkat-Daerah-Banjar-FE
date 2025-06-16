@@ -94,7 +94,7 @@ const DoPage = () => {
                   <Button variant="secondary" type="submit">
                     Cari
                   </Button>
-                  <Button variant="primary" href="/opd/perencanaan/tambah">
+                  <Button variant="primary" href="/program/do/tambah">
                     Tambah
                   </Button>
                 </Form>
