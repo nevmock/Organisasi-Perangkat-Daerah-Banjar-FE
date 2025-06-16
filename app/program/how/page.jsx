@@ -95,7 +95,7 @@ const HowPage = () => {
                   <Button variant="secondary" type="submit">
                     Cari
                   </Button>
-                  <Button variant="primary" href="/opd/perencanaan/tambah">
+                  <Button variant="primary" href="/program/how/tambah">
                     Tambah
                   </Button>
                 </Form>
