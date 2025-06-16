@@ -1,5 +1,6 @@
 'use client';
 
+import { getAllHowByNamaProgram } from 'app/api/getAllHowByNamaProgram';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import request from 'utils/request';
@@ -17,6 +18,9 @@ const initialForm = {
 
 export default function DoForm({ id }) {
   const [form, setForm] = useState(initialForm);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [programNames, setProgramNames] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,7 +88,6 @@ export default function DoForm({ id }) {
             : [{ nama: '', peran: '' }],
           rincian_kegiatan,
           capaian_output,
-          dokumentasi_kegiatan,
           kendala,
           rekomendasi,
         });
@@ -96,6 +99,24 @@ export default function DoForm({ id }) {
     if (id) fetchData();
   }, [id]);
 
+  useEffect(() => {
+    const fetchDataHow = async () => {
+      try {
+        setLoading(true);
+        const names = await getAllHowByNamaProgram();
+        setProgramNames(names);
+        setError(null);
+      } catch (err) {
+        setError('Gagal memuat data program');
+        setProgramNames([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDataHow();
+  }, []);
+
   return (
     <Container fluid className="p-6">
       <PageHeading heading="Update Data DO" />
@@ -105,7 +126,7 @@ export default function DoForm({ id }) {
             <Card.Body>
               <Form onSubmit={handleSubmit}>
                 {/* Nama Program */}
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                   <Form.Label column md={3}>
                     Nama Program
                   </Form.Label>
@@ -117,6 +138,26 @@ export default function DoForm({ id }) {
                       placeholder="Masukkan nama program"
                       required
                     />
+                  </Col>
+                </Row> */}
+                <Row className="mb-3">
+                  <Form.Label column md={3}>
+                    Nama Program
+                  </Form.Label>
+                  <Col md={9}>
+                    <Form.Select
+                      name="nama_program"
+                      value={form.nama_program}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Pilih Nama Program</option>
+                      {programNames.map((opt, index) => (
+                        <option key={index} value={opt.nama_program}>
+                          {opt.nama_program}
+                        </option>
+                      ))}
+                    </Form.Select>
                   </Col>
                 </Row>
 
@@ -210,7 +251,7 @@ export default function DoForm({ id }) {
                 </Row>
 
                 {/* Dokumentasi */}
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                   <Form.Label column md={3}>
                     Dokumentasi Kegiatan
                   </Form.Label>
@@ -222,6 +263,36 @@ export default function DoForm({ id }) {
                       placeholder="Link dokumentasi (Google Drive, dsb)"
                       required
                     />
+                  </Col>
+                </Row> */}
+
+                <Row className="mb-3">
+                  <Form.Label column md={3}>
+                    Laporan PDF
+                  </Form.Label>
+                  <Col md={9}>
+                    <Form.Control
+                      name="dokumentasi_kegiatan"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // Simpan nama file atau path relatif ke state
+                          setForm((prev) => ({
+                            ...prev,
+                            dokumentasi_kegiatan: `uploads/${file.name}`, // atau format path lain yang Anda butuhkan
+                          }));
+                        }
+                      }}
+                    />
+                    {form.dokumentasi_kegiatan && (
+                      <div className="mt-2">
+                        <small>
+                          File terpilih: {form.dokumentasi_kegiatan}
+                        </small>
+                      </div>
+                    )}
                   </Col>
                 </Row>
 

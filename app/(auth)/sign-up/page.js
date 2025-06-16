@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 // import node module libraries
-import { Row, Col, Card, Form, Button, Image } from "react-bootstrap";
-import Link from "next/link";
+import { Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
+import Link from 'next/link';
 
 // import hooks
-import useMounted from "hooks/useMounted";
-import toast, { Toaster } from "node_modules/react-hot-toast/dist";
-import Cookies from "js-cookie";
-import request from "utils/request";
-import { useState } from "react";
-import { useRouter } from "node_modules/next/navigation";
+import useMounted from 'hooks/useMounted';
+import toast, { Toaster } from 'node_modules/react-hot-toast/dist';
+import Cookies from 'js-cookie';
+import request from 'utils/request';
+import { useState } from 'react';
+import { useRouter } from 'node_modules/next/navigation';
 
 const SignUp = () => {
   const router = useRouter();
@@ -24,22 +24,22 @@ const SignUp = () => {
       email: e.target.email.value,
       password: e.target.password.value,
       unit: e.target.unit.value,
-      role: "admin",
+      role: 'admin',
     };
-    toast.loading("Loading...");
+    toast.loading('Loading...');
 
     try {
       request
-        .post("/auth/register", data)
+        .post('/auth/register', data)
         .then(function (response) {
-          console.log("Success:", response.data);
+          console.log('Success:', response.data);
           if (response.status === 200 || response.status === 201) {
             toast.dismiss();
-            toast.success("Success register");
-            router.push("/sign-in");
+            toast.success('Success register');
+            router.push('/sign-in');
           } else {
             toast.dismiss();
-            toast.error("Failed to register. Please try again.");
+            toast.error('Failed to register. Please try again.');
             setLoading(false);
           }
         })
@@ -83,7 +83,7 @@ const SignUp = () => {
                     />
                   </svg>
                 </Link>
-                <p className="mb-6">Please enter your user information.</p>
+                <p className="mb-6">Tolong masukan informasi anda.</p>
               </div>
               {/* Form */}
               {hasMounted && (
@@ -94,7 +94,7 @@ const SignUp = () => {
                     <Form.Control
                       type="email"
                       name="email"
-                      placeholder="Enter address here"
+                      placeholder="Masukan Email anda"
                       required=""
                     />
                   </Form.Group>
@@ -116,7 +116,7 @@ const SignUp = () => {
                     <Form.Control
                       type="text"
                       name="unit"
-                      placeholder="Enter Your Unit"
+                      placeholder="Masukan Unit Anda"
                       required=""
                     />
                   </Form.Group>
@@ -125,13 +125,13 @@ const SignUp = () => {
                     {/* Button */}
                     <div className="d-grid">
                       <Button variant="primary" type="submit">
-                        Create Account
+                        Buat Akun
                       </Button>
                     </div>
                     <div className="d-md-flex justify-content-between mt-4">
                       <div className="mb-2 mb-md-0">
                         <Link href="/sign-in" className="fs-5">
-                          Already member? Login{" "}
+                          Sudah memiliki akun? Login{' '}
                         </Link>
                       </div>
                     </div>
