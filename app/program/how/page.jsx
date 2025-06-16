@@ -20,21 +20,22 @@ import { useEffect, useState } from 'react';
 
 import { fetchHows } from 'app/api/get-all-how';
 import request from 'utils/request';
+import Pagination from 'sub-components/Pagination';
 
 const HowPage = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]); // Data setelah search
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
-  const handleSearch = async () => {
-    try {
-      const res = await request.get(`/how/search?q=${searchQuery}`);
-      setPrograms(res.data);
-      setLoading(false);
-    } catch (err) {
-      console.error('Gagal fetch data pencarian:', err);
-      setLoading(false);
-    }
+  const handleSearch = () => {
+    const filtered = programs.filter((item) =>
+      item.nama_program.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filtered);
+    setCurrentPage(1); // Reset ke halaman 1 saat search
   };
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const HowPage = () => {
       try {
         const res = await request.get(`/how`);
         setPrograms(res.data);
+        setFilteredData(res.data);
         setLoading(false);
       } catch (err) {
         console.error('Gagal fetch data how:', err);
@@ -52,15 +54,10 @@ const HowPage = () => {
     fetchData();
   }, []);
 
-  //   useEffect(() => {
-  //     const getPrograms = async () => {
-  //       const data = await fetchHows();
-  //       setPrograms(data);
-  //       setLoading(false);
-  //     };
-
-  //     getPrograms();
-  //   }, []);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   if (loading) return <p>Loading...</p>;
 
@@ -81,32 +78,27 @@ const HowPage = () => {
         <Col xl={12} lg={12} md={12} sm={12}>
           <Tab.Container id="tab-container-11" defaultActiveKey="design">
             <Card>
-              <Card.Header className="border-bottom-0 p-0">
-                <div className="d-flex justify-content-between align-items-center flex-wrap p-3">
-                  {/* Search + Add Button */}
-                  <Form
-                    className="d-flex align-items-center gap-2 mt-2 mt-md-0"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSearch();
-                    }}
-                  >
-                    <Form.Control
-                      type="text"
-                      placeholder="Cari program..."
-                      className="me-2"
-                      style={{ minWidth: '200px' }}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <Button variant="secondary" type="submit">
-                      Cari
-                    </Button>
-                    <Button variant="primary" href="/program/how/tambah">
-                      Tambah
-                    </Button>
-                  </Form>
-                </div>
+              <Card.Header className="border-bottom-0 p-3 bg-white">
+                <Form
+                  className="d-flex align-items-center gap-2 "
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSearch();
+                  }}
+                >
+                  <Form.Control
+                    type="text"
+                    placeholder="Cari program..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <Button variant="secondary" type="submit">
+                    Cari
+                  </Button>
+                  <Button variant="primary" href="/opd/perencanaan/tambah">
+                    Tambah
+                  </Button>
+                </Form>
               </Card.Header>
               <Card.Body className="p-0">
                 <Tab.Content>
@@ -127,9 +119,9 @@ const HowPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {programs.map((program, index) => (
+                        {currentItems.map((program, index) => (
                           <tr key={program._id}>
-                            <td>{index + 1}</td>
+                            <td>{indexOfFirstItem + index + 1}</td>
                             <td>{program.nama_program}</td>
                             <td>
                               <div
@@ -163,6 +155,13 @@ const HowPage = () => {
                         ))}
                       </tbody>
                     </Table>
+                    {filteredData.length > itemsPerPage && (
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                      />
+                    )}
                     {/* end of code */}
                   </Tab.Pane>
                   <Tab.Pane eventKey="react" className="pb-4 p-4 react-code">
