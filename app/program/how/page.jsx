@@ -61,6 +61,7 @@ const HowPage = () => {
         `/how?page=${pageNumber}&limit=${limitNumber}`
       );
 
+      // const dataArray = Array.isArray(res.data) ? res.data : [];
       const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
 
       setPrograms(dataArray);

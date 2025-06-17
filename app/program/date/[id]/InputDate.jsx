@@ -1,270 +1,18 @@
-// 'use client';
-
-// import { getAllHowByNamaProgram } from 'app/api/getAllHowByNamaProgram';
-// import React, { useEffect, useState } from 'react';
-// import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
-// import request from 'utils/request';
-// import { PageHeading } from 'widgets';
-
-// const initialForm = {
-//   nama_program: '',
-//   tanggal_mulai: '',
-//   tanggal_selesai: '',
-//   link_laporan_pdf: '',
-//   status_laporan: '',
-// };
-
-// const sumberDanaOptions = [
-//   { value: 'draft', label: 'Draft' },
-//   { value: 'final', label: 'Final' },
-//   { value: 'revisi', label: 'Revisi' },
-// ];
-
-// export default function DateForm({ id }) {
-//   const [form, setForm] = useState(initialForm);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [programNames, setProgramNames] = useState([]);
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setForm((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const newData = {
-//       nama_program: form.nama_program,
-//       tanggal_mulai: form.tanggal_mulai,
-//       tanggal_selesai: form.tanggal_selesai,
-//       link_laporan_pdf: form.link_laporan_pdf,
-//       status_laporan: form.status_laporan,
-//     };
-//     try {
-//       await request.put(`/date/${id}`, newData);
-//       alert('Data berhasil diperbarui!');
-//       window.location.href = '/program/date';
-//     } catch (err) {
-//       console.error('Gagal memperbarui data:', err);
-//       alert('Terjadi kesalahan saat memperbarui.');
-//     }
-//   };
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const res = await request.get(`/date/getById/${id}`);
-//         // Menyaring hanya field yang dibutuhkan
-//         const {
-//           nama_program,
-//           tanggal_mulai,
-//           tanggal_selesai,
-//           // link_laporan_pdf,
-//           status_laporan,
-//         } = res.data;
-
-//         setForm({
-//           nama_program,
-//           tanggal_mulai,
-//           tanggal_selesai,
-//           // link_laporan_pdf,
-//           status_laporan,
-//         });
-//       } catch (err) {
-//         console.error('Gagal fetch data:', err);
-//       }
-//     };
-
-//     if (id) fetchData();
-//   }, [id]);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         setLoading(true);
-//         const names = await getAllHowByNamaProgram();
-//         setProgramNames(names);
-//         setError(null);
-//       } catch (err) {
-//         setError('Gagal memuat data program');
-//         setProgramNames([]);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
-//   return (
-//     <Container fluid className="p-6">
-//       <PageHeading heading="Update Data DATE" />
-//       <Row className="mb-8">
-//         <Col>
-//           <Card>
-//             <Card.Body>
-//               <Form onSubmit={handleSubmit}>
-//                 {/* <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Nama Program
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Control
-//                       name="nama_program"
-//                       placeholder="Masukkan nama program"
-//                       value={form.nama_program}
-//                       onChange={handleChange}
-//                       required
-//                     />
-//                   </Col>
-//                 </Row> */}
-//                 <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Nama Program
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Select
-//                       name="nama_program"
-//                       value={form.nama_program}
-//                       onChange={handleChange}
-//                       required
-//                     >
-//                       <option value="">Pilih Nama Program</option>
-//                       {programNames.map((opt, index) => (
-//                         <option key={index} value={opt.nama_program}>
-//                           {opt.nama_program}
-//                         </option>
-//                       ))}
-//                     </Form.Select>
-//                   </Col>
-//                 </Row>
-//                 <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Tanggal Mulai
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Control
-//                       type="date"
-//                       name="tanggal_mulai"
-//                       value={form.tanggal_mulai?.slice(0, 10) || ''}
-//                       onChange={handleChange}
-//                       required
-//                     />
-//                   </Col>
-//                 </Row>
-//                 <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Tanggal Selesai
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Control
-//                       type="date"
-//                       name="tanggal_selesai"
-//                       value={form.tanggal_selesai?.slice(0, 10) || ''}
-//                       onChange={handleChange}
-//                       required
-//                     />
-//                   </Col>
-//                 </Row>
-//                 {/* <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Link Laporan PDF
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Control
-//                       name="link_laporan_pdf"
-//                       placeholder="Masukkan link laporan PDF"
-//                       value={form.link_laporan_pdf}
-//                       onChange={handleChange}
-//                       required
-//                     />
-//                   </Col>
-//                 </Row> */}
-//                 <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     Laporan PDF
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Control
-//                       name="link_laporan_pdf"
-//                       type="file"
-//                       accept=".pdf"
-//                       onChange={(e) => {
-//                         const file = e.target.files[0];
-//                         if (file) {
-//                           // Simpan nama file atau path relatif ke state
-//                           setForm((prev) => ({
-//                             ...prev,
-//                             link_laporan_pdf: `uploads/${file.name}`, // atau format path lain yang Anda butuhkan
-//                           }));
-//                         }
-//                       }}
-//                     />
-//                     {form.link_laporan_pdf && (
-//                       <div className="mt-2">
-//                         <small>File terpilih: {form.link_laporan_pdf}</small>
-//                       </div>
-//                     )}
-//                   </Col>
-//                 </Row>
-//                 <Row className="mb-3">
-//                   <Form.Label column md={3}>
-//                     status_laporan
-//                   </Form.Label>
-//                   <Col md={9}>
-//                     <Form.Select
-//                       name="status_laporan"
-//                       value={form.status_laporan}
-//                       onChange={handleChange}
-//                       required
-//                     >
-//                       <option value="">Pilih Status Laporan</option>
-//                       {sumberDanaOptions.map((opt) => (
-//                         <option key={opt.value} value={opt.value}>
-//                           {opt.label}
-//                         </option>
-//                       ))}
-//                     </Form.Select>
-//                   </Col>
-//                 </Row>
-//                 <Row className="mt-8">
-//                   <Col md={12}>
-//                     <div className="d-flex align-items-center justify-content-end">
-//                       <div>
-//                         <Button
-//                           variant="primary"
-//                           className="me-2"
-//                           type="submit"
-//                         >
-//                           Update
-//                         </Button>
-//                         <Button
-//                           variant="outline-white"
-//                           type="link"
-//                           href="/program/date"
-//                         >
-//                           Kembali
-//                         </Button>
-//                       </div>
-//                     </div>
-//                   </Col>
-//                 </Row>
-//               </Form>
-//             </Card.Body>
-//           </Card>
-//         </Col>
-//       </Row>
-//     </Container>
-//   );
-// }
-
 'use client';
 
 import FilePreviewCard from 'components/bootstrap/FilePreviewCard';
 import Selection from 'components/form/selection';
-import { getAllHowByNamaProgram } from 'app/api/getAllHowByNamaProgram';
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  InputGroup,
+  Alert,
+} from 'react-bootstrap';
 import request from 'utils/request';
 import { PageHeading } from 'widgets';
 
@@ -273,9 +21,11 @@ const initialForm = {
   tanggal_mulai: '',
   tanggal_selesai: '',
   link_laporan_pdf: [],
-  status_laporan: '',
-  existingFiles: [], // Untuk menyimpan file yang sudah ada
+  status: '',
 };
+
+const MAX_FILE_COUNT = 3;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
 const sumberDanaOptions = [
   { value: 'draft', label: 'Draft' },
@@ -285,81 +35,28 @@ const sumberDanaOptions = [
 
 export default function DateForm({ id }) {
   const [form, setForm] = useState(initialForm);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [programNames, setProgramNames] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [defaultFile, setDefaultFile] = useState([]);
+  const [fileError, setFileError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const uploadFiles = async () => {
-    if (!form.nama_program) {
-      throw new Error('Pilih program terlebih dahulu');
-    }
-
-    const uploadedUrls = [];
-    const filesToUpload = form.link_laporan_pdf.filter(
-      (file) => !file.url.includes('http')
-    ); // Hanya upload file baru
-
-    for (const file of filesToUpload) {
-      try {
-        const res = await request.postMultipart(
-          `/date/${form.nama_program}/dokumentasi`,
-          { files: file.fileObject }
-        );
-        uploadedUrls.push(res.data.url);
-      } catch (err) {
-        console.error('Gagal mengunggah file:', err);
-        throw err;
-      }
-    }
-
-    return uploadedUrls;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
+  const fetchData = async () => {
     try {
-      // 1. Upload files baru terlebih dahulu
-      const newFileUrls = await uploadFiles();
+      setLoading(true);
+      const res = await request.get(`/how?all=${true}`);
 
-      // Gabungkan URL file baru dengan yang sudah ada
-      const existingFileUrls = form.link_laporan_pdf
-        .filter((file) => file.url.includes('http'))
-        .map((file) => file.url);
+      const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
 
-      const allFileUrls = [...existingFileUrls, ...newFileUrls];
+      setProgramNames(
+        dataArray.map((item) => ({
+          label: item.nama_program, // This will be displayed
+          value: item._id, // This will be the actual value
+        }))
+      );
 
-      // 2. Kirim data utama
-      const newData = {
-        nama_program: form.nama_program,
-        tanggal_mulai: form.tanggal_mulai,
-        tanggal_selesai: form.tanggal_selesai,
-        link_laporan_pdf: allFileUrls,
-        status_laporan: form.status_laporan,
-      };
-
-      await request.put(`/date/${id}`, newData);
-      alert('Data berhasil diperbarui!');
-      window.location.href = '/program/date';
-    } catch (err) {
-      console.error(err);
-      setError(err.message || 'Gagal memperbarui data.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Ambil data yang akan diupdate
+      if (id) {
         const res = await request.get(`/date/getById/${id}`);
         const {
           nama_program,
@@ -369,46 +66,184 @@ export default function DateForm({ id }) {
           status_laporan,
         } = res.data;
 
-        // Format file yang sudah ada
-        const existingFiles = Array.isArray(link_laporan_pdf)
-          ? link_laporan_pdf.map((url) => ({ url, name: url.split('/').pop() }))
-          : [];
-
         setForm({
-          nama_program,
-          tanggal_mulai,
-          tanggal_selesai,
-          link_laporan_pdf: existingFiles,
-          status_laporan,
-          existingFiles,
+          nama_program: nama_program._id,
+          tanggal_mulai: tanggal_mulai,
+          tanggal_selesai: tanggal_selesai,
+          status: status_laporan,
         });
-      } catch (err) {
-        console.error('Gagal fetch data:', err);
-      } finally {
-        setLoading(false);
+        setDefaultFile(link_laporan_pdf);
       }
-    };
 
-    if (id) fetchData();
-  }, [id]);
+      setLoading(false);
+    } catch (err) {
+      console.error('Gagal fetch data how:', err);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProgramNames = async () => {
-      try {
-        const names = await getAllHowByNamaProgram();
-        setProgramNames(names);
-      } catch (err) {
-        console.error('Gagal memuat data program:', err);
-        setProgramNames([]);
-      }
-    };
-
-    fetchProgramNames();
+    fetchData();
   }, []);
+  console.log(form);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    if (defaultFile?.length > 3) {
+      setFileError('Maksimal 3 File');
+      return;
+    }
+
+    console.log(form);
+    try {
+      const newData = {
+        nama_program: form.nama_program,
+        tanggal_mulai: form.tanggal_mulai,
+        tanggal_selesai: form.tanggal_selesai,
+        status: form.status,
+      };
+
+      const response = await request.put(`/date/${id}`, newData);
+      const doId = response.data._id;
+
+      if (uploadedFiles?.length > 0) {
+        try {
+          await uploadFiles(doId);
+        } catch (uploadError) {
+          console.error('Gagal mengunggah dokumentasi:', uploadError);
+        }
+      }
+
+      alert('Data berhasil disimpan!');
+      window.location.href = '/program/date';
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Gagal menyimpan data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadFiles = async (doId) => {
+    if (!doId) {
+      throw new Error('ID DO tidak valid');
+    }
+    console.log(uploadedFiles);
+
+    try {
+      const res = await request.postMultipart(`/date/${doId}/dokumentasi`, {
+        files: Array.from(uploadedFiles),
+      });
+
+      // Handle response
+      if (Array.isArray(res.data)) {
+        return res.data;
+      } else if (res.data.urls) {
+        return res.data.urls;
+      } else if (res.data.url) {
+        return [res.data.url];
+      }
+
+      return [];
+    } catch (err) {
+      console.error('Gagal mengunggah file:', err);
+      throw err;
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setFileError('');
+
+    // Calculate available slots for new files
+    const availableSlots = MAX_FILE_COUNT - defaultFile.length;
+
+    // Validation 1: Check if there are any available slots
+    if (availableSlots <= 0) {
+      setFileError(`Anda sudah mencapai batas maksimal ${MAX_FILE_COUNT} file`);
+      e.target.value = ''; // Clear the file input
+      return;
+    }
+
+    // Validation 2: Check if new files exceed available slots
+    if (files.length > availableSlots) {
+      setFileError(
+        `Anda hanya dapat menambahkan ${availableSlots} file lagi (total maksimal ${MAX_FILE_COUNT} file)`
+      );
+      e.target.value = ''; // Clear the file input
+      return;
+    }
+
+    // Validation 3: Check for oversized files
+    const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      setFileError(
+        `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
+          .map((f) => f.name)
+          .join(', ')}`
+      );
+      e.target.value = ''; // Clear the file input
+      return;
+    }
+
+    if (files.length > 0) {
+      setUploadedFiles(files);
+
+      const processedFiles = files.map((file) => ({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        url: URL.createObjectURL(file),
+        fileObject: file,
+      }));
+      setForm((prev) => ({
+        ...prev,
+        link_laporan_pdf: [...(prev.link_laporan_pdf || []), ...processedFiles],
+      }));
+    }
+  };
+
+  const removeFile = async (file, index, isDefault = false) => {
+    if (isDefault) {
+      try {
+        const filename = file.split('/').pop();
+        await request.delete(
+          `/date/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
+        );
+        // Remove from default files
+        const updatedDefaultFiles = [...defaultFile];
+        updatedDefaultFiles.splice(index, 1);
+        setDefaultFile(updatedDefaultFiles);
+        alert('File berhasil dihapus');
+      } catch (error) {
+        console.error('Gagal menghapus file:', error);
+        alert('Gagal menghapus file. Silakan coba lagi.');
+      }
+    } else {
+      // Remove from newly uploaded files
+      const updatedFiles = [...form.link_laporan_pdf];
+      updatedFiles.splice(index, 1);
+      setForm((prev) => ({
+        ...prev,
+        link_laporan_pdf: updatedFiles,
+      }));
+    }
+    setFileError('');
+  };
+
+  console.log(defaultFile);
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Update Data DATE" />
+      <PageHeading heading="Input Data DATE" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -417,7 +252,6 @@ export default function DateForm({ id }) {
                 {error && (
                   <div className="alert alert-danger mb-4">{error}</div>
                 )}
-
                 <Row className="mb-3">
                   <Form.Label column md={3}>
                     Nama Program
@@ -433,14 +267,13 @@ export default function DateForm({ id }) {
                     >
                       <option value="">Pilih Nama Program</option>
                       {programNames.map((opt, index) => (
-                        <option key={index} value={opt.id || opt._id}>
-                          {opt.nama_program}
+                        <option key={index} value={opt.value}>
+                          {opt.label}
                         </option>
                       ))}
                     </Selection>
                   </Col>
                 </Row>
-
                 <Row className="mb-3">
                   <Form.Label column md={3}>
                     Tanggal Mulai
@@ -455,7 +288,6 @@ export default function DateForm({ id }) {
                     />
                   </Col>
                 </Row>
-
                 <Row className="mb-3">
                   <Form.Label column md={3}>
                     Tanggal Selesai
@@ -470,10 +302,9 @@ export default function DateForm({ id }) {
                     />
                   </Col>
                 </Row>
-
                 <Row className="mb-3">
                   <Form.Label column md={3}>
-                    Dokumentasi Kegiatan
+                    Dokumen Laporan
                   </Form.Label>
                   <Col md={9}>
                     <Form.Control
@@ -481,65 +312,106 @@ export default function DateForm({ id }) {
                       type="file"
                       accept=".pdf,.jpg,.jpeg,.png,.gif"
                       multiple
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files);
-                        if (files.length > 0) {
-                          const processedFiles = files.map((file) => ({
-                            name: file.name,
-                            type: file.type,
-                            size: file.size,
-                            url: URL.createObjectURL(file),
-                            fileObject: file,
-                          }));
+                      // disabled={defaultFile?.length <= 3}
+                      // onChange={(e) => {
+                      //   const files = Array.from(e.target.files);
+                      //   if (files.length > 0) {
+                      //     setUploadedFiles(files);
 
-                          // Gabungkan dengan file yang sudah ada
-                          setForm((prev) => ({
-                            ...prev,
-                            link_laporan_pdf: [
-                              ...prev.link_laporan_pdf,
-                              ...processedFiles,
-                            ],
-                          }));
-                        }
-                      }}
+                      //     const processedFiles = files.map((file) => ({
+                      //       name: file.name,
+                      //       type: file.type,
+                      //       size: file.size,
+                      //       url: URL.createObjectURL(file),
+                      //       fileObject: file,
+                      //     }));
+                      //     setForm((prev) => ({
+                      //       ...prev,
+                      //       link_laporan_pdf: processedFiles,
+                      //     }));
+                      //   }
+                      // }}
+                      onChange={handleFileChange}
+                      // required
                     />
+                    {fileError ? (
+                      <Alert variant="danger" className="mt-2">
+                        {fileError}
+                      </Alert>
+                    ) : (
+                      <div className="text-muted small mt-1">
+                        {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
+                        Maksimal {MAX_FILE_COUNT} file (5MB/file)
+                      </div>
+                    )}
 
-                    {form.link_laporan_pdf?.length > 0 && (
+                    {(form.link_laporan_pdf?.length > 0 ||
+                      defaultFile.length > 0) && (
                       <div className="mt-3">
                         <h6>File Terpilih:</h6>
                         <div className="d-flex flex-wrap gap-2">
-                          {form.link_laporan_pdf.map((file, index) => (
-                            <FilePreviewCard
-                              key={index}
-                              file={file}
-                              onRemove={() => {
-                                const updatedFiles = [...form.link_laporan_pdf];
-                                updatedFiles.splice(index, 1);
-                                setForm((prev) => ({
-                                  ...prev,
-                                  link_laporan_pdf: updatedFiles,
-                                }));
-                              }}
-                            />
-                          ))}
+                          {defaultFile.length > 0 &&
+                            defaultFile.map((file, index) => (
+                              <FilePreviewCard
+                                key={index}
+                                file={file}
+                                // onRemove={async () => {
+                                //   try {
+                                //     const filename = file.split('/').pop();
+                                //     await request.delete(
+                                //       `/date/${id}/dokumentasi?filename=${encodeURIComponent(
+                                //         filename
+                                //       )}`
+                                //     );
+                                //     alert('File berhasil dihapus');
+                                //     fetchData();
+                                //   } catch (error) {
+                                //     console.error(
+                                //       'Gagal menghapus file:',
+                                //       error
+                                //     );
+                                //     alert(
+                                //       'Gagal menghapus file. Silakan coba lagi.'
+                                //     );
+                                //   }
+                                // }}
+                                onRemove={() => removeFile(file, index, true)}
+                              />
+                            ))}
+                          {form.link_laporan_pdf?.length > 0 &&
+                            form.link_laporan_pdf.map((file, index) => (
+                              <FilePreviewCard
+                                key={index}
+                                file={file}
+                                onRemove={() => {
+                                  const updatedFiles = [
+                                    ...form.link_laporan_pdf,
+                                  ];
+                                  updatedFiles.splice(index, 1);
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    link_laporan_pdf: updatedFiles,
+                                  }));
+                                }}
+                              />
+                            ))}
                         </div>
                       </div>
                     )}
                   </Col>
                 </Row>
-
                 <Row className="mb-3">
                   <Form.Label column md={3}>
-                    Status Laporan
+                    Status
                   </Form.Label>
                   <Col md={9}>
                     <Form.Select
-                      name="status_laporan"
-                      value={form.status_laporan}
+                      name="status"
+                      value={form.status}
                       onChange={handleChange}
                       required
                     >
-                      <option value="">Pilih Status Laporan</option>
+                      <option value="">Pilih Status</option>
                       {sumberDanaOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -548,7 +420,6 @@ export default function DateForm({ id }) {
                     </Form.Select>
                   </Col>
                 </Row>
-
                 <Row className="mt-8">
                   <Col md={12}>
                     <div className="d-flex align-items-center justify-content-end">
@@ -559,7 +430,7 @@ export default function DateForm({ id }) {
                           type="submit"
                           disabled={loading}
                         >
-                          {loading ? 'Memproses...' : 'Update'}
+                          {loading ? 'Menyimpan...' : 'Simpan'}
                         </Button>
                         <Button
                           variant="outline-white"

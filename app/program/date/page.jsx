@@ -35,6 +35,7 @@ const DatePage = () => {
   const handleSearch = async () => {
     try {
       setLoading(true);
+      setPage(1);
       const res = await request.get(
         `/date/search?q=${searchQuery}&page=${page}&limit=${limit}`
       );
@@ -59,7 +60,7 @@ const DatePage = () => {
     try {
       setLoading(true);
       const res = await request.get(
-        `/date?page=${pageNumber}&limit=${limitNumber}`
+        `/date/populated?page=${pageNumber}&limit=${limitNumber}`
       );
 
       const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
@@ -95,7 +96,7 @@ const DatePage = () => {
     setPage(newPage);
   };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
@@ -161,7 +162,7 @@ const DatePage = () => {
                                 index +
                                 1}
                             </td>
-                            <td>{program.nama_program}</td>
+                            <td>{program.nama_program.nama_program}</td>
                             <td>{program.tanggal_mulai?.slice(0, 10) || ''}</td>
                             <td>
                               {program.tanggal_selesai?.slice(0, 10) || ''}

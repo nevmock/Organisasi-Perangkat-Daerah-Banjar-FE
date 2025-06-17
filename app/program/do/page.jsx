@@ -58,7 +58,7 @@ const DoPage = () => {
     try {
       setLoading(true);
       const res = await request.get(
-        `/do?page=${pageNumber}&limit=${limitNumber}`
+        `/do/populated?page=${pageNumber}&limit=${limitNumber}`
       );
 
       const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
@@ -94,7 +94,7 @@ const DoPage = () => {
     setPage(newPage);
   };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
@@ -156,7 +156,7 @@ const DoPage = () => {
                                 index +
                                 1}
                             </td>
-                            <td>{program.nama_program}</td>
+                            <td>{program.nama_program.nama_program}</td>
                             <td>
                               {program.kolaborator
                                 .map((item) => item.nama)

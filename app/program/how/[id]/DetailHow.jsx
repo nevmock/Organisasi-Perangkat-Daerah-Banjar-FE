@@ -357,7 +357,6 @@ const InputProgram = ({ id }) => {
                               value={form.tingkat_kepuasan}
                               onChange={handleChange}
                               required
-                              className="mb-2"
                             />
                             <InputGroup.Text>%</InputGroup.Text>
                           </InputGroup>
