@@ -207,6 +207,8 @@ export default function DoForm() {
     setFileError('');
   };
 
+  console.log(programNames);
+
   return (
     <Container fluid className="p-6">
       <PageHeading heading="Input Data DO" />
@@ -224,7 +226,7 @@ export default function DoForm() {
                     Nama Program
                   </Form.Label>
                   <Col md={9}>
-                    <Selection
+                    {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -238,7 +240,25 @@ export default function DoForm() {
                           {opt.nama_program}
                         </option>
                       ))}
-                    </Selection>
+                    </Selection> */}
+                    {/* <Selection
+                      name="nama_program"
+                      value={form.nama_program}
+                      onChange={handleChange}
+                      options={programNames}
+                      optionLabel="nama_program"
+                      optionValue="id"
+                      placeholder="Pilih Nama Program"
+                    /> */}
+                    <Selection
+                      name="nama_program"
+                      value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
+                      onChange={handleChange}
+                      options={programNames}
+                      optionLabel="nama_program"
+                      optionValue="id"
+                      placeholder="Pilih Nama Program"
+                    />
                   </Col>
                 </Row>
 

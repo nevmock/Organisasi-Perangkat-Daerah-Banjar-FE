@@ -352,7 +352,7 @@ const NavbarVertical = (props) => {
             })}
           </Accordion>
           {/* end of Dashboard Menu */}
-          <div className="mt-auto p-3">
+          {/* <div className="mt-auto p-3">
             <button
               className="btn btn-outline-danger w-100"
               onClick={handleLogout}
@@ -360,7 +360,7 @@ const NavbarVertical = (props) => {
             >
               Logout
             </button>
-          </div>
+          </div> */}
         </div>
       </SimpleBar>
     </Fragment>
