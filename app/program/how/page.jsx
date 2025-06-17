@@ -95,7 +95,7 @@ const HowPage = () => {
     setPage(newPage);
   };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
