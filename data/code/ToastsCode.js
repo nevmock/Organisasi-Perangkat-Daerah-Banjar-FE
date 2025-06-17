@@ -73,7 +73,7 @@ export const PlacementCode1 = `
     <ToastContainer className="p-3" position={position}>
         <Toast>
             <Toast.Header closeButton={false}>
-                <Image src="/images/avatar/avatar-1.jpg" className="rounded me-2 avatar-xs" alt="..." />
+                <Image src="/images/logo/logo-banjar.png" className="rounded me-2 avatar-xs" alt="..." />
                 <strong className="me-auto">Bootstrap</strong>
                 <small>11 mins ago</small>
             </Toast.Header>
@@ -181,13 +181,13 @@ const Toasts = () => {
 `.trim();
 
 export const ToastsCode = [
-	BasicExampleCode,
-	TranslucentToastsCode,
-	StackingCode,
-	PlacementCode1,
-	PlacementCode2,
-	PlacementCode3,
-	DismissibleCode
+  BasicExampleCode,
+  TranslucentToastsCode,
+  StackingCode,
+  PlacementCode1,
+  PlacementCode2,
+  PlacementCode3,
+  DismissibleCode,
 ];
 
 export default ToastsCode;

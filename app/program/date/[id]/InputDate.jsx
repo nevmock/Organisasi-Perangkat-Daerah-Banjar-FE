@@ -51,8 +51,8 @@ export default function DateForm({ id }) {
 
       setProgramNames(
         dataArray.map((item) => ({
-          label: item.nama_program, // This will be displayed
-          value: item._id, // This will be the actual value
+          nama_program: item.nama_program, // This will be displayed
+          id: item._id, // This will be the actual value
         }))
       );
 
@@ -257,7 +257,7 @@ export default function DateForm({ id }) {
                     Nama Program
                   </Form.Label>
                   <Col md={9}>
-                    <Selection
+                    {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -271,7 +271,16 @@ export default function DateForm({ id }) {
                           {opt.label}
                         </option>
                       ))}
-                    </Selection>
+                    </Selection> */}
+                    <Selection
+                      name="nama_program"
+                      value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
+                      onChange={handleChange}
+                      options={programNames}
+                      optionLabel="nama_program"
+                      optionValue="id"
+                      placeholder="Pilih Nama Program"
+                    />
                   </Col>
                 </Row>
                 <Row className="mb-3">

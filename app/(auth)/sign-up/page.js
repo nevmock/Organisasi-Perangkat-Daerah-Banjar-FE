@@ -68,7 +68,17 @@ const SignUp = () => {
             {/* Card body */}
             <Card.Body className="p-6">
               <div className="mb-4">
-                <Link href="/">
+                <Link
+                  href="/"
+                  className="d-flex align-items-center text-decoration-none"
+                >
+                  {/* Logo Image */}
+                  <img
+                    src="/images/logo/logo-banjar.png"
+                    alt="Banjar Logo"
+                    className="me-2" // margin end (right) 2
+                    style={{ height: '60px' }} // sesuaikan tinggi sesuai kebutuhan
+                  />
                   <svg
                     width="141"
                     height="19"

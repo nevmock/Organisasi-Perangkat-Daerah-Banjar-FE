@@ -30,9 +30,12 @@ const Selection = ({
   validationStyle = {},
   enableCustomOption = false,
   onInputChange = (e) => {},
+  options: propOptions = [],
+  optionLabel = 'label', // default ke 'label' jika tidak ditentukan
+  optionValue = 'value',
 }) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
-  const [options, setOptions] = useState(null);
+  const [options, setOptions] = useState([]); // Ubah initial state ke array kosong
   const [currentOptions, setCurrentOptions] = useState([]);
 
   const SelectComponent = enableCustomOption ? CreatableSelect : Select;
@@ -51,15 +54,34 @@ const Selection = ({
     onInputChange(value);
   };
 
+  // useEffect(() => {
+  //   if (children) {
+  //     const childObj = Children.toArray(children)
+  //       .filter((child) => isValidElement(child) && child.type === 'option')
+  //       .map((child) => {
+  //         return {
+  //           label: child.props.children,
+  //           value: child.props.value,
+  //           isDisabled: child.props.disabled,
+  //         };
+  //       });
+
+  //     setOptions(childObj);
+  //   }
+  // }, [children]);
+
   useEffect(() => {
     if (children) {
       const childObj = Children.toArray(children)
         .filter((child) => isValidElement(child) && child.type === 'option')
         .map((child) => {
+          // Cari objek program yang sesuai
+          const program = programNames.find((p) => p.id === child.props.value);
           return {
-            label: child.props.children,
+            label: program ? program.nama_program : child.props.children,
             value: child.props.value,
             isDisabled: child.props.disabled,
+            originalData: program, // Simpan data asli jika diperlukan
           };
         });
 
@@ -67,20 +89,42 @@ const Selection = ({
     }
   }, [children]);
 
+  // useEffect(() => {
+  //   if (options) {
+  //     if (!options?.find((v) => v?.value === value)) {
+  //       if (String(value) != '') {
+  //         setCurrentOptions([
+  //           ...options,
+  //           { label: value, value: value, isDisabled: false },
+  //         ]);
+  //       }
+  //     } else {
+  //       setCurrentOptions(options);
+  //     }
+  //   }
+  // }, [options, value]);
+
   useEffect(() => {
-    if (options) {
-      if (!options?.find((v) => v?.value === value)) {
-        if (String(value) != '') {
-          setCurrentOptions([
-            ...options,
-            { label: value, value: value, isDisabled: false },
-          ]);
-        }
-      } else {
-        setCurrentOptions(options);
-      }
+    if (propOptions && propOptions.length > 0) {
+      const mappedOptions = propOptions.map((option) => ({
+        label: option[optionLabel],
+        value: option[optionValue],
+        originalData: option,
+      }));
+      setOptions(mappedOptions);
+      setCurrentOptions(mappedOptions); // Langsung set currentOptions juga
+    } else if (children) {
+      const childObj = Children.toArray(children)
+        .filter((child) => isValidElement(child) && child.type === 'option')
+        .map((child) => ({
+          label: child.props.children,
+          value: child.props.value,
+          isDisabled: child.props.disabled,
+        }));
+      setOptions(childObj);
+      setCurrentOptions(childObj); // Langsung set currentOptions juga
     }
-  }, [options, value]);
+  }, [propOptions, children, optionLabel, optionValue]);
 
   return (
     <div>
@@ -161,7 +205,15 @@ const Selection = ({
                 : ''
             }`,
         }}
-        value={value ? { label: value, value: value, isDisabled: false } : null}
+        // value={value ? { label: value, value: value, isDisabled: false } : null}
+        value={
+          value
+            ? options.find((opt) => String(opt.value) === String(value)) || {
+                label: value,
+                value: value,
+              }
+            : null
+        }
         name={name}
         onChange={(e) => {
           const customEvent = {
@@ -177,7 +229,8 @@ const Selection = ({
 
           setMenuIsOpen(false);
         }}
-        options={currentOptions}
+        // options={currentOptions}
+        options={options}
         placeholder={placeHolder || 'Select an option'}
         isClearable={false}
         onInputChange={handleInputChange}

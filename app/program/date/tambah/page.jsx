@@ -499,7 +499,7 @@ export default function DateForm() {
                     Nama Program
                   </Form.Label>
                   <Col md={9}>
-                    <Selection
+                    {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -513,7 +513,16 @@ export default function DateForm() {
                           {opt.nama_program}
                         </option>
                       ))}
-                    </Selection>
+                    </Selection> */}
+                    <Selection
+                      name="nama_program"
+                      value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
+                      onChange={handleChange}
+                      options={programNames}
+                      optionLabel="nama_program"
+                      optionValue="id"
+                      placeholder="Pilih Nama Program"
+                    />
                   </Col>
                 </Row>
                 <Row className="mb-3">
