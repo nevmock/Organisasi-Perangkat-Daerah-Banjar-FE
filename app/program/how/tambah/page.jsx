@@ -25,6 +25,8 @@ const InputProgram = ({ id }) => {
     opd_kolaborator: [''],
     status: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -119,6 +121,9 @@ const InputProgram = ({ id }) => {
             <Card.Body>
               {hasMounted && (
                 <Form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger mb-4">{error}</div>
+                  )}
                   <Row className="mb-3">
                     <Form.Label column md={3}>
                       Nama Program

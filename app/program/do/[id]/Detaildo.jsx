@@ -1,6 +1,7 @@
 'use client';
 
 import { getAllHowByNamaProgram } from 'app/api/getAllHowByNamaProgram';
+import Selection from 'components/form/selection';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import request from 'utils/request';
@@ -140,7 +141,7 @@ export default function DoForm({ id }) {
                     />
                   </Col>
                 </Row> */}
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                   <Form.Label column md={3}>
                     Nama Program
                   </Form.Label>
@@ -158,6 +159,27 @@ export default function DoForm({ id }) {
                         </option>
                       ))}
                     </Form.Select>
+                  </Col>
+                </Row> */}
+                <Row className="mb-3">
+                  <Form.Label column md={3}>
+                    Nama Program
+                  </Form.Label>
+                  <Col md={9}>
+                    <Selection
+                      name="nama_program"
+                      value={form.nama_program}
+                      onChange={handleChange}
+                      placeHolder="Pilih Nama Program"
+                      className="form-select"
+                    >
+                      <option value="">Pilih Nama Program</option>
+                      {programNames.map((opt, index) => (
+                        <option key={index} value={opt.nama_program}>
+                          {opt.nama_program}
+                        </option>
+                      ))}
+                    </Selection>
                   </Col>
                 </Row>
 
