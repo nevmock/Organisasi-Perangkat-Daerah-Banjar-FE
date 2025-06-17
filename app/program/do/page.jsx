@@ -10,55 +10,91 @@ import {
   Container,
   Form,
   Button,
+  InputGroup,
 } from 'react-bootstrap';
-
 import { HighlightCode } from 'widgets';
-
 import { ResponsiveTableCode } from 'data/code/TablesCode';
-
 import { useEffect, useState } from 'react';
-
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
 
 const DoPage = () => {
   const [programs, setPrograms] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState([]); // Data setelah search
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [paginationData, setPaginationData] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0,
+  });
 
-  const handleSearch = () => {
-    const filtered = programs.filter((item) =>
-      item.nama_program.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredData(filtered);
-    setCurrentPage(1); // Reset ke halaman 1 saat search
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const res = await request.get(
+        `/do/search?q=${searchQuery}&page=${page}&limit=${limit}`
+      );
+
+      const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
+
+      setPrograms(dataArray);
+      setPaginationData({
+        total: res.data.total,
+        page: res.data.page,
+        limit: res.data.limit,
+        totalPages: res.data.totalPages,
+      });
+      setLoading(false);
+    } catch (err) {
+      console.error('Gagal melakukan pencarian:', err);
+      setLoading(false);
+    }
+  };
+
+  const fetchData = async (pageNumber = page, limitNumber = limit) => {
+    try {
+      setLoading(true);
+      const res = await request.get(
+        `/do/populated?page=${pageNumber}&limit=${limitNumber}`
+      );
+
+      const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
+
+      setPrograms(dataArray);
+      setPaginationData({
+        total: res.data.total,
+        page: res.data.page,
+        limit: res.data.limit,
+        totalPages: res.data.totalPages,
+      });
+      setLoading(false);
+    } catch (err) {
+      console.error('Gagal fetch data do:', err);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await request.get(`/do`);
-        setPrograms(res.data);
-        setFilteredData(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Gagal fetch data how:', err);
-        setLoading(false);
+    // Gunakan debounce untuk menghindari terlalu banyak request
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery.trim() !== '') {
+        handleSearch();
+      } else {
+        fetchData();
       }
-    };
+    }, 500); // Delay 500ms setelah user berhenti mengetik
 
-    fetchData();
-  }, []);
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, page, limit]);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
@@ -78,23 +114,20 @@ const DoPage = () => {
           <Tab.Container id="tab-container-11" defaultActiveKey="design">
             <Card>
               <Card.Header className="border-bottom-0 p-3 bg-white">
-                <Form
-                  className="d-flex align-items-center gap-2 "
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSearch();
-                  }}
-                >
-                  <Form.Control
-                    type="text"
-                    placeholder="Cari program..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <Button variant="secondary" type="submit">
-                    Cari
-                  </Button>
-                  <Button variant="primary" href="/program/do/tambah">
+                <Form className="d-flex align-items-center gap-2">
+                  <InputGroup style={{ maxWidth: '300px' }}>
+                    <InputGroup.Text>
+                      <i className="nav-icon fe fe-search me-2"></i>
+                    </InputGroup.Text>
+                    <Form.Control
+                      size="sm"
+                      type="text"
+                      placeholder="Cari program..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </InputGroup>
+                  <Button size="sm" variant="primary" href="/program/do/tambah">
                     Tambah
                   </Button>
                 </Form>
@@ -115,10 +148,15 @@ const DoPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {currentItems.map((program, index) => (
-                          <tr key={program._id}>
-                            <td>{indexOfFirstItem + index + 1}</td>
-                            <td>{program.nama_program}</td>
+                        {programs.map((program, index) => (
+                          <tr key={program._id || index}>
+                            <td>
+                              {(paginationData.page - 1) *
+                                paginationData.limit +
+                                index +
+                                1}
+                            </td>
+                            <td>{program.nama_program.nama_program}</td>
                             <td>
                               {program.kolaborator
                                 .map((item) => item.nama)
@@ -145,11 +183,11 @@ const DoPage = () => {
                         ))}
                       </tbody>
                     </Table>
-                    {filteredData.length > itemsPerPage && (
+                    {paginationData.totalPages > 1 && (
                       <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
+                        currentPage={paginationData.page}
+                        totalPages={paginationData.totalPages}
+                        onPageChange={handlePageChange}
                       />
                     )}
                     {/* end of code */}

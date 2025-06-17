@@ -1,10 +1,10 @@
 // import node module libraries
-import { Menu } from "react-feather";
-import Link from "next/link";
-import { Nav, Navbar, Form } from "react-bootstrap";
+import { Menu } from 'react-feather';
+import Link from 'next/link';
+import { Nav, Navbar, Form } from 'react-bootstrap';
 
 // import sub components
-import QuickMenu from "layouts/QuickMenu";
+import QuickMenu from 'layouts/QuickMenu';
 
 const NavbarTop = (props) => {
   return (

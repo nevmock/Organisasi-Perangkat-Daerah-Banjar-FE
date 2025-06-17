@@ -1,6 +1,6 @@
-"use client";
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+'use client';
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Button,
   Card,
@@ -9,11 +9,11 @@ import {
   Form,
   Modal,
   Row,
-} from "react-bootstrap";
-import { getISOWeek } from "utils/getISOWeek";
-import { PageHeading } from "widgets";
-import useMounted from "hooks/useMounted";
-import request from "utils/request";
+} from 'react-bootstrap';
+import { getISOWeek } from 'utils/getISOWeek';
+import { PageHeading } from 'widgets';
+import useMounted from 'hooks/useMounted';
+import request from 'utils/request';
 
 const DetailLaporan = ({ id }) => {
   const hasMounted = useMounted();
@@ -22,14 +22,14 @@ const DetailLaporan = ({ id }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const baseURL = "http://localhost:5050/";
+  const baseURL = 'http://localhost:5050/';
 
   const fetchData = useCallback(async () => {
     try {
       const res = await request.get(`/perencanaan/getById/${id}`);
       setDataProgram(res.data);
     } catch (err) {
-      console.error("Gagal fetch data perencanaan:", err);
+      console.error('Gagal fetch data perencanaan:', err);
     }
   }, [id]);
 
@@ -59,6 +59,7 @@ const DetailLaporan = ({ id }) => {
     // Ambil input file langsung via querySelector
     const evidenceInput = form.querySelector(`[name="evidence[${index}][]"]`);
     const evidenceFiles = evidenceInput?.files;
+    console.log(evidenceFiles);
 
     const payload = {
       sudah_selesai: !!sudahSelesai,
@@ -69,8 +70,8 @@ const DetailLaporan = ({ id }) => {
     try {
       await request.put(`/indikator/${indikatorId}`, payload);
     } catch (err) {
-      console.error("Gagal update indikator:", err);
-      alert("Gagal update indikator.");
+      console.error('Gagal update indikator:', err);
+      alert('Gagal update indikator.');
       return;
     }
 
@@ -84,13 +85,13 @@ const DetailLaporan = ({ id }) => {
           }
         );
       } catch (err) {
-        console.error("Gagal upload evidence:", err?.response?.data || err);
-        alert("Gagal upload evidence.");
+        console.error('Gagal upload evidence:', err?.response?.data || err);
+        alert('Gagal upload evidence.');
         return;
       }
     }
 
-    alert("Laporan berhasil disimpan!");
+    alert('Laporan berhasil disimpan!');
     fetchData();
   };
 
@@ -99,14 +100,14 @@ const DetailLaporan = ({ id }) => {
       await request.delete(`/indikator/${indikatorId}/remove-evidence`, {
         url: urlEvidence,
       });
-      alert("Evidence berhasil dihapus!");
+      alert('Evidence berhasil dihapus!');
       fetchData(); // Refresh data setelah hapus
     } catch (error) {
       console.error(
-        "Gagal menghapus evidence:",
+        'Gagal menghapus evidence:',
         error?.response?.data || error
       );
-      alert("Gagal menghapus evidence.");
+      alert('Gagal menghapus evidence.');
     }
   };
 
@@ -134,7 +135,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="namaProgram"
                         type="text"
-                        value={dataProgram?.nama_program || ""}
+                        value={dataProgram?.nama_program || ''}
                         readOnly
                       />
                     </Col>
@@ -151,7 +152,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="namaPelaksana"
                         type="text"
-                        value={dataProgram?.opd_pelaksana || ""}
+                        value={dataProgram?.opd_pelaksana || ''}
                         readOnly
                       />
                     </Col>
@@ -168,7 +169,7 @@ const DetailLaporan = ({ id }) => {
                       <Form.Control
                         id="tglPelaksanaan"
                         type="week"
-                        value={getISOWeek(dataProgram?.tgl_mulai || "")}
+                        value={getISOWeek(dataProgram?.tgl_mulai || '')}
                         readOnly
                       />
                     </Col>
@@ -186,7 +187,7 @@ const DetailLaporan = ({ id }) => {
                         id="target"
                         as="textarea"
                         rows={3}
-                        value={dataProgram?.target || ""}
+                        value={dataProgram?.target || ''}
                         readOnly
                       />
                     </Col>
@@ -220,13 +221,13 @@ const DetailLaporan = ({ id }) => {
                       <div className="mb-4 border rounded p-3">
                         <div
                           className="d-flex justify-content-between align-items-center"
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: 'pointer' }}
                           onClick={() => toggleDropdown(index)}
                         >
                           <h5 className="mb-0">
                             {index + 1}. {item.indikator_label}
                           </h5>
-                          <span>{isOpen ? "▲ Tutup" : "▼ Lihat"}</span>
+                          <span>{isOpen ? '▲ Tutup' : '▼ Lihat'}</span>
                         </div>
 
                         {isOpen && (
@@ -261,15 +262,15 @@ const DetailLaporan = ({ id }) => {
                                     {item.evidence.map((imgPath, i) => {
                                       const fixedUrl = imgPath.replace(
                                         /\\/g,
-                                        "/"
+                                        '/'
                                       );
 
                                       return (
                                         <div
                                           key={i}
                                           style={{
-                                            position: "relative",
-                                            display: "inline-block",
+                                            position: 'relative',
+                                            display: 'inline-block',
                                           }}
                                         >
                                           <img
@@ -278,8 +279,8 @@ const DetailLaporan = ({ id }) => {
                                             style={{
                                               width: 80,
                                               height: 80,
-                                              objectFit: "cover",
-                                              cursor: "pointer",
+                                              objectFit: 'cover',
+                                              cursor: 'pointer',
                                               borderRadius: 4,
                                             }}
                                             onClick={() =>
@@ -295,18 +296,18 @@ const DetailLaporan = ({ id }) => {
                                               )
                                             }
                                             style={{
-                                              position: "absolute",
+                                              position: 'absolute',
                                               top: 2,
                                               right: 2,
                                               backgroundColor:
-                                                "rgba(255,0,0,0.7)",
-                                              border: "none",
-                                              borderRadius: "50%",
+                                                'rgba(255,0,0,0.7)',
+                                              border: 'none',
+                                              borderRadius: '50%',
                                               width: 20,
                                               height: 20,
-                                              color: "white",
-                                              fontWeight: "bold",
-                                              cursor: "pointer",
+                                              color: 'white',
+                                              fontWeight: 'bold',
+                                              cursor: 'pointer',
                                             }}
                                             title="Hapus gambar"
                                           >
@@ -329,7 +330,7 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`kendala[${index}]`}
-                                  defaultValue={item.kendala || ""}
+                                  defaultValue={item.kendala || ''}
                                 />
                               </Col>
                             </Row>
@@ -343,7 +344,7 @@ const DetailLaporan = ({ id }) => {
                                   as="textarea"
                                   rows={2}
                                   name={`tindakan[${index}]`}
-                                  defaultValue={item.kesimpulan_tindakan || ""}
+                                  defaultValue={item.kesimpulan_tindakan || ''}
                                 />
                               </Col>
                             </Row>
@@ -371,7 +372,7 @@ const DetailLaporan = ({ id }) => {
           <img
             src={previewImage}
             alt="Preview"
-            style={{ width: "100%", height: "auto" }}
+            style={{ width: '100%', height: 'auto' }}
           />
         </Modal.Body>
       </Modal>

@@ -1,34 +1,34 @@
 // import node module libraries
-import Link from "next/link";
-import { Fragment } from "react";
-import { useMediaQuery } from "react-responsive";
-import { Row, Col, Image, Dropdown, ListGroup } from "react-bootstrap";
+import Link from 'next/link';
+import { Fragment } from 'react';
+import { useMediaQuery } from 'react-responsive';
+import { Row, Col, Image, Dropdown, ListGroup } from 'react-bootstrap';
 
 // simple bar scrolling used for notification item scrolling
-import SimpleBar from "simplebar-react";
-import "simplebar/dist/simplebar.min.css";
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
 
 // import data files
-import NotificationList from "data/Notification";
+import NotificationList from 'data/Notification';
 
 // import hooks
-import useMounted from "hooks/useMounted";
+import useMounted from 'hooks/useMounted';
 
 const QuickMenu = () => {
   const hasMounted = useMounted();
 
   const isDesktop = useMediaQuery({
-    query: "(min-width: 1224px)",
+    query: '(min-width: 1224px)',
   });
 
   const Notifications = () => {
     return (
-      <SimpleBar style={{ maxHeight: "300px" }}>
+      <SimpleBar style={{ maxHeight: '300px' }}>
         <ListGroup variant="flush">
           {NotificationList.map(function (item, index) {
             return (
               <ListGroup.Item
-                className={index === 0 ? "bg-light" : ""}
+                className={index === 0 ? 'bg-light' : ''}
                 key={index}
               >
                 <Row>
@@ -54,7 +54,7 @@ const QuickMenu = () => {
         bsPrefix="navbar-nav"
         className="navbar-right-wrap ms-auto d-flex nav-top-wrap"
       >
-        {/* <Dropdown as="li" className="ms-2">
+        <Dropdown as="li" className="ms-2">
           <Dropdown.Toggle
             as="a"
             bsPrefix=" "
@@ -100,7 +100,7 @@ const QuickMenu = () => {
               <i className="fe fe-power me-2"></i>Sign Out
             </Dropdown.Item>
           </Dropdown.Menu>
-        </Dropdown> */}
+        </Dropdown>
       </ListGroup>
     );
   };
@@ -112,7 +112,7 @@ const QuickMenu = () => {
         bsPrefix="navbar-nav"
         className="navbar-right-wrap ms-auto d-flex nav-top-wrap"
       >
-        {/* <Dropdown as="li" className="ms-2">
+        <Dropdown as="li" className="ms-2">
           <Dropdown.Toggle
             as="a"
             bsPrefix=" "
@@ -157,7 +157,7 @@ const QuickMenu = () => {
               <i className="fe fe-power me-2"></i>Sign Out
             </Dropdown.Item>
           </Dropdown.Menu>
-        </Dropdown> */}
+        </Dropdown>
       </ListGroup>
     );
   };

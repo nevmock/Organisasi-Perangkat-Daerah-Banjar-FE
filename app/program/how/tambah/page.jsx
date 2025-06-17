@@ -1,7 +1,15 @@
 'use client';
 import useMounted from 'hooks/useMounted';
 import { useEffect, useState } from 'react';
-import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  InputGroup,
+  Row,
+} from 'react-bootstrap';
 import request from 'utils/request';
 import { PageHeading } from 'widgets';
 
@@ -25,6 +33,8 @@ const InputProgram = ({ id }) => {
     opd_kolaborator: [''],
     status: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +97,7 @@ const InputProgram = ({ id }) => {
       target_indikator_kinerja: {
         jumlah_peserta: parseInt(form.jumlah_peserta) || 0,
         jumlah_pelatihan: parseInt(form.jumlah_pelatihan) || 0,
-        tingkat_kepuasan: form.tingkat_kepuasan,
+        tingkat_kepuasan: parseInt(form.tingkat_kepuasan) || 0,
       },
       rencana_lokasi: {
         kelurahan: form.lokasi_kelurahan,
@@ -119,6 +129,9 @@ const InputProgram = ({ id }) => {
             <Card.Body>
               {hasMounted && (
                 <Form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger mb-4">{error}</div>
+                  )}
                   <Row className="mb-3">
                     <Form.Label column md={3}>
                       Nama Program
@@ -315,14 +328,17 @@ const InputProgram = ({ id }) => {
                       </Row>
                       <Row className="mb-2">
                         <Col md={6}>
-                          <Form.Control
-                            name="tingkat_kepuasan"
-                            placeholder="Tingkat Kepuasan Minimum (%)"
-                            value={form.tingkat_kepuasan}
-                            onChange={handleChange}
-                            required
-                            className="mb-2"
-                          />
+                          <InputGroup>
+                            <Form.Control
+                              type="number"
+                              name="tingkat_kepuasan"
+                              placeholder="Tingkat Kepuasan Minimum (%)"
+                              value={form.tingkat_kepuasan}
+                              onChange={handleChange}
+                              required
+                            />
+                            <InputGroup.Text>%</InputGroup.Text>
+                          </InputGroup>
                         </Col>
                       </Row>
                     </Col>
