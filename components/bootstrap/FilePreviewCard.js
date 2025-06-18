@@ -306,9 +306,9 @@ const FilePreviewCard = ({ file, onRemove }) => {
       if (file.startsWith('http')) {
         previewUrl = file;
       } else if (file.startsWith('/')) {
-        previewUrl = `http://localhost:5050/public/${file}`;
+        previewUrl = `${process.env.NEXT_PUBLIC_API_URL}/public/${file}`;
       } else {
-        previewUrl = `http://localhost:5050/public/${file}`;
+        previewUrl = `${process.env.NEXT_PUBLIC_API_URL}/public/${file}`;
       }
 
       return {

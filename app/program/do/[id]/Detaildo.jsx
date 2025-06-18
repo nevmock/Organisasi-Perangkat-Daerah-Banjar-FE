@@ -89,6 +89,12 @@ export default function DoForm({ id }) {
   }, []);
   console.log(form);
 
+  const validateFileCount = () => {
+    const totalFiles =
+      defaultFile.length + (form.dokumentasi_kegiatan?.length || 0);
+    return totalFiles <= MAX_FILE_COUNT;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -117,12 +123,12 @@ export default function DoForm({ id }) {
     setLoading(true);
     setError(null);
 
-    if (defaultFile?.length > 3) {
-      setFileError('Maksimal 3 File');
+    const totalFiles = defaultFile.length + uploadedFiles.length;
+    if (totalFiles > MAX_FILE_COUNT) {
+      setFileError(`Maksimal ${MAX_FILE_COUNT} file`);
+      setLoading(false);
       return;
     }
-
-    console.log(form);
 
     try {
       const newData = {
@@ -130,7 +136,6 @@ export default function DoForm({ id }) {
         kolaborator: form.kolaborator,
         rincian_kegiatan: form.rincian_kegiatan,
         capaian_output: form.capaian_output,
-        dokumentasi_kegiatan: form.dokumentasi_kegiatan,
         kendala: form.kendala,
         rekomendasi: form.rekomendasi,
       };
@@ -138,12 +143,8 @@ export default function DoForm({ id }) {
       const response = await request.put(`/do/${id}`, newData);
       const doId = response.data._id;
 
-      if (uploadedFiles?.length > 0) {
-        try {
-          await uploadFiles(doId);
-        } catch (uploadError) {
-          console.error('Gagal mengunggah dokumentasi:', uploadError);
-        }
+      if (uploadedFiles.length > 0) {
+        await uploadFiles(doId);
       }
 
       alert('Data berhasil disimpan!');
@@ -157,70 +158,104 @@ export default function DoForm({ id }) {
   };
 
   const uploadFiles = async (doId) => {
-    if (!doId) {
-      throw new Error('ID DO tidak valid');
-    }
-    console.log(uploadedFiles);
+    if (!doId || uploadedFiles.length === 0) return;
 
     try {
       const res = await request.postMultipart(`/do/${doId}/dokumentasi`, {
         files: Array.from(uploadedFiles),
       });
-
-      // Handle response
-      if (Array.isArray(res.data)) {
-        return res.data;
-      } else if (res.data.urls) {
-        return res.data.urls;
-      } else if (res.data.url) {
-        return [res.data.url];
-      }
-
-      return [];
+      return res.data?.urls || [];
     } catch (err) {
       console.error('Gagal mengunggah file:', err);
       throw err;
     }
   };
 
+  // const handleFileChange = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   setFileError('');
+
+  //   // Calculate available slots for new files
+  //   const availableSlots = MAX_FILE_COUNT - defaultFile.length;
+
+  //   // Validation 1: Check if there are any available slots
+  //   if (availableSlots <= 0) {
+  //     setFileError(`Anda sudah mencapai batas maksimal ${MAX_FILE_COUNT} file`);
+  //     e.target.value = ''; // Clear the file input
+  //     return;
+  //   }
+
+  //   // Validation 2: Check if new files exceed available slots
+  //   if (files.length > availableSlots) {
+  //     setFileError(
+  //       `Anda hanya dapat menambahkan ${availableSlots} file lagi (total maksimal ${MAX_FILE_COUNT} file)`
+  //     );
+  //     e.target.value = ''; // Clear the file input
+  //     return;
+  //   }
+
+  //   // Validation 3: Check for oversized files
+  //   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+  //   if (oversizedFiles.length > 0) {
+  //     setFileError(
+  //       `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
+  //         .map((f) => f.name)
+  //         .join(', ')}`
+  //     );
+  //     e.target.value = ''; // Clear the file input
+  //     return;
+  //   }
+
+  //   if (files.length > 0) {
+  //     setUploadedFiles(files);
+
+  //     const processedFiles = files.map((file) => ({
+  //       name: file.name,
+  //       type: file.type,
+  //       size: file.size,
+  //       url: URL.createObjectURL(file),
+  //       fileObject: file,
+  //     }));
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       dokumentasi_kegiatan: [
+  //         ...(prev.dokumentasi_kegiatan || []),
+  //         ...processedFiles,
+  //       ],
+  //     }));
+  //   }
+  // };
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setFileError('');
 
-    // Calculate available slots for new files
-    const availableSlots = MAX_FILE_COUNT - defaultFile.length;
+    // Hitung total file yang akan ada
+    const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
 
-    // Validation 1: Check if there are any available slots
-    if (availableSlots <= 0) {
-      setFileError(`Anda sudah mencapai batas maksimal ${MAX_FILE_COUNT} file`);
-      e.target.value = ''; // Clear the file input
+    if (totalFiles > MAX_FILE_COUNT) {
+      const availableSlots =
+        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      e.target.value = '';
       return;
     }
 
-    // Validation 2: Check if new files exceed available slots
-    if (files.length > availableSlots) {
-      setFileError(
-        `Anda hanya dapat menambahkan ${availableSlots} file lagi (total maksimal ${MAX_FILE_COUNT} file)`
-      );
-      e.target.value = ''; // Clear the file input
-      return;
-    }
-
-    // Validation 3: Check for oversized files
+    // Validasi ukuran file
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       setFileError(
-        `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
-          .map((f) => f.name)
-          .join(', ')}`
+        `File melebihi 5MB: ${oversizedFiles.map((f) => f.name).join(', ')}`
       );
-      e.target.value = ''; // Clear the file input
+      e.target.value = '';
       return;
     }
 
     if (files.length > 0) {
-      setUploadedFiles(files);
+      // Tambahkan ke state uploadedFiles (file asli)
+      setUploadedFiles((prev) => [...prev, ...files]);
 
+      // Tambahkan ke form.dokumentasi_kegiatan (untuk preview)
       const processedFiles = files.map((file) => ({
         name: file.name,
         type: file.type,
@@ -228,6 +263,7 @@ export default function DoForm({ id }) {
         url: URL.createObjectURL(file),
         fileObject: file,
       }));
+
       setForm((prev) => ({
         ...prev,
         dokumentasi_kegiatan: [
@@ -236,8 +272,37 @@ export default function DoForm({ id }) {
         ],
       }));
     }
+
+    e.target.value = ''; // Reset input file setelah diproses
   };
 
+  // const removeFile = async (file, index, isDefault = false) => {
+  //   if (isDefault) {
+  //     try {
+  //       const filename = file.split('/').pop();
+  //       await request.delete(
+  //         `/do/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
+  //       );
+  //       // Remove from default files
+  //       const updatedDefaultFiles = [...defaultFile];
+  //       updatedDefaultFiles.splice(index, 1);
+  //       setDefaultFile(updatedDefaultFiles);
+  //       alert('File berhasil dihapus');
+  //     } catch (error) {
+  //       console.error('Gagal menghapus file:', error);
+  //       alert('Gagal menghapus file. Silakan coba lagi.');
+  //     }
+  //   } else {
+  //     // Remove from newly uploaded files
+  //     const updatedFiles = [...form.dokumentasi_kegiatan];
+  //     updatedFiles.splice(index, 1);
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       dokumentasi_kegiatan: updatedFiles,
+  //     }));
+  //   }
+  //   setFileError('');
+  // };
   const removeFile = async (file, index, isDefault = false) => {
     if (isDefault) {
       try {
@@ -262,15 +327,19 @@ export default function DoForm({ id }) {
         ...prev,
         dokumentasi_kegiatan: updatedFiles,
       }));
+
+      // Juga hapus dari uploadedFiles state jika perlu
+      const updatedUploaded = [...uploadedFiles];
+      updatedUploaded.splice(index, 1);
+      setUploadedFiles(updatedUploaded);
     }
     setFileError('');
   };
-
   console.log(programNames);
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Update Data DO" />
+      <PageHeading heading="Update Data Do" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -437,6 +506,7 @@ export default function DoForm({ id }) {
                       //   }
                       // }}
                       onChange={handleFileChange}
+                      disabled={!validateFileCount()}
                     />
                     {fileError ? (
                       <Alert variant="danger" className="mt-2">

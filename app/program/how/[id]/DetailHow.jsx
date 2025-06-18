@@ -146,7 +146,7 @@ const InputProgram = ({ id }) => {
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Update Data HOW" />
+      <PageHeading heading="Update Data How" />
       <Row className="mb-8">
         <Col>
           <Card>
