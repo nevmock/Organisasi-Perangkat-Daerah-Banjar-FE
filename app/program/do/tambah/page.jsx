@@ -343,6 +343,7 @@ export default function DoForm() {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Control
+                      as="textarea"
                       name="rincian_kegiatan"
                       placeholder="Masukan rincian kegiatan"
                       value={form.rincian_kegiatan}
@@ -358,6 +359,7 @@ export default function DoForm() {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Control
+                      as="textarea"
                       name="capaian_output"
                       placeholder="Masukan capaian output"
                       value={form.capaian_output}

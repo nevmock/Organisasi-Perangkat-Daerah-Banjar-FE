@@ -4,7 +4,7 @@ import toast from 'node_modules/react-hot-toast/dist';
 
 const request = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
-  timeout: 60000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     // "Content-Type": "application/json, multipart/form-data",

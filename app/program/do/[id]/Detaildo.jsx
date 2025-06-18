@@ -444,6 +444,7 @@ export default function DoForm({ id }) {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Control
+                      as="textarea"
                       name="rincian_kegiatan"
                       value={form.rincian_kegiatan}
                       onChange={handleChange}
@@ -460,6 +461,7 @@ export default function DoForm({ id }) {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Control
+                      as="textarea"
                       name="capaian_output"
                       value={form.capaian_output}
                       onChange={handleChange}
