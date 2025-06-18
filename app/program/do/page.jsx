@@ -158,9 +158,14 @@ const DoPage = () => {
                             </td>
                             <td>{program.nama_program.nama_program}</td>
                             <td>
-                              {program.kolaborator
-                                .map((item) => item.nama)
-                                .join(', ')}
+                              <div
+                                className="text-wrap"
+                                style={{ minWidth: '300px' }}
+                              >
+                                {program.kolaborator
+                                  .map((item) => item.nama)
+                                  .join(', ')}
+                              </div>
                             </td>
                             <td>
                               <div
@@ -170,7 +175,14 @@ const DoPage = () => {
                                 {program.capaian_output}
                               </div>
                             </td>
-                            <td>{program.rincian_kegiatan}</td>
+                            <td>
+                              <div
+                                className="text-wrap"
+                                style={{ minWidth: '300px' }}
+                              >
+                                {program.rincian_kegiatan}
+                              </div>
+                            </td>
                             <td>
                               <Button
                                 variant="outline-primary"

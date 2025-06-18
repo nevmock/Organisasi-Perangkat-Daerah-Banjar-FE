@@ -21,7 +21,7 @@ const initialForm = {
   tanggal_mulai: '',
   tanggal_selesai: '',
   link_laporan_pdf: [],
-  status: '',
+  status_laporan: '',
 };
 
 const MAX_FILE_COUNT = 3;
@@ -70,7 +70,7 @@ export default function DateForm({ id }) {
           nama_program: nama_program._id,
           tanggal_mulai: tanggal_mulai,
           tanggal_selesai: tanggal_selesai,
-          status: status_laporan,
+          status_laporan: status_laporan,
         });
         setDefaultFile(link_laporan_pdf);
       }
@@ -115,7 +115,7 @@ export default function DateForm({ id }) {
   //       nama_program: form.nama_program,
   //       tanggal_mulai: form.tanggal_mulai,
   //       tanggal_selesai: form.tanggal_selesai,
-  //       status: form.status,
+  //       status_laporan: form.status_laporan,
   //     };
 
   //     const response = await request.put(`/date/${id}`, newData);
@@ -157,7 +157,7 @@ export default function DateForm({ id }) {
         nama_program: form.nama_program,
         tanggal_mulai: form.tanggal_mulai,
         tanggal_selesai: form.tanggal_selesai,
-        status: form.status,
+        status_laporan: form.status_laporan,
       };
 
       const response = await request.put(`/date/${id}`, newData);
@@ -544,8 +544,8 @@ export default function DateForm({ id }) {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Select
-                      name="status"
-                      value={form.status}
+                      name="status_laporan"
+                      value={form.status_laporan}
                       onChange={handleChange}
                       required
                     >

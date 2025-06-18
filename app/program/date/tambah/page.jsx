@@ -21,7 +21,7 @@ const initialForm = {
   tanggal_mulai: '',
   tanggal_selesai: '',
   link_laporan_pdf: [],
-  status: '',
+  status_laporan: '',
 };
 
 const MAX_FILE_COUNT = 3;
@@ -95,7 +95,7 @@ export default function DateForm() {
         nama_program: form.nama_program,
         tanggal_mulai: form.tanggal_mulai,
         tanggal_selesai: form.tanggal_selesai,
-        status: form.status,
+        status_laporan: form.status_laporan,
       };
 
       const response = await request.post(`/date`, newData);
@@ -373,8 +373,8 @@ export default function DateForm() {
                   </Form.Label>
                   <Col md={9}>
                     <Form.Select
-                      name="status"
-                      value={form.status}
+                      name="status_laporan"
+                      value={form.status_laporan}
                       onChange={handleChange}
                       required
                     >
