@@ -168,9 +168,9 @@ const DatePage = () => {
                               {program.tanggal_selesai?.slice(0, 10) || ''}
                             </td>
                             <td>
-                              {program.status_laporan == 'sudah diperiksa' ? (
-                                <Badge pill bg="primary" className="me-1">
-                                  SUDAH DIPERIKSA
+                              {program.status_laporan == 'revisi' ? (
+                                <Badge pill bg="danger" className="me-1">
+                                  REVISI
                                 </Badge>
                               ) : program.status_laporan == 'final' ? (
                                 <Badge pill bg="info" className="me-1">
