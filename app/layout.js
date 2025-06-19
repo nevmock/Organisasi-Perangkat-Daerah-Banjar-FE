@@ -3,9 +3,9 @@ import Link from 'next/link';
 import 'styles/theme.scss';
 
 export const metadata = {
-  title: 'Dashboard SIA',
-  description: 'Dashboard SIA',
-  keywords: 'Dashboard SIA, banjar, pemerintah',
+  title: 'Dashboard SERASI',
+  description: 'Dashboard SERASI',
+  keywords: 'Dashboard SERASI, banjar, pemerintah',
 };
 
 export default function RootLayout({ children }) {
