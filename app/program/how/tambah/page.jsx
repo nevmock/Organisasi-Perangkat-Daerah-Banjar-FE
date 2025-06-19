@@ -124,7 +124,7 @@ const InputProgram = ({ id }) => {
   };
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Input Data HOW" />
+      <PageHeading heading="Input Data How" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -337,6 +337,8 @@ const InputProgram = ({ id }) => {
                               placeholder="Tingkat Kepuasan Minimum (%)"
                               value={form.tingkat_kepuasan}
                               onChange={handleChange}
+                              min={1}
+                              max={100}
                               required
                             />
                             <InputGroup.Text>%</InputGroup.Text>

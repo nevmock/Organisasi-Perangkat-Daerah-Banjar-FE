@@ -36,6 +36,7 @@ export default function DoForm() {
   const [error, setError] = useState(null);
   const [programNames, setProgramNames] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [defaultFile, setDefaultFile] = useState([]);
   const [fileError, setFileError] = useState('');
 
   const fetchData = async () => {
@@ -62,6 +63,12 @@ export default function DoForm() {
     fetchData();
   }, []);
 
+  const validateFileCount = () => {
+    const totalFiles =
+      defaultFile.length + (form.dokumentasi_kegiatan?.length || 0);
+    return totalFiles <= MAX_FILE_COUNT;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -87,17 +94,15 @@ export default function DoForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validasi file sebelum submit
-    if (form.dokumentasi_kegiatan?.length === 0) {
-      setFileError('Harap unggah minimal 1 file');
-      return;
-    }
-
     setLoading(true);
     setError(null);
-
-    console.log(form);
+    // Validasi file sebelum submit
+    const totalFiles = defaultFile.length + uploadedFiles.length;
+    if (totalFiles > MAX_FILE_COUNT) {
+      setFileError(`Maksimal ${MAX_FILE_COUNT} file`);
+      setLoading(false);
+      return;
+    }
 
     try {
       // 1. Kirim data utama DO terlebih dahulu
@@ -114,14 +119,8 @@ export default function DoForm() {
       const doId = response.data._id; // Asumsi response mengembalikan ID DO yang baru dibuat
 
       // 2. Jika ada file dokumentasi, upload ke endpoint dokumentasi
-      if (uploadedFiles?.length > 0) {
-        try {
-          await uploadFiles(doId);
-        } catch (uploadError) {
-          console.error('Gagal mengunggah dokumentasi:', uploadError);
-          // Anda bisa memilih untuk melanjutkan atau membatalkan
-          // Di sini saya akan melanjutkan karena data utama sudah tersimpan
-        }
+      if (uploadedFiles.length > 0) {
+        await uploadFiles(doId);
       }
 
       alert('Data berhasil disimpan!');
@@ -135,26 +134,13 @@ export default function DoForm() {
   };
 
   const uploadFiles = async (doId) => {
-    if (!doId) {
-      throw new Error('ID DO tidak valid');
-    }
-    console.log(uploadedFiles);
+    if (!doId || uploadedFiles.length === 0) return;
 
     try {
       const res = await request.postMultipart(`/do/${doId}/dokumentasi`, {
         files: Array.from(uploadedFiles),
       });
-
-      // Handle response
-      if (Array.isArray(res.data)) {
-        return res.data;
-      } else if (res.data.urls) {
-        return res.data.urls;
-      } else if (res.data.url) {
-        return [res.data.url];
-      }
-
-      return [];
+      return res.data?.urls || [];
     } catch (err) {
       console.error('Gagal mengunggah file:', err);
       throw err;
@@ -165,9 +151,14 @@ export default function DoForm() {
     const files = Array.from(e.target.files);
     setFileError('');
 
-    // Validasi jumlah file
-    if (files.length > MAX_FILE_COUNT) {
-      setFileError(`Maksimal ${MAX_FILE_COUNT} file yang dapat diunggah`);
+    // Hitung total file yang akan ada
+    const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
+
+    if (totalFiles > MAX_FILE_COUNT) {
+      const availableSlots =
+        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      e.target.value = '';
       return;
     }
 
@@ -175,16 +166,17 @@ export default function DoForm() {
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       setFileError(
-        `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
-          .map((f) => f.name)
-          .join(', ')}`
+        `File melebihi 5MB: ${oversizedFiles.map((f) => f.name).join(', ')}`
       );
+      e.target.value = '';
       return;
     }
 
     if (files.length > 0) {
-      setUploadedFiles(files);
+      // Tambahkan ke state uploadedFiles (file asli)
+      setUploadedFiles((prev) => [...prev, ...files]);
 
+      // Tambahkan ke form.dokumentasi_kegiatan (untuk preview)
       const processedFiles = files.map((file) => ({
         name: file.name,
         type: file.type,
@@ -192,28 +184,55 @@ export default function DoForm() {
         url: URL.createObjectURL(file),
         fileObject: file,
       }));
+
       setForm((prev) => ({
         ...prev,
-        dokumentasi_kegiatan: processedFiles,
+        dokumentasi_kegiatan: [
+          ...(prev.dokumentasi_kegiatan || []),
+          ...processedFiles,
+        ],
       }));
     }
+
+    e.target.value = ''; // Reset input file setelah diproses
   };
 
-  const removeFile = (index) => {
-    const updatedFiles = [...form.dokumentasi_kegiatan];
-    updatedFiles.splice(index, 1);
-    setForm((prev) => ({
-      ...prev,
-      dokumentasi_kegiatan: updatedFiles,
-    }));
+  const removeFile = async (file, index, isDefault = false) => {
+    if (isDefault) {
+      try {
+        const filename = file.split('/').pop();
+        await request.delete(
+          `/do/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
+        );
+        // Remove from default files
+        const updatedDefaultFiles = [...defaultFile];
+        updatedDefaultFiles.splice(index, 1);
+        setDefaultFile(updatedDefaultFiles);
+        alert('File berhasil dihapus');
+      } catch (error) {
+        console.error('Gagal menghapus file:', error);
+        alert('Gagal menghapus file. Silakan coba lagi.');
+      }
+    } else {
+      // Remove from newly uploaded files
+      const updatedFiles = [...form.dokumentasi_kegiatan];
+      updatedFiles.splice(index, 1);
+      setForm((prev) => ({
+        ...prev,
+        dokumentasi_kegiatan: updatedFiles,
+      }));
+
+      // Juga hapus dari uploadedFiles state jika perlu
+      const updatedUploaded = [...uploadedFiles];
+      updatedUploaded.splice(index, 1);
+      setUploadedFiles(updatedUploaded);
+    }
     setFileError('');
   };
 
-  console.log(programNames);
-
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Input Data DO" />
+      <PageHeading heading="Input Data Do" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -380,7 +399,6 @@ export default function DoForm() {
                         //   }
                         // }}
                         onChange={handleFileChange}
-                        required
                       />
                       {fileError ? (
                         <Alert variant="danger" className="mt-2">

@@ -36,6 +36,7 @@ const DoPage = () => {
   const handleSearch = async () => {
     try {
       setLoading(true);
+      setPage(1);
       const res = await request.get(
         `/do/search?q=${searchQuery}&page=${page}&limit=${limit}`
       );

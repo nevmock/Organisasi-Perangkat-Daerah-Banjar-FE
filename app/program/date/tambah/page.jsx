@@ -41,6 +41,7 @@ export default function DateForm() {
   const [error, setError] = useState(null);
   const [programNames, setProgramNames] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [defaultFile, setDefaultFile] = useState([]);
   const [fileError, setFileError] = useState('');
 
   const fetchData = async () => {
@@ -67,6 +68,12 @@ export default function DateForm() {
     fetchData();
   }, []);
 
+  const validateFileCount = () => {
+    const totalFiles =
+      defaultFile.length + (form.link_laporan_pdf?.length || 0);
+    return totalFiles <= MAX_FILE_COUNT;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -74,17 +81,17 @@ export default function DateForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validasi file sebelum submit
-    if (form.link_laporan_pdf?.length === 0) {
-      setFileError('Harap unggah minimal 1 file');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
-    console.log(form);
+    // Validasi file sebelum submit
+    const totalFiles = defaultFile.length + uploadedFiles.length;
+    if (totalFiles > MAX_FILE_COUNT) {
+      setFileError(`Maksimal ${MAX_FILE_COUNT} file`);
+      setLoading(false);
+      return;
+    }
+
     try {
       const newData = {
         nama_program: form.nama_program,
@@ -96,12 +103,8 @@ export default function DateForm() {
       const response = await request.post(`/date`, newData);
       const doId = response.data._id;
 
-      if (uploadedFiles?.length > 0) {
-        try {
-          await uploadFiles(doId);
-        } catch (uploadError) {
-          console.error('Gagal mengunggah dokumentasi:', uploadError);
-        }
+      if (uploadedFiles.length > 0) {
+        await uploadFiles(doId);
       }
 
       alert('Data berhasil disimpan!');
@@ -115,39 +118,68 @@ export default function DateForm() {
   };
 
   const uploadFiles = async (doId) => {
-    if (!doId) {
-      throw new Error('ID DO tidak valid');
-    }
-    console.log(uploadedFiles);
+    if (!doId || uploadedFiles.length === 0) return;
 
     try {
       const res = await request.postMultipart(`/date/${doId}/dokumentasi`, {
         files: Array.from(uploadedFiles),
       });
-
-      // Handle response
-      if (Array.isArray(res.data)) {
-        return res.data;
-      } else if (res.data.urls) {
-        return res.data.urls;
-      } else if (res.data.url) {
-        return [res.data.url];
-      }
-
-      return [];
+      return res.data?.urls || [];
     } catch (err) {
-      console.error('Gagal mengunggah file:', err);
+      console.error('Gagal upload file:', err);
       throw err;
     }
   };
 
+  // const handleFileChange = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   setFileError('');
+
+  //   // Validasi jumlah file
+  //   if (files.length > MAX_FILE_COUNT) {
+  //     setFileError(`Maksimal ${MAX_FILE_COUNT} file yang dapat diunggah`);
+  //     return;
+  //   }
+
+  //   // Validasi ukuran file
+  //   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+  //   if (oversizedFiles.length > 0) {
+  //     setFileError(
+  //       `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
+  //         .map((f) => f.name)
+  //         .join(', ')}`
+  //     );
+  //     return;
+  //   }
+
+  //   if (files.length > 0) {
+  //     setUploadedFiles(files);
+
+  //     const processedFiles = files.map((file) => ({
+  //       name: file.name,
+  //       type: file.type,
+  //       size: file.size,
+  //       url: URL.createObjectURL(file),
+  //       fileObject: file,
+  //     }));
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       link_laporan_pdf: processedFiles,
+  //     }));
+  //   }
+  // };
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setFileError('');
 
-    // Validasi jumlah file
-    if (files.length > MAX_FILE_COUNT) {
-      setFileError(`Maksimal ${MAX_FILE_COUNT} file yang dapat diunggah`);
+    // Hitung total file yang akan ada
+    const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
+
+    if (totalFiles > MAX_FILE_COUNT) {
+      const availableSlots =
+        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      e.target.value = '';
       return;
     }
 
@@ -155,16 +187,17 @@ export default function DateForm() {
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       setFileError(
-        `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
-          .map((f) => f.name)
-          .join(', ')}`
+        `File melebihi 5MB: ${oversizedFiles.map((f) => f.name).join(', ')}`
       );
+      e.target.value = '';
       return;
     }
 
     if (files.length > 0) {
-      setUploadedFiles(files);
+      // Tambahkan ke state uploadedFiles (file asli)
+      setUploadedFiles((prev) => [...prev, ...files]);
 
+      // Tambahkan ke form.link_laporan_pdf (untuk preview)
       const processedFiles = files.map((file) => ({
         name: file.name,
         type: file.type,
@@ -172,26 +205,62 @@ export default function DateForm() {
         url: URL.createObjectURL(file),
         fileObject: file,
       }));
+
       setForm((prev) => ({
         ...prev,
-        link_laporan_pdf: processedFiles,
+        link_laporan_pdf: [...(prev.link_laporan_pdf || []), ...processedFiles],
       }));
     }
+
+    e.target.value = ''; // Reset input file setelah diproses
   };
 
-  const removeFile = (index) => {
-    const updatedFiles = [...form.link_laporan_pdf];
-    updatedFiles.splice(index, 1);
-    setForm((prev) => ({
-      ...prev,
-      link_laporan_pdf: updatedFiles,
-    }));
+  // const removeFile = (index) => {
+  //   const updatedFiles = [...form.link_laporan_pdf];
+  //   updatedFiles.splice(index, 1);
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     link_laporan_pdf: updatedFiles,
+  //   }));
+  //   setFileError('');
+  // };
+
+  const removeFile = async (file, index, isDefault = false) => {
+    if (isDefault) {
+      try {
+        const filename = file.split('/').pop();
+        await request.delete(
+          `/date/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
+        );
+        // Remove from default files
+        const updatedDefaultFiles = [...defaultFile];
+        updatedDefaultFiles.splice(index, 1);
+        setDefaultFile(updatedDefaultFiles);
+        alert('File berhasil dihapus');
+      } catch (error) {
+        console.error('Gagal menghapus file:', error);
+        alert('Gagal menghapus file. Silakan coba lagi.');
+      }
+    } else {
+      // Remove from newly uploaded files
+      const updatedFiles = [...form.link_laporan_pdf];
+      updatedFiles.splice(index, 1);
+      setForm((prev) => ({
+        ...prev,
+        link_laporan_pdf: updatedFiles,
+      }));
+
+      // Juga hapus dari uploadedFiles state jika perlu
+      const updatedUploaded = [...uploadedFiles];
+      updatedUploaded.splice(index, 1);
+      setUploadedFiles(updatedUploaded);
+    }
     setFileError('');
   };
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Input Data DATE" />
+      <PageHeading heading="Input Data Date" />
       <Row className="mb-8">
         <Col>
           <Card>
@@ -271,7 +340,6 @@ export default function DateForm() {
                         accept=".pdf,.jpg,.jpeg,.png,.gif"
                         multiple
                         onChange={handleFileChange}
-                        required
                       />
 
                       {fileError ? (
