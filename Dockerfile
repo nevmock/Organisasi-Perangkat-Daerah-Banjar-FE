@@ -1,6 +1,8 @@
 FROM node:20-alpine AS builder
 
 ARG APP_PORT=3000
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 WORKDIR /app
 
@@ -14,7 +16,6 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-COPY .env .env
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
