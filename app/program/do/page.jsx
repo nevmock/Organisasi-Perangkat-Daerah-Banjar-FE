@@ -17,8 +17,10 @@ import { ResponsiveTableCode } from 'data/code/TablesCode';
 import { useEffect, useState } from 'react';
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
+import useMounted from 'hooks/useMounted';
 
 const DoPage = () => {
+  const hasMounted = useMounted();
   const [programs, setPrograms] = useState([]);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -34,6 +36,7 @@ const DoPage = () => {
   const handleSearch = async () => {
     try {
       setLoading(true);
+      setPage(1);
       const res = await request.get(
         `/do/search?q=${searchQuery}&page=${page}&limit=${limit}`
       );
@@ -124,10 +127,17 @@ const DoPage = () => {
                       type="text"
                       placeholder="Cari program..."
                       value={searchQuery}
+                      disabled={!hasMounted}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </InputGroup>
-                  <Button size="sm" variant="primary" href="/program/do/tambah">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    className="text-white"
+                    disabled={!hasMounted}
+                    href="/program/do/tambah"
+                  >
                     Tambah
                   </Button>
                 </Form>
@@ -147,53 +157,46 @@ const DoPage = () => {
                           <th>Aksi</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {programs.map((program, index) => (
-                          <tr key={program._id || index}>
-                            <td>
-                              {(paginationData.page - 1) *
-                                paginationData.limit +
-                                index +
-                                1}
-                            </td>
-                            <td>{program.nama_program.nama_program}</td>
-                            <td>
-                              <div
-                                className="text-wrap"
-                                style={{ minWidth: '300px' }}
-                              >
+                      {hasMounted && (
+                        <tbody>
+                          {programs.map((program, index) => (
+                            <tr key={program._id || index}>
+                              <td>
+                                {(paginationData.page - 1) *
+                                  paginationData.limit +
+                                  index +
+                                  1}
+                              </td>
+                              <td>{program.nama_program.nama_program}</td>
+                              <td>
                                 {program.kolaborator
                                   .map((item) => item.nama)
                                   .join(', ')}
-                              </div>
-                            </td>
-                            <td>
-                              <div
-                                className="text-wrap"
-                                style={{ minWidth: '300px' }}
-                              >
-                                {program.capaian_output}
-                              </div>
-                            </td>
-                            <td>
-                              <div
-                                className="text-wrap"
-                                style={{ minWidth: '300px' }}
-                              >
-                                {program.rincian_kegiatan}
-                              </div>
-                            </td>
-                            <td>
-                              <Button
-                                variant="outline-primary"
-                                href={`/program/do/${program._id}`}
-                              >
-                                Detail
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                              </td>
+                              <td>
+                                <div
+                                  className="text-wrap"
+                                  style={{ minWidth: '300px' }}
+                                >
+                                  {program.capaian_output}
+                                </div>
+                              </td>
+                              <td>{program.rincian_kegiatan}</td>
+                              <td>
+                                <Button
+                                  variant="outline-primary"
+                                  style={{
+                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
+                                  }}
+                                  href={`/program/do/${program._id}`}
+                                >
+                                  Detail
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      )}
                     </Table>
                     {paginationData.totalPages > 1 && (
                       <Pagination

@@ -231,7 +231,7 @@ export const FormsCode1 = `
             <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check type="checkbox" label="Remember me" />
             </Form.Group>
-            <Button variant="primary" type="submit">Sign in</Button>
+            <Button variant="primary" type="submit" className='text-white'>Sign in</Button>
         </Form> 
     <Dropdown.Divider />
     <Dropdown.Item >New around here? Sign up</Dropdown.Item>                          
@@ -254,24 +254,24 @@ export const FormsCode2 = `
             <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check type="checkbox" label="Remember me" />
             </Form.Group>
-            <Button variant="primary" type="submit">Sign in </Button>
+            <Button variant="primary" type="submit" className='text-white'>Sign in </Button>
         </Form> 
 </Dropdown.Menu> 
 `.trim();
 
 export const DropdownsCode = [
-	BasicDropdownCode,
-	SplitDropdownCode,
-	DropdownVariantCode,
-	DropdownSizingCode,
-	DirectionsCode,
-	MenuAlignmentCode,
-	ResponsiveMenuAlignmentCode1,
-	ResponsiveMenuAlignmentCode2,
-	MenuContentCode,
-	DividersCode,
-	FormsCode1,
-	FormsCode2
+  BasicDropdownCode,
+  SplitDropdownCode,
+  DropdownVariantCode,
+  DropdownSizingCode,
+  DirectionsCode,
+  MenuAlignmentCode,
+  ResponsiveMenuAlignmentCode1,
+  ResponsiveMenuAlignmentCode2,
+  MenuContentCode,
+  DividersCode,
+  FormsCode1,
+  FormsCode2,
 ];
 
 export default DropdownsCode;

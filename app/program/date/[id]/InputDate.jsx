@@ -2,6 +2,7 @@
 
 import FilePreviewCard from 'components/bootstrap/FilePreviewCard';
 import Selection from 'components/form/selection';
+import useMounted from 'hooks/useMounted';
 import React, { useEffect, useState } from 'react';
 import {
   Container,
@@ -34,6 +35,7 @@ const sumberDanaOptions = [
 ];
 
 export default function DateForm({ id }) {
+  const hasMounted = useMounted();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -371,21 +373,22 @@ export default function DateForm({ id }) {
 
   return (
     <Container fluid className="p-6">
-      <PageHeading heading="Input Data Date" />
+      <PageHeading heading="Update Data DATE" />
       <Row className="mb-8">
         <Col>
           <Card>
             <Card.Body>
-              <Form onSubmit={handleSubmit}>
-                {error && (
-                  <div className="alert alert-danger mb-4">{error}</div>
-                )}
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Nama Program
-                  </Form.Label>
-                  <Col md={9}>
-                    {/* <Selection
+              {hasMounted && (
+                <Form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger mb-4">{error}</div>
+                  )}
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Nama Program
+                    </Form.Label>
+                    <Col md={9}>
+                      {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -400,188 +403,189 @@ export default function DateForm({ id }) {
                         </option>
                       ))}
                     </Selection> */}
-                    <Selection
-                      name="nama_program"
-                      value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
-                      onChange={handleChange}
-                      options={programNames}
-                      optionLabel="nama_program"
-                      optionValue="id"
-                      placeholder="Pilih Nama Program"
-                    />
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Tanggal Mulai
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      type="date"
-                      name="tanggal_mulai"
-                      value={form.tanggal_mulai?.slice(0, 10) || ''}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Tanggal Selesai
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      type="date"
-                      name="tanggal_selesai"
-                      value={form.tanggal_selesai?.slice(0, 10) || ''}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Dokumen Laporan
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      name="link_laporan_pdf"
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,.gif"
-                      multiple
-                      // disabled={defaultFile?.length <= 3}
-                      // onChange={(e) => {
-                      //   const files = Array.from(e.target.files);
-                      //   if (files.length > 0) {
-                      //     setUploadedFiles(files);
+                      <Selection
+                        name="nama_program"
+                        value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
+                        onChange={handleChange}
+                        options={programNames}
+                        optionLabel="nama_program"
+                        optionValue="id"
+                        placeholder="Pilih Nama Program"
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Tanggal Mulai
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        type="date"
+                        name="tanggal_mulai"
+                        value={form.tanggal_mulai?.slice(0, 10) || ''}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Tanggal Selesai
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        type="date"
+                        name="tanggal_selesai"
+                        value={form.tanggal_selesai?.slice(0, 10) || ''}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Dokumen Laporan
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        name="link_laporan_pdf"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        multiple
+                        // disabled={defaultFile?.length <= 3}
+                        // onChange={(e) => {
+                        //   const files = Array.from(e.target.files);
+                        //   if (files.length > 0) {
+                        //     setUploadedFiles(files);
 
-                      //     const processedFiles = files.map((file) => ({
-                      //       name: file.name,
-                      //       type: file.type,
-                      //       size: file.size,
-                      //       url: URL.createObjectURL(file),
-                      //       fileObject: file,
-                      //     }));
-                      //     setForm((prev) => ({
-                      //       ...prev,
-                      //       link_laporan_pdf: processedFiles,
-                      //     }));
-                      //   }
-                      // }}
-                      onChange={handleFileChange}
-                      disabled={!validateFileCount()}
-                      // required
-                    />
-                    {fileError ? (
-                      <Alert variant="danger" className="mt-2">
-                        {fileError}
-                      </Alert>
-                    ) : (
-                      <div className="text-muted small mt-1">
-                        {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
-                        Maksimal {MAX_FILE_COUNT} file (5MB/file)
-                      </div>
-                    )}
+                        //     const processedFiles = files.map((file) => ({
+                        //       name: file.name,
+                        //       type: file.type,
+                        //       size: file.size,
+                        //       url: URL.createObjectURL(file),
+                        //       fileObject: file,
+                        //     }));
+                        //     setForm((prev) => ({
+                        //       ...prev,
+                        //       link_laporan_pdf: processedFiles,
+                        //     }));
+                        //   }
+                        // }}
+                        onChange={handleFileChange}
+                        disabled={!validateFileCount()}
+                        // required
+                      />
+                      {fileError ? (
+                        <Alert variant="danger" className="mt-2">
+                          {fileError}
+                        </Alert>
+                      ) : (
+                        <div className="text-muted small mt-1">
+                          {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
+                          Maksimal {MAX_FILE_COUNT} file (5MB/file)
+                        </div>
+                      )}
 
-                    {(form.link_laporan_pdf?.length > 0 ||
-                      defaultFile.length > 0) && (
-                      <div className="mt-3">
-                        <h6>File Terpilih:</h6>
-                        <div className="d-flex flex-wrap gap-2">
-                          {defaultFile.length > 0 &&
-                            defaultFile.map((file, index) => (
-                              <FilePreviewCard
-                                key={index}
-                                file={file}
-                                // onRemove={async () => {
-                                //   try {
-                                //     const filename = file.split('/').pop();
-                                //     await request.delete(
-                                //       `/date/${id}/dokumentasi?filename=${encodeURIComponent(
-                                //         filename
-                                //       )}`
-                                //     );
-                                //     alert('File berhasil dihapus');
-                                //     fetchData();
-                                //   } catch (error) {
-                                //     console.error(
-                                //       'Gagal menghapus file:',
-                                //       error
-                                //     );
-                                //     alert(
-                                //       'Gagal menghapus file. Silakan coba lagi.'
-                                //     );
-                                //   }
-                                // }}
-                                onRemove={() => removeFile(file, index, true)}
-                              />
-                            ))}
-                          {form.link_laporan_pdf?.length > 0 &&
-                            form.link_laporan_pdf.map((file, index) => (
-                              <FilePreviewCard
-                                key={index}
-                                file={file}
-                                onRemove={() => {
-                                  const updatedFiles = [
-                                    ...form.link_laporan_pdf,
-                                  ];
-                                  updatedFiles.splice(index, 1);
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    link_laporan_pdf: updatedFiles,
-                                  }));
-                                }}
-                              />
-                            ))}
+                      {(form.link_laporan_pdf?.length > 0 ||
+                        defaultFile.length > 0) && (
+                        <div className="mt-3">
+                          <h6>File Terpilih:</h6>
+                          <div className="d-flex flex-wrap gap-2">
+                            {defaultFile.length > 0 &&
+                              defaultFile.map((file, index) => (
+                                <FilePreviewCard
+                                  key={index}
+                                  file={file}
+                                  // onRemove={async () => {
+                                  //   try {
+                                  //     const filename = file.split('/').pop();
+                                  //     await request.delete(
+                                  //       `/date/${id}/dokumentasi?filename=${encodeURIComponent(
+                                  //         filename
+                                  //       )}`
+                                  //     );
+                                  //     alert('File berhasil dihapus');
+                                  //     fetchData();
+                                  //   } catch (error) {
+                                  //     console.error(
+                                  //       'Gagal menghapus file:',
+                                  //       error
+                                  //     );
+                                  //     alert(
+                                  //       'Gagal menghapus file. Silakan coba lagi.'
+                                  //     );
+                                  //   }
+                                  // }}
+                                  onRemove={() => removeFile(file, index, true)}
+                                />
+                              ))}
+                            {form.link_laporan_pdf?.length > 0 &&
+                              form.link_laporan_pdf.map((file, index) => (
+                                <FilePreviewCard
+                                  key={index}
+                                  file={file}
+                                  onRemove={() => {
+                                    const updatedFiles = [
+                                      ...form.link_laporan_pdf,
+                                    ];
+                                    updatedFiles.splice(index, 1);
+                                    setForm((prev) => ({
+                                      ...prev,
+                                      link_laporan_pdf: updatedFiles,
+                                    }));
+                                  }}
+                                />
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                    </Col>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Status
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Select
+                        name="status_laporan"
+                        value={form.status_laporan}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Pilih Status</option>
+                        {sumberDanaOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Col>
+                  </Row>
+                  <Row className="mt-8">
+                    <Col md={12}>
+                      <div className="d-flex align-items-center justify-content-end">
+                        <div>
+                          <Button
+                            variant="primary"
+                            className="me-2 text-white"
+                            type="submit"
+                            disabled={loading}
+                          >
+                            {loading ? 'Menyimpan...' : 'Simpan'}
+                          </Button>
+                          <Button
+                            variant="outline-white"
+                            type="link"
+                            href="/program/date"
+                          >
+                            Kembali
+                          </Button>
                         </div>
                       </div>
-                    )}
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Status
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Select
-                      name="status_laporan"
-                      value={form.status_laporan}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Pilih Status</option>
-                      {sumberDanaOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-                </Row>
-                <Row className="mt-8">
-                  <Col md={12}>
-                    <div className="d-flex align-items-center justify-content-end">
-                      <div>
-                        <Button
-                          variant="primary"
-                          className="me-2"
-                          type="submit"
-                          disabled={loading}
-                        >
-                          {loading ? 'Menyimpan...' : 'Simpan'}
-                        </Button>
-                        <Button
-                          variant="outline-white"
-                          type="link"
-                          href="/program/date"
-                        >
-                          Kembali
-                        </Button>
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
-              </Form>
+                    </Col>
+                  </Row>
+                </Form>
+              )}
             </Card.Body>
           </Card>
         </Col>

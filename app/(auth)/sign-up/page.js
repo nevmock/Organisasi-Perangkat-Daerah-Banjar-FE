@@ -134,7 +134,11 @@ const SignUp = () => {
                   <div>
                     {/* Button */}
                     <div className="d-grid">
-                      <Button variant="primary" type="submit">
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        className="text-white"
+                      >
                         Buat Akun
                       </Button>
                     </div>

@@ -18,8 +18,10 @@ import { HighlightCode } from 'widgets';
 import { ResponsiveTableCode } from 'data/code/TablesCode';
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
+import useMounted from 'hooks/useMounted';
 
 const DatePage = () => {
+  const hasMounted = useMounted();
   const [programs, setPrograms] = useState([]);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -126,12 +128,15 @@ const DatePage = () => {
                       type="text"
                       placeholder="Cari program..."
                       value={searchQuery}
+                      disabled={!hasMounted}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </InputGroup>
                   <Button
                     size="sm"
                     variant="primary"
+                    className="text-white"
+                    disabled={!hasMounted}
                     href="/program/date/tambah"
                   >
                     Tambah
@@ -153,46 +158,53 @@ const DatePage = () => {
                           <th>Aksi</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {programs.map((program, index) => (
-                          <tr key={program._id || index}>
-                            <td>
-                              {(paginationData.page - 1) *
-                                paginationData.limit +
-                                index +
-                                1}
-                            </td>
-                            <td>{program.nama_program.nama_program}</td>
-                            <td>{program.tanggal_mulai?.slice(0, 10) || ''}</td>
-                            <td>
-                              {program.tanggal_selesai?.slice(0, 10) || ''}
-                            </td>
-                            <td>
-                              {program.status_laporan == 'revisi' ? (
-                                <Badge pill bg="danger" className="me-1">
-                                  REVISI
-                                </Badge>
-                              ) : program.status_laporan == 'final' ? (
-                                <Badge pill bg="info" className="me-1">
-                                  FINAL
-                                </Badge>
-                              ) : (
-                                <Badge pill bg="secondary" className="me-1">
-                                  DRAFT
-                                </Badge>
-                              )}
-                            </td>
-                            <td>
-                              <Button
-                                variant="outline-primary"
-                                href={`/program/date/${program._id}`}
-                              >
-                                Detail
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                      {hasMounted && (
+                        <tbody>
+                          {programs.map((program, index) => (
+                            <tr key={program._id || index}>
+                              <td>
+                                {(paginationData.page - 1) *
+                                  paginationData.limit +
+                                  index +
+                                  1}
+                              </td>
+                              <td>{program.nama_program.nama_program}</td>
+                              <td>
+                                {program.tanggal_mulai?.slice(0, 10) || ''}
+                              </td>
+                              <td>
+                                {program.tanggal_selesai?.slice(0, 10) || ''}
+                              </td>
+                              <td>
+                                {program.status_laporan == 'revisi' ? (
+                                  <Badge pill bg="danger" className="me-1">
+                                    Revisi
+                                  </Badge>
+                                ) : program.status_laporan == 'final' ? (
+                                  <Badge pill bg="primary" className="me-1">
+                                    FINAL
+                                  </Badge>
+                                ) : (
+                                  <Badge pill bg="secondary" className="me-1">
+                                    DRAFT
+                                  </Badge>
+                                )}
+                              </td>
+                              <td>
+                                <Button
+                                  variant="outline-primary"
+                                  style={{
+                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
+                                  }}
+                                  href={`/program/date/${program._id}`}
+                                >
+                                  Detail
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      )}
                     </Table>
                     {paginationData.totalPages > 1 && (
                       <Pagination

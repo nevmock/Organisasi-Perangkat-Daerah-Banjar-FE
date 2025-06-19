@@ -1,6 +1,7 @@
 'use client';
 import FilePreviewCard from 'components/bootstrap/FilePreviewCard';
 import Selection from 'components/form/selection';
+import useMounted from 'hooks/useMounted';
 import React, { useEffect, useState } from 'react';
 import {
   Container,
@@ -29,6 +30,7 @@ const MAX_FILE_COUNT = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
 export default function DoForm() {
+  const hasMounted = useMounted();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -235,17 +237,18 @@ export default function DoForm() {
         <Col>
           <Card>
             <Card.Body>
-              <Form onSubmit={handleSubmit}>
-                {error && (
-                  <div className="alert alert-danger mb-4">{error}</div>
-                )}
+              {hasMounted && (
+                <Form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger mb-4">{error}</div>
+                  )}
 
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Nama Program
-                  </Form.Label>
-                  <Col md={9}>
-                    {/* <Selection
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Nama Program
+                    </Form.Label>
+                    <Col md={9}>
+                      {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -260,7 +263,7 @@ export default function DoForm() {
                         </option>
                       ))}
                     </Selection> */}
-                    {/* <Selection
+                      {/* <Selection
                       name="nama_program"
                       value={form.nama_program}
                       onChange={handleChange}
@@ -269,205 +272,231 @@ export default function DoForm() {
                       optionValue="id"
                       placeholder="Pilih Nama Program"
                     /> */}
-                    <Selection
-                      name="nama_program"
-                      value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
-                      onChange={handleChange}
-                      options={programNames}
-                      optionLabel="nama_program"
-                      optionValue="id"
-                      placeholder="Pilih Nama Program"
-                    />
-                  </Col>
-                </Row>
+                      <Selection
+                        name="nama_program"
+                        value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
+                        onChange={handleChange}
+                        options={programNames}
+                        optionLabel="nama_program"
+                        optionValue="id"
+                        placeholder="Pilih Nama Program"
+                      />
+                    </Col>
+                  </Row>
 
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Kolaborator
-                  </Form.Label>
-                  <Col md={9}>
-                    {form.kolaborator.map((item, idx) => (
-                      <Row className="mb-2" key={idx}>
-                        <Col md={5}>
-                          <Form.Control
-                            placeholder="Nama Kolaborator"
-                            value={item.nama}
-                            onChange={(e) =>
-                              handleKolaboratorChange(
-                                idx,
-                                'nama',
-                                e.target.value
-                              )
-                            }
-                            required
-                          />
-                        </Col>
-                        <Col md={5}>
-                          <Form.Control
-                            placeholder="Peran Kolaborator"
-                            value={item.peran}
-                            onChange={(e) =>
-                              handleKolaboratorChange(
-                                idx,
-                                'peran',
-                                e.target.value
-                              )
-                            }
-                            required
-                          />
-                        </Col>
-                        <Col md={2} className="d-flex gap-2">
-                          <Button
-                            variant="outline-danger"
-                            onClick={() => removeKolaborator(idx)}
-                            disabled={form.kolaborator.length === 1}
-                          >
-                            -
-                          </Button>
-                          <Button
-                            variant="outline-primary"
-                            onClick={addKolaborator}
-                            disabled={idx !== form.kolaborator.length - 1}
-                          >
-                            +
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))}
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Rincian Kegiatan
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      as="textarea"
-                      name="rincian_kegiatan"
-                      placeholder="Masukan rincian kegiatan"
-                      value={form.rincian_kegiatan}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Capaian Output
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      as="textarea"
-                      name="capaian_output"
-                      placeholder="Masukan capaian output"
-                      value={form.capaian_output}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Dokumentasi Kegiatan
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      name="dokumentasi_kegiatan"
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,.gif"
-                      multiple
-                      onChange={handleFileChange}
-                      disabled={!validateFileCount()}
-                    />
-                    {fileError ? (
-                      <Alert variant="danger" className="mt-2">
-                        {fileError}
-                      </Alert>
-                    ) : (
-                      <div className="text-muted small mt-1">
-                        Maksimal {MAX_FILE_COUNT} file, masing-masing maksimal
-                        5MB
-                      </div>
-                    )}
-
-                    {form.dokumentasi_kegiatan?.length > 0 && (
-                      <div className="mt-3">
-                        <h6>File Terpilih:</h6>
-                        <div className="d-flex flex-wrap gap-2">
-                          {form.dokumentasi_kegiatan.map((file, index) => (
-                            <FilePreviewCard
-                              key={index}
-                              file={file}
-                              onRemove={() => removeFile(index)}
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Kolaborator
+                    </Form.Label>
+                    <Col md={9}>
+                      {form.kolaborator.map((item, idx) => (
+                        <Row className="mb-2" key={idx}>
+                          <Col md={5}>
+                            <Form.Control
+                              placeholder="Nama Kolaborator"
+                              value={item.nama}
+                              onChange={(e) =>
+                                handleKolaboratorChange(
+                                  idx,
+                                  'nama',
+                                  e.target.value
+                                )
+                              }
+                              required
                             />
-                          ))}
+                          </Col>
+                          <Col md={5}>
+                            <Form.Control
+                              placeholder="Peran Kolaborator"
+                              value={item.peran}
+                              onChange={(e) =>
+                                handleKolaboratorChange(
+                                  idx,
+                                  'peran',
+                                  e.target.value
+                                )
+                              }
+                              required
+                            />
+                          </Col>
+                          <Col md={2} className="d-flex gap-2">
+                            <Button
+                              variant="outline-danger"
+                              onClick={() => removeKolaborator(idx)}
+                              disabled={form.kolaborator.length === 1}
+                            >
+                              -
+                            </Button>
+                            <Button
+                              variant="outline-primary"
+                              onClick={addKolaborator}
+                              disabled={idx !== form.kolaborator.length - 1}
+                            >
+                              +
+                            </Button>
+                          </Col>
+                        </Row>
+                      ))}
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Rincian Kegiatan
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        name="rincian_kegiatan"
+                        placeholder="Masukan rincian kegiatan"
+                        value={form.rincian_kegiatan}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Capaian Output
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        name="capaian_output"
+                        placeholder="Masukan capaian output"
+                        value={form.capaian_output}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Dokumentasi Kegiatan
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        name="dokumentasi_kegiatan"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        multiple
+                        // onChange={(e) => {
+                        //   const files = Array.from(e.target.files);
+                        //   if (files.length > 0) {
+                        //     setUploadedFiles(files);
+
+                        //     const processedFiles = files.map((file) => ({
+                        //       name: file.name,
+                        //       type: file.type,
+                        //       size: file.size,
+                        //       url: URL.createObjectURL(file),
+                        //       fileObject: file,
+                        //     }));
+                        //     setForm((prev) => ({
+                        //       ...prev,
+                        //       dokumentasi_kegiatan: processedFiles,
+                        //     }));
+                        //   }
+                        // }}
+                        onChange={handleFileChange}
+                      />
+                      {fileError ? (
+                        <Alert variant="danger" className="mt-2">
+                          {fileError}
+                        </Alert>
+                      ) : (
+                        <div className="text-muted small mt-1">
+                          Maksimal {MAX_FILE_COUNT} file, masing-masing maksimal
+                          5MB
+                        </div>
+                      )}
+
+                      {form.dokumentasi_kegiatan?.length > 0 && (
+                        <div className="mt-3">
+                          <h6>File Terpilih:</h6>
+                          <div className="d-flex flex-wrap gap-2">
+                            {form.dokumentasi_kegiatan.map((file, index) => (
+                              <FilePreviewCard
+                                key={index}
+                                file={file}
+                                // onRemove={() => {
+                                //   const updatedFiles = [
+                                //     ...form.dokumentasi_kegiatan,
+                                //   ];
+                                //   updatedFiles.splice(index, 1);
+                                //   setForm((prev) => ({
+                                //     ...prev,
+                                //     dokumentasi_kegiatan: updatedFiles,
+                                //   }));
+                                // }}
+                                onRemove={() => removeFile(index)}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Kendala
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        name="kendala"
+                        placeholder="Masukan kendala"
+                        value={form.kendala}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Rekomendasi
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        name="rekomendasi"
+                        placeholder="Masukan rekomendasi"
+                        value={form.rekomendasi}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row className="mt-8">
+                    <Col md={12}>
+                      <div className="d-flex align-items-center justify-content-end">
+                        <div>
+                          <Button
+                            variant="primary"
+                            className="me-2 text-white"
+                            type="submit"
+                            disabled={loading}
+                          >
+                            {loading ? 'Menyimpan...' : 'Simpan'}
+                          </Button>
+                          <Button
+                            variant="outline-white"
+                            type="link"
+                            href="/program/do"
+                          >
+                            Kembali
+                          </Button>
                         </div>
                       </div>
-                    )}
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Kendala
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      name="kendala"
-                      placeholder="Masukan kendala"
-                      value={form.kendala}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Rekomendasi
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      name="rekomendasi"
-                      placeholder="Masukan rekomendasi"
-                      value={form.rekomendasi}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Col>
-                </Row>
-
-                <Row className="mt-8">
-                  <Col md={12}>
-                    <div className="d-flex align-items-center justify-content-end">
-                      <div>
-                        <Button
-                          variant="primary"
-                          className="me-2"
-                          type="submit"
-                          disabled={loading}
-                        >
-                          {loading ? 'Menyimpan...' : 'Simpan'}
-                        </Button>
-                        <Button
-                          variant="outline-white"
-                          type="link"
-                          href="/program/do"
-                        >
-                          Kembali
-                        </Button>
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
-              </Form>
+                    </Col>
+                  </Row>
+                </Form>
+              )}
             </Card.Body>
           </Card>
         </Col>
