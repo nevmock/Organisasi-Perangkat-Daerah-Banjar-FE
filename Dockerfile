@@ -21,4 +21,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
 
 EXPOSE ${APP_PORT}
-CMD ["node_modules/.bin/next", "start", "-p", "3020"]
+CMD ["npm", "run", "start"]
