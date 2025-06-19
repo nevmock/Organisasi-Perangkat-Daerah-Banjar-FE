@@ -169,7 +169,7 @@ const DatePage = () => {
                             </td>
                             <td>
                               {program.status_laporan == 'revisi' ? (
-                                <Badge pill bg="primary" className="me-1">
+                                <Badge pill bg="danger" className="me-1">
                                   REVISI
                                 </Badge>
                               ) : program.status_laporan == 'final' ? (
