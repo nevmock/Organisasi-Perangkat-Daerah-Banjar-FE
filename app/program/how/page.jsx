@@ -17,8 +17,10 @@ import { ResponsiveTableCode } from 'data/code/TablesCode';
 import { useEffect, useState } from 'react';
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
+import useMounted from 'hooks/useMounted';
 
 const HowPage = () => {
+  const hasMounted = useMounted();
   const [programs, setPrograms] = useState([]);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -124,12 +126,15 @@ const HowPage = () => {
                       type="text"
                       placeholder="Cari program..."
                       value={searchQuery}
+                      disabled={!hasMounted}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </InputGroup>
                   <Button
                     size="sm"
                     variant="primary"
+                    className="text-white"
+                    disabled={!hasMounted}
                     href="/program/how/tambah"
                   >
                     Tambah
@@ -153,47 +158,52 @@ const HowPage = () => {
                           <th>Aksi</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {programs.map((program, index) => (
-                          <tr key={program._id || index}>
-                            <td>
-                              {(paginationData.page - 1) *
-                                paginationData.limit +
-                                index +
-                                1}
-                            </td>
-                            <td>{program.nama_program}</td>
-                            <td>
-                              <div
-                                className="text-wrap"
-                                style={{ minWidth: '300px' }}
-                              >
-                                {program.tujuan_program}
-                              </div>
-                            </td>
-                            <td>
-                              <div
-                                className="text-wrap"
-                                style={{ minWidth: '300px' }}
-                              >
-                                {program.sasaran_program}
-                              </div>
-                            </td>
-                            <td>{program.rencana_lokasi?.kelurahan}</td>
-                            <td>{program.rencana_lokasi?.kecamatan}</td>
-                            <td>{program.rencana_lokasi?.kota}</td>
-                            <td>{program.opd_pengusul_utama}</td>
-                            <td>
-                              <Button
-                                variant="outline-primary"
-                                href={`/program/how/${program._id}`}
-                              >
-                                Detail
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                      {hasMounted && (
+                        <tbody>
+                          {programs.map((program, index) => (
+                            <tr key={program._id || index}>
+                              <td>
+                                {(paginationData.page - 1) *
+                                  paginationData.limit +
+                                  index +
+                                  1}
+                              </td>
+                              <td>{program.nama_program}</td>
+                              <td>
+                                <div
+                                  className="text-wrap"
+                                  style={{ minWidth: '300px' }}
+                                >
+                                  {program.tujuan_program}
+                                </div>
+                              </td>
+                              <td>
+                                <div
+                                  className="text-wrap"
+                                  style={{ minWidth: '300px' }}
+                                >
+                                  {program.sasaran_program}
+                                </div>
+                              </td>
+                              <td>{program.rencana_lokasi?.kelurahan}</td>
+                              <td>{program.rencana_lokasi?.kecamatan}</td>
+                              <td>{program.rencana_lokasi?.kota}</td>
+                              <td>{program.opd_pengusul_utama}</td>
+                              <td>
+                                <Button
+                                  variant="outline-primary"
+                                  style={{
+                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
+                                  }}
+                                  href={`/program/how/${program._id}`}
+                                >
+                                  Detail
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      )}
                     </Table>
                     {paginationData.totalPages > 1 && (
                       <Pagination

@@ -81,6 +81,8 @@ const InputProgram = ({ id }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     const payload = {
       nama_program: form.nama_program,
@@ -550,10 +552,11 @@ const InputProgram = ({ id }) => {
                         <div>
                           <Button
                             variant="primary"
-                            className="me-2"
+                            className="me-2 text-white"
                             type="submit"
+                            disabled={loading}
                           >
-                            Simpan
+                            {loading ? 'Menyimpan...' : 'Simpan'}
                           </Button>
                           <Button
                             variant="outline-white"

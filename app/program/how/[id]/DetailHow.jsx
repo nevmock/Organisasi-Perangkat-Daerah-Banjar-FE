@@ -35,6 +35,7 @@ const initialForm = {
 const InputProgram = ({ id }) => {
   const hasMounted = useMounted();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState(initialForm);
 
   const handleChange = (e) => {
@@ -67,6 +68,8 @@ const InputProgram = ({ id }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     const newData = {
       nama_program: form.nama_program,
       tujuan_program: form.tujuan_program,
@@ -141,8 +144,6 @@ const InputProgram = ({ id }) => {
 
     if (id) fetchData();
   }, [id]);
-
-  if (loading) return <p>Loading...</p>;
 
   return (
     <Container fluid className="p-6">
@@ -603,10 +604,11 @@ const InputProgram = ({ id }) => {
                         <div>
                           <Button
                             variant="primary"
-                            className="me-2"
+                            className="me-2 text-white"
                             type="submit"
+                            disabled={loading}
                           >
-                            Update
+                            {loading ? 'Menyimpan...' : 'Update'}
                           </Button>
                           <Button
                             variant="outline-white"
