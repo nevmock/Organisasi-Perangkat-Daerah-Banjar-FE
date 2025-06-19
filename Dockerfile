@@ -1,7 +1,5 @@
 FROM node:20-alpine AS builder
 
-ARG APP_PORT=3018
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -20,5 +18,5 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
 
-EXPOSE ${APP_PORT}
-CMD ["npm", "start"]
+EXPOSE 3020
+CMD ["node_modules/.bin/next", "start", "-p", "3020"]
