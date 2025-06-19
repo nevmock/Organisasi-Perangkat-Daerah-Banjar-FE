@@ -42,5 +42,6 @@ jobs:
             docker rm sia-fe-dev || true
             docker run -d --name sia-fe-dev \
               -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
+              -e PORT=${{ secrets.DEV_PORT }} \
               -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
               kevinirawand/sia-fe-dev:latest
