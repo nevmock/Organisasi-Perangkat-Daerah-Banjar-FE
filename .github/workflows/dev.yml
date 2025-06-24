@@ -1,10 +1,9 @@
-name: CI/CD Prod
+name: CI/CD Dev
 
 on:
   push:
     branches:
-      - dev
-
+      - main
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -25,7 +24,11 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker build --build-arg APP_PORT=${{ secrets.DEV_PORT }} -t kevinirawand/sia-fe-dev:latest .
+        run: |
+              docker build \
+              --build-arg APP_PORT=${{ secrets.DEV_PORT }} \
+              --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
+              -t kevinirawand/sia-fe-dev:latest .
 
       - name: Push Docker Image
         run: docker push kevinirawand/sia-fe-dev:latest
@@ -42,5 +45,6 @@ jobs:
             docker rm sia-fe-dev || true
             docker run -d --name sia-fe-dev \
               -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
+              -e PORT=${{ secrets.DEV_PORT }} \
               -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
               kevinirawand/sia-fe-dev:latest
