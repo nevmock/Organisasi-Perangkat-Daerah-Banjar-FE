@@ -349,7 +349,7 @@ export default function DateForm() {
                       ) : (
                         <div className="text-muted small mt-1">
                           Maksimal {MAX_FILE_COUNT} file, masing-masing maksimal
-                          5MB
+                          5MB (.pdf, .png, .jpg, .jpeg)
                         </div>
                       )}
 
