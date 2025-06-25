@@ -1,12 +1,12 @@
 // import node module libraries
+'use client';
 import Link from 'next/link';
 import { Col, Row, Card, Table, Button } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
 
-const ActiveProjectsByOpd = ({ id }) => {
+const ActiveProjectsByOpd = ({ id, opdName }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -16,9 +16,6 @@ const ActiveProjectsByOpd = ({ id }) => {
     limit: 10,
     totalPages: 0,
   });
-
-  const searchParams = useSearchParams();
-  const opdName = searchParams.get('opdName') || 'OPD';
 
   const handlePageChange = (newPage) => setPage(newPage);
 
