@@ -3,7 +3,7 @@ name: CI/CD Dev
 on:
   push:
     branches:
-      - dev
+      - main
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -26,12 +26,12 @@ jobs:
       - name: Build Docker Image
         run: |
               docker build \
-              --build-arg APP_PORT=${{ secrets.DEV_PORT }} \
-              --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
-              -t kevinirawand/sia-fe-dev:latest .
+              --build-arg APP_PORT=${{ secrets.PROD_PORT }} \
+              --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_PROD_API_URL }} \
+              -t kevinirawand/sia-fe-prod:latest .
 
       - name: Push Docker Image
-        run: docker push kevinirawand/sia-fe-dev:latest
+        run: docker push kevinirawand/sia-fe-prod:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
@@ -40,11 +40,11 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull kevinirawand/sia-fe-dev:latest
-            docker stop sia-fe-dev || true
-            docker rm sia-fe-dev || true
-            docker run -d --name sia-fe-dev \
-              -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
-              -e PORT=${{ secrets.DEV_PORT }} \
-              -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
-              kevinirawand/sia-fe-dev:latest
+            docker pull kevinirawand/sia-fe-prod:latest
+            docker stop sia-fe-prod || true
+            docker rm sia-fe-prod || true
+            docker run -d --name sia-fe-prod \
+              -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_PROD_API_URL }} \
+              -e PORT=${{ secrets.PROD_PORT }} \
+              -p ${{secrets.PROD_PORT}}:${{secrets.PROD_PORT}} \
+              kevinirawand/sia-fe-prod:latest
