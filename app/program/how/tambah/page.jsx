@@ -307,6 +307,7 @@ const InputProgram = ({ id }) => {
                     <Col md={9}>
                       <Row className="mb-2">
                         <Col md={6}>
+                          <Form.Label column>Jumlah Peserta</Form.Label>
                           <Form.Control
                             type="number"
                             name="jumlah_peserta"
@@ -318,6 +319,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={6}>
+                          <Form.Label column>Jumlah Sesi Pelatihan</Form.Label>
                           <Form.Control
                             type="number"
                             name="jumlah_pelatihan"
@@ -330,6 +332,9 @@ const InputProgram = ({ id }) => {
                       </Row>
                       <Row className="mb-2">
                         <Col md={6}>
+                          <Form.Label column>
+                            Tingkat Kepuasan Minimum (%)
+                          </Form.Label>
                           <InputGroup>
                             <Form.Control
                               type="number"
@@ -356,6 +361,7 @@ const InputProgram = ({ id }) => {
                     <Col md={9}>
                       <Row className="mb-2">
                         <Col md={4}>
+                          <Form.Label column>Kelurahan</Form.Label>
                           <Form.Control
                             name="lokasi_kelurahan"
                             placeholder="Kelurahan"
@@ -366,6 +372,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={4}>
+                          <Form.Label column>Kecamatan</Form.Label>
                           <Form.Control
                             name="lokasi_kecamatan"
                             placeholder="Kecamatan"
@@ -376,6 +383,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={4}>
+                          <Form.Label column>Kota</Form.Label>
                           <Form.Control
                             name="lokasi_kota"
                             placeholder="Kota"

@@ -173,61 +173,6 @@ export default function DoForm({ id }) {
     }
   };
 
-  // const handleFileChange = (e) => {
-  //   const files = Array.from(e.target.files);
-  //   setFileError('');
-
-  //   // Calculate available slots for new files
-  //   const availableSlots = MAX_FILE_COUNT - defaultFile.length;
-
-  //   // Validation 1: Check if there are any available slots
-  //   if (availableSlots <= 0) {
-  //     setFileError(`Anda sudah mencapai batas maksimal ${MAX_FILE_COUNT} file`);
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   // Validation 2: Check if new files exceed available slots
-  //   if (files.length > availableSlots) {
-  //     setFileError(
-  //       `Anda hanya dapat menambahkan ${availableSlots} file lagi (total maksimal ${MAX_FILE_COUNT} file)`
-  //     );
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   // Validation 3: Check for oversized files
-  //   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
-  //   if (oversizedFiles.length > 0) {
-  //     setFileError(
-  //       `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
-  //         .map((f) => f.name)
-  //         .join(', ')}`
-  //     );
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   if (files.length > 0) {
-  //     setUploadedFiles(files);
-
-  //     const processedFiles = files.map((file) => ({
-  //       name: file.name,
-  //       type: file.type,
-  //       size: file.size,
-  //       url: URL.createObjectURL(file),
-  //       fileObject: file,
-  //     }));
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       dokumentasi_kegiatan: [
-  //         ...(prev.dokumentasi_kegiatan || []),
-  //         ...processedFiles,
-  //       ],
-  //     }));
-  //   }
-  // };
-
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setFileError('');
@@ -278,33 +223,6 @@ export default function DoForm({ id }) {
     e.target.value = ''; // Reset input file setelah diproses
   };
 
-  // const removeFile = async (file, index, isDefault = false) => {
-  //   if (isDefault) {
-  //     try {
-  //       const filename = file.split('/').pop();
-  //       await request.delete(
-  //         `/do/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
-  //       );
-  //       // Remove from default files
-  //       const updatedDefaultFiles = [...defaultFile];
-  //       updatedDefaultFiles.splice(index, 1);
-  //       setDefaultFile(updatedDefaultFiles);
-  //       alert('File berhasil dihapus');
-  //     } catch (error) {
-  //       console.error('Gagal menghapus file:', error);
-  //       alert('Gagal menghapus file. Silakan coba lagi.');
-  //     }
-  //   } else {
-  //     // Remove from newly uploaded files
-  //     const updatedFiles = [...form.dokumentasi_kegiatan];
-  //     updatedFiles.splice(index, 1);
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       dokumentasi_kegiatan: updatedFiles,
-  //     }));
-  //   }
-  //   setFileError('');
-  // };
   const removeFile = async (file, index, isDefault = false) => {
     if (isDefault) {
       try {
@@ -356,21 +274,6 @@ export default function DoForm({ id }) {
                       Nama Program
                     </Form.Label>
                     <Col md={9}>
-                      {/* <Selection
-                      name="nama_program"
-                      value={form.nama_program}
-                      onChange={handleChange}
-                      placeHolder="Pilih Nama Program"
-                      className="form-select"
-                      required
-                    >
-                      <option value="">Pilih Nama Program</option>
-                      {programNames.map((opt, index) => (
-                        <option key={index} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Selection> */}
                       <Selection
                         name="nama_program"
                         value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
@@ -392,6 +295,7 @@ export default function DoForm({ id }) {
                       {form.kolaborator.map((item, idx) => (
                         <Row className="mb-2" key={idx}>
                           <Col md={5}>
+                            <Form.Label column>Nama Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Nama Kolaborator"
                               value={item.nama}
@@ -406,6 +310,7 @@ export default function DoForm({ id }) {
                             />
                           </Col>
                           <Col md={5}>
+                            <Form.Label column>Peran Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Peran Kolaborator"
                               value={item.peran}
@@ -419,21 +324,37 @@ export default function DoForm({ id }) {
                               required
                             />
                           </Col>
-                          <Col md={2} className="d-flex gap-2">
-                            <Button
-                              variant="outline-danger"
-                              onClick={() => removeKolaborator(idx)}
-                              disabled={form.kolaborator.length === 1}
-                            >
-                              -
-                            </Button>
-                            <Button
-                              variant="outline-primary"
-                              onClick={addKolaborator}
-                              disabled={idx !== form.kolaborator.length - 1}
-                            >
-                              +
-                            </Button>
+                          <Col md={2} className="d-flex align-items-end gap-2">
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-danger"
+                                onClick={() => removeKolaborator(idx)}
+                                disabled={form.kolaborator.length === 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                -
+                              </Button>
+                            </div>
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-primary"
+                                onClick={addKolaborator}
+                                disabled={idx !== form.kolaborator.length - 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                +
+                              </Button>
+                            </div>
                           </Col>
                         </Row>
                       ))}
@@ -474,22 +395,6 @@ export default function DoForm({ id }) {
                     </Col>
                   </Row>
 
-                  {/* Dokumentasi */}
-                  {/* <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Dokumentasi Kegiatan
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      name="dokumentasi_kegiatan"
-                      value={form.dokumentasi_kegiatan}
-                      onChange={handleChange}
-                      placeholder="Link dokumentasi (Google Drive, dsb)"
-                      required
-                    />
-                  </Col>
-                </Row> */}
-
                   <Row className="mb-3">
                     <Form.Label column md={3}>
                       Laporan PDF
@@ -500,16 +405,6 @@ export default function DoForm({ id }) {
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png,.gif"
                         multiple
-                        // onChange={(e) => {
-                        //   const file = e.target.files[0];
-                        //   if (file) {
-                        //     // Simpan nama file atau path relatif ke state
-                        //     setForm((prev) => ({
-                        //       ...prev,
-                        //       dokumentasi_kegiatan: `uploads/${file.name}`, // atau format path lain yang Anda butuhkan
-                        //     }));
-                        //   }
-                        // }}
                         onChange={handleFileChange}
                       />
                       {fileError ? (
@@ -532,26 +427,6 @@ export default function DoForm({ id }) {
                                 <FilePreviewCard
                                   key={index}
                                   file={file}
-                                  // onRemove={async () => {
-                                  //   try {
-                                  //     const filename = file.split('/').pop();
-                                  //     await request.delete(
-                                  //       `/date/${id}/dokumentasi?filename=${encodeURIComponent(
-                                  //         filename
-                                  //       )}`
-                                  //     );
-                                  //     alert('File berhasil dihapus');
-                                  //     fetchData();
-                                  //   } catch (error) {
-                                  //     console.error(
-                                  //       'Gagal menghapus file:',
-                                  //       error
-                                  //     );
-                                  //     alert(
-                                  //       'Gagal menghapus file. Silakan coba lagi.'
-                                  //     );
-                                  //   }
-                                  // }}
                                   onRemove={() => removeFile(file, index, true)}
                                 />
                               ))}
