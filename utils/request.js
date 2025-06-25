@@ -112,7 +112,7 @@ export default {
   },
   patch: (url, data, headers) =>
     request({ method: 'patch', url, data, headers }),
-  delete: (url, data) => request({ method: 'delete', url, data }),
+  delete: (url, config = {}) => request({ method: 'delete', url, ...config }),
   setToken: (token) => {
     if (token) {
       request.defaults.headers.common.Authorization = `Bearer ${token}`;
