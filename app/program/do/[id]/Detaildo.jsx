@@ -24,6 +24,7 @@ const initialForm = {
   capaian_output: '',
   dokumentasi_kegiatan: '',
   kendala: '',
+  status: false,
   rekomendasi: '',
 };
 
@@ -64,6 +65,7 @@ export default function DoForm({ id }) {
           dokumentasi_kegiatan,
           kendala,
           rekomendasi,
+          status,
         } = res.data;
 
         setForm({
@@ -75,6 +77,7 @@ export default function DoForm({ id }) {
           capaian_output,
           kendala,
           rekomendasi,
+          status,
         });
         setDefaultFile(dokumentasi_kegiatan);
       }
@@ -98,8 +101,11 @@ export default function DoForm({ id }) {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleKolaboratorChange = (idx, field, value) => {
@@ -140,6 +146,7 @@ export default function DoForm({ id }) {
         capaian_output: form.capaian_output,
         kendala: form.kendala,
         rekomendasi: form.rekomendasi,
+        status: form.status,
       };
 
       const response = await request.put(`/do/${id}`, newData);
@@ -153,7 +160,7 @@ export default function DoForm({ id }) {
       window.location.href = '/program/do';
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Gagal menyimpan data.');
+      setError(err.response.data.message || 'Gagal menyimpan data.');
     } finally {
       setLoading(false);
     }
@@ -169,6 +176,7 @@ export default function DoForm({ id }) {
       return res.data?.urls || [];
     } catch (err) {
       console.error('Gagal mengunggah file:', err);
+      setError(err.response.data.message || 'Gagal menyimpan data.');
       throw err;
     }
   };
@@ -181,9 +189,9 @@ export default function DoForm({ id }) {
     const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
 
     if (totalFiles > MAX_FILE_COUNT) {
-      const availableSlots =
-        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
-      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      // const availableSlots =
+      //   MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan maksimal 3 file`);
       e.target.value = '';
       return;
     }
@@ -240,7 +248,7 @@ export default function DoForm({ id }) {
         alert('Gagal menghapus file. Silakan coba lagi.');
       }
     } else {
-      // Remove from newly uploaded files
+      const fileToRemove = file; // karena sudah dikirim sebagai file
       const updatedFiles = [...form.dokumentasi_kegiatan];
       updatedFiles.splice(index, 1);
       setForm((prev) => ({
@@ -248,14 +256,20 @@ export default function DoForm({ id }) {
         dokumentasi_kegiatan: updatedFiles,
       }));
 
-      // Juga hapus dari uploadedFiles state jika perlu
       const updatedUploaded = [...uploadedFiles];
-      updatedUploaded.splice(index, 1);
-      setUploadedFiles(updatedUploaded);
+      const uploadedIndex = updatedUploaded.findIndex(
+        (f) => f.name === fileToRemove.name && f.size === fileToRemove.size
+      );
+
+      if (uploadedIndex !== -1) {
+        updatedUploaded.splice(uploadedIndex, 1);
+        setUploadedFiles(updatedUploaded);
+      }
     }
+
     setFileError('');
   };
-  console.log(programNames);
+  console.log(uploadedFiles);
 
   return (
     <Container fluid className="p-6">
@@ -407,15 +421,19 @@ export default function DoForm({ id }) {
                         multiple
                         onChange={handleFileChange}
                       />
-                      {fileError ? (
+                      <div className="text-muted small mt-1">
+                        {defaultFile.length + uploadedFiles.length}/
+                        {MAX_FILE_COUNT} file terisi. Maksimal {MAX_FILE_COUNT}{' '}
+                        file (5MB/file)
+                      </div>
+                      <div className="text-muted small mt-1">
+                        Hanya file gambar (jpg, jpeg, png) dan PDF yang
+                        diizinkan!
+                      </div>
+                      {fileError && (
                         <Alert variant="danger" className="mt-2">
                           {fileError}
                         </Alert>
-                      ) : (
-                        <div className="text-muted small mt-1">
-                          {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
-                          Maksimal {MAX_FILE_COUNT} file (5MB/file)
-                        </div>
                       )}
                       {(form.dokumentasi_kegiatan?.length > 0 ||
                         defaultFile.length > 0) && (
@@ -435,16 +453,9 @@ export default function DoForm({ id }) {
                                 <FilePreviewCard
                                   key={index}
                                   file={file}
-                                  onRemove={() => {
-                                    const updatedFiles = [
-                                      ...form.dokumentasi_kegiatan,
-                                    ];
-                                    updatedFiles.splice(index, 1);
-                                    setForm((prev) => ({
-                                      ...prev,
-                                      dokumentasi_kegiatan: updatedFiles,
-                                    }));
-                                  }}
+                                  onRemove={() =>
+                                    removeFile(file, index, false)
+                                  } // perhatikan argumennya
                                 />
                               ))}
                           </div>
@@ -486,6 +497,28 @@ export default function DoForm({ id }) {
                         placeholder="Masukkan rekomendasi"
                         required
                       />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-4">
+                    <Form.Label column md={3}>
+                      Status Do
+                    </Form.Label>
+                    <Col md={9}>
+                      <div className="d-flex align-items-center p-2 border rounded bg-light">
+                        <Form.Check
+                          type="switch"
+                          id="status-switch"
+                          label={form.status ? 'Aktif' : 'Nonaktif'}
+                          name="status"
+                          checked={form.status}
+                          onChange={handleChange}
+                          className="form-check-lg"
+                        />
+                      </div>
+                      <small className="text-muted mt-1 d-block">
+                        Nyalakan untuk menandai program selesai dilaksanakan.
+                      </small>
                     </Col>
                   </Row>
 

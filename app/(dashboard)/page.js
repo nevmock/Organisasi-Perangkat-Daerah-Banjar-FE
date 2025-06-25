@@ -1,20 +1,35 @@
-"use client";
+'use client';
 // import node module libraries
-import { Fragment } from "react";
-import Link from "next/link";
-import { Container, Col, Row } from "react-bootstrap";
+import { Fragment } from 'react';
+import Link from 'next/link';
+import { Container, Col, Row } from 'react-bootstrap';
 
 // import widget/custom components
-import { StatRightTopIcon } from "widgets";
+import { StatRightTopIcon } from 'widgets';
 
 // import sub components
-import { ActiveProjects, Teams, TasksPerformance } from "sub-components";
+import { ActiveProjects, Teams, TasksPerformance } from 'sub-components';
 
 // import required data files
-import ProjectsStatsData from "data/dashboard/ProjectsStatsData";
-import LineChart from "sub-components/dashboard/ProgressProgramOpd";
+import ProjectsStatsData from 'data/dashboard/ProjectsStatsData';
+import LineChart from 'sub-components/dashboard/ProgressProgramOpd';
+import HorizontalGroupedBarChart from 'sub-components/dashboard/HorizontalGroupedBarChart';
 
 const Home = () => {
+  const customData = {
+    series: [
+      {
+        name: 'Product A',
+        data: [30, 40, 45, 50, 49, 60, 70],
+      },
+      {
+        name: 'Product B',
+        data: [20, 35, 40, 45, 55, 65, 75],
+      },
+    ],
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+  };
+
   return (
     <Fragment>
       <div className="bg-primary pt-10 pb-21"></div>
@@ -33,7 +48,14 @@ const Home = () => {
             <LineChart />
           </Col>
         </Row>
-        <ActiveProjects />
+        <Row className="my-6">
+          {/* card  */}
+          <Col xs={12}>
+            {/* Teams  */}
+            <HorizontalGroupedBarChart />
+          </Col>
+        </Row>
+        {/* <ActiveProjects /> */}
       </Container>
     </Fragment>
   );
