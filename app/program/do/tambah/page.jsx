@@ -248,30 +248,6 @@ export default function DoForm() {
                       Nama Program
                     </Form.Label>
                     <Col md={9}>
-                      {/* <Selection
-                      name="nama_program"
-                      value={form.nama_program}
-                      onChange={handleChange}
-                      placeHolder="Pilih Nama Program"
-                      className="form-select"
-                      required
-                    >
-                      <option value="">Pilih Nama Program</option>
-                      {programNames.map((opt, index) => (
-                        <option key={index} value={opt.id}>
-                          {opt.nama_program}
-                        </option>
-                      ))}
-                    </Selection> */}
-                      {/* <Selection
-                      name="nama_program"
-                      value={form.nama_program}
-                      onChange={handleChange}
-                      options={programNames}
-                      optionLabel="nama_program"
-                      optionValue="id"
-                      placeholder="Pilih Nama Program"
-                    /> */}
                       <Selection
                         name="nama_program"
                         value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
@@ -292,6 +268,7 @@ export default function DoForm() {
                       {form.kolaborator.map((item, idx) => (
                         <Row className="mb-2" key={idx}>
                           <Col md={5}>
+                            <Form.Label column>Nama Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Nama Kolaborator"
                               value={item.nama}
@@ -306,6 +283,7 @@ export default function DoForm() {
                             />
                           </Col>
                           <Col md={5}>
+                            <Form.Label column>Peran Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Peran Kolaborator"
                               value={item.peran}
@@ -319,21 +297,37 @@ export default function DoForm() {
                               required
                             />
                           </Col>
-                          <Col md={2} className="d-flex gap-2">
-                            <Button
-                              variant="outline-danger"
-                              onClick={() => removeKolaborator(idx)}
-                              disabled={form.kolaborator.length === 1}
-                            >
-                              -
-                            </Button>
-                            <Button
-                              variant="outline-primary"
-                              onClick={addKolaborator}
-                              disabled={idx !== form.kolaborator.length - 1}
-                            >
-                              +
-                            </Button>
+                          <Col md={2} className="d-flex align-items-end gap-2">
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-danger"
+                                onClick={() => removeKolaborator(idx)}
+                                disabled={form.kolaborator.length === 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                -
+                              </Button>
+                            </div>
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-primary"
+                                onClick={addKolaborator}
+                                disabled={idx !== form.kolaborator.length - 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                +
+                              </Button>
+                            </div>
                           </Col>
                         </Row>
                       ))}
@@ -382,24 +376,6 @@ export default function DoForm() {
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png,.gif"
                         multiple
-                        // onChange={(e) => {
-                        //   const files = Array.from(e.target.files);
-                        //   if (files.length > 0) {
-                        //     setUploadedFiles(files);
-
-                        //     const processedFiles = files.map((file) => ({
-                        //       name: file.name,
-                        //       type: file.type,
-                        //       size: file.size,
-                        //       url: URL.createObjectURL(file),
-                        //       fileObject: file,
-                        //     }));
-                        //     setForm((prev) => ({
-                        //       ...prev,
-                        //       dokumentasi_kegiatan: processedFiles,
-                        //     }));
-                        //   }
-                        // }}
                         onChange={handleFileChange}
                       />
                       {fileError ? (
@@ -421,16 +397,6 @@ export default function DoForm() {
                               <FilePreviewCard
                                 key={index}
                                 file={file}
-                                // onRemove={() => {
-                                //   const updatedFiles = [
-                                //     ...form.dokumentasi_kegiatan,
-                                //   ];
-                                //   updatedFiles.splice(index, 1);
-                                //   setForm((prev) => ({
-                                //     ...prev,
-                                //     dokumentasi_kegiatan: updatedFiles,
-                                //   }));
-                                // }}
                                 onRemove={() => removeFile(index)}
                               />
                             ))}

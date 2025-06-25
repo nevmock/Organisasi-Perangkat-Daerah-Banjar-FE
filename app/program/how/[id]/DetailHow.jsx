@@ -327,6 +327,7 @@ const InputProgram = ({ id }) => {
                     <Col md={9}>
                       <Row className="mb-2">
                         <Col md={6}>
+                          <Form.Label column>Jumlah Peserta</Form.Label>
                           <Form.Control
                             type="number"
                             name="jumlah_peserta"
@@ -338,6 +339,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={6}>
+                          <Form.Label column>Jumlah Sesi Pelatihan</Form.Label>
                           <Form.Control
                             type="number"
                             name="jumlah_pelatihan"
@@ -350,6 +352,9 @@ const InputProgram = ({ id }) => {
                       </Row>
                       <Row className="mb-2">
                         <Col md={6}>
+                          <Form.Label column>
+                            Tingkat Kepuasan Minimum (%)
+                          </Form.Label>
                           <InputGroup>
                             <Form.Control
                               type="number"
@@ -357,9 +362,9 @@ const InputProgram = ({ id }) => {
                               placeholder="Tingkat Kepuasan Minimum (%)"
                               value={form.tingkat_kepuasan}
                               onChange={handleChange}
-                              required
                               min={1}
                               max={100}
+                              required
                             />
                             <InputGroup.Text>%</InputGroup.Text>
                           </InputGroup>
@@ -376,6 +381,7 @@ const InputProgram = ({ id }) => {
                     <Col md={9}>
                       <Row className="mb-2">
                         <Col md={4}>
+                          <Form.Label column>Kelurahan</Form.Label>
                           <Form.Control
                             name="lokasi_kelurahan"
                             placeholder="Kelurahan"
@@ -386,6 +392,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={4}>
+                          <Form.Label column>Kecamatan</Form.Label>
                           <Form.Control
                             name="lokasi_kecamatan"
                             placeholder="Kecamatan"
@@ -396,6 +403,7 @@ const InputProgram = ({ id }) => {
                           />
                         </Col>
                         <Col md={4}>
+                          <Form.Label column>Kota</Form.Label>
                           <Form.Control
                             name="lokasi_kota"
                             placeholder="Kota"
@@ -407,103 +415,6 @@ const InputProgram = ({ id }) => {
                       </Row>
                     </Col>
                   </Row>
-
-                  {/* Anggaran */}
-                  {/* <Row className="mb-3">
-                    <Form.Label column md={3}>
-                      Rencana Anggaran
-                    </Form.Label>
-                    <Col md={9}>
-                      <Row className="mb-2">
-                        <Col md={6}>
-                          <InputGroup>
-                            <InputGroup.Text>Rp</InputGroup.Text>
-                            <Form.Control
-                              type="number"
-                              name="anggaran_jumlah"
-                              placeholder="Jumlah Anggaran"
-                              value={form.anggaran_jumlah}
-                              onChange={handleChange}
-                              required
-                            />
-                          </InputGroup>
-                        </Col>
-                      </Row>
-                      <Row className="align-items-start">
-                        <Col>
-                          {form.anggaran_sumber_dana.map((item, idx) => (
-                            <Row className="mb-2" key={idx}>
-                              <Col md={6}>
-                                <Form.Select
-                                  value={item.jenis}
-                                  onChange={(e) =>
-                                    handleSumberDanaChange(
-                                      idx,
-                                      'jenis',
-                                      e.target.value
-                                    )
-                                  }
-                                  required
-                                  className="mb-2"
-                                >
-                                  <option value="">Pilih Sumber Dana</option>
-                                  {sumberDanaOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                      {opt.label}
-                                    </option>
-                                  ))}
-                                </Form.Select>
-                              </Col>
-                              <Col md={4} className="mb-2">
-                                <InputGroup>
-                                  <Form.Control
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    value={item.persentase}
-                                    placeholder="Jumlah persentase"
-                                    onChange={(e) =>
-                                      handleSumberDanaChange(
-                                        idx,
-                                        'persentase',
-                                        e.target.value
-                                      )
-                                    }
-                                    required
-                                  />
-                                  <InputGroup.Text>%</InputGroup.Text>
-                                </InputGroup>
-                              </Col>
-                              <Col
-                                xs={4}
-                                md={2}
-                                className="d-flex gap-2 align-items-start justify-content-start"
-                              >
-                                <Button
-                                  variant="outline-danger"
-                                  onClick={() => removeSumberDana(idx)}
-                                  disabled={
-                                    form.anggaran_sumber_dana.length === 1
-                                  }
-                                >
-                                  -
-                                </Button>
-                                <Button
-                                  variant="outline-primary"
-                                  onClick={addSumberDana}
-                                  disabled={
-                                    idx !== form.anggaran_sumber_dana.length - 1
-                                  }
-                                >
-                                  +
-                                </Button>
-                              </Col>
-                            </Row>
-                          ))}
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row> */}
 
                   {/* OPD */}
                   <Row className="mb-3">
@@ -566,37 +477,6 @@ const InputProgram = ({ id }) => {
                           </Col>
                         </Row>
                       ))}
-                      {/* {form.opd_kolaborator.map((val, idx) => (
-                        <InputGroup className="mb-2" key={idx}>
-                          <Form.Control
-                            value={val}
-                            onChange={(e) =>
-                              handleArrayChange(
-                                "opd_kolaborator",
-                                idx,
-                                e.target.value
-                              )
-                            }
-                            required
-                          />
-                          <Button
-                            variant="outline-danger"
-                            onClick={() =>
-                              removeArrayItem("opd_kolaborator", idx)
-                            }
-                            disabled={form.opd_kolaborator.length === 1}
-                          >
-                            -
-                          </Button>
-                          <Button
-                            variant="outline-primary"
-                            onClick={() => addArrayItem("opd_kolaborator")}
-                            disabled={idx !== form.opd_kolaborator.length - 1}
-                          >
-                            +
-                          </Button>
-                        </InputGroup>
-                      ))} */}
                     </Col>
                   </Row>
 
