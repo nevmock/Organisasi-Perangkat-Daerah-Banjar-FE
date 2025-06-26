@@ -483,7 +483,7 @@ export default function DoForm() {
                         <Form.Check
                           type="switch"
                           id="status-switch"
-                          label={form.status ? 'Aktif' : 'Nonaktif'}
+                          label={form.status ? 'Selesai' : 'Belum Selesai'}
                           name="status"
                           checked={form.status}
                           onChange={handleChange}

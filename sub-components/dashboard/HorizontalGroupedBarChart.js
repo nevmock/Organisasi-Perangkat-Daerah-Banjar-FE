@@ -111,7 +111,7 @@ const HorizontalGroupedBarChart = () => {
   return (
     <div className="card h-100">
       <div className="card-body">
-        <h5 className="card-title">Horizontal Grouped Bar Chart</h5>
+        <h5 className="card-title">Data Inputan OPD</h5>
         <Chart
           options={options}
           series={seriesData}
