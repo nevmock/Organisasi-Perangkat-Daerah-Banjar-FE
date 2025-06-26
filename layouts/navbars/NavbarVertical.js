@@ -23,7 +23,7 @@ const NavbarVertical = (props) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const allowedMenusByRole = {
-    superadmin: ['Monitoring'],
+    superadmin: ['Dashboard', 'Monitoring'],
     admin: ['Dashboard', 'Menu OPD', 'Program'],
   };
 
