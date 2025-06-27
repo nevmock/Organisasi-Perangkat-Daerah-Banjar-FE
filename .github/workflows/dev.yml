@@ -1,50 +1,58 @@
-name: CI/CD Dev
+name: 🚀 CI/CD Development
 
 on:
   push:
     branches:
-      - main
+      - dev
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: Development
 
     steps:
-      - name: Checkout Code
+      - name: 📦 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: 🧰 Setup Node.js v20
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: 📥 Install Dependencies
         run: npm install
 
-      - name: Docker Login
+      - name: 🔐 Docker Login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build Docker Image
-        run: |
-              docker build \
-              --build-arg APP_PORT=${{ secrets.DEV_PORT }} \
-              --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
-              -t kevinirawand/sia-fe-dev:latest .
+      - name: 🛠 Build Docker Image
+        run: docker build --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} -t nevmock/sia-fe-dev:latest .
 
-      - name: Push Docker Image
-        run: docker push kevinirawand/sia-fe-dev:latest
+      - name: 📤 Push Docker Image
+        run: docker push nevmock/sia-fe-dev:latest
 
-      - name: Deploy to Server
+      - name: 🚢 Deploy to VPS Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull kevinirawand/sia-fe-dev:latest
+            echo "🔁 Pulling latest Docker image..."
+            docker pull nevmock/sia-fe-dev:latest
+
+            echo "🛑 Stopping and removing old container (if exists)..."
             docker stop sia-fe-dev || true
             docker rm sia-fe-dev || true
-            docker run -d --name sia-fe-dev \
-              -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_DEV_API_URL }} \
-              -e PORT=${{ secrets.DEV_PORT }} \
-              -p ${{secrets.DEV_PORT}}:${{secrets.DEV_PORT}} \
-              kevinirawand/sia-fe-dev:latest
+
+            echo "🚀 Running new container..."
+            docker run -d \
+              --name sia-fe-dev \
+              --restart unless-stopped \
+              -p "${{ secrets.PORT }}":3000 \
+              nevmock/sia-fe-dev:latest
+
+            echo "🧹 Cleaning up unused Docker resources..."
+            docker system prune -f
+
+            echo "✅ Deployment to Development environment completed successfully!"

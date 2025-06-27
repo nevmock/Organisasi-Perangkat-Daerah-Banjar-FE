@@ -1,6 +1,5 @@
 FROM node:20-alpine AS builder
 
-ARG APP_PORT=3000
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
@@ -22,5 +21,5 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
 
-EXPOSE ${APP_PORT}
+EXPOSE 3000
 CMD ["npm", "run", "start"]
