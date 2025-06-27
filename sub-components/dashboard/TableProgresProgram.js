@@ -15,14 +15,14 @@ import { useEffect, useState } from 'react';
 import request from 'utils/request';
 import Pagination from 'sub-components/Pagination';
 
-const ActiveProjects = () => {
+const TableProgresProgram = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(7);
   const [paginationData, setPaginationData] = useState({
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 7,
     totalPages: 0,
   });
 
@@ -38,7 +38,7 @@ const ActiveProjects = () => {
     const fetchDataMonitoring = async () => {
       try {
         const res = await request.get(
-          `/users/getUsersWithCount?page=${page}&limit=${limit}`
+          `/how/progressSummary?page=${page}&limit=${limit}`
         );
         const dataArray = Array.isArray(res.data.data) ? res.data.data : [];
         setData(dataArray);
@@ -58,52 +58,57 @@ const ActiveProjects = () => {
   }, [page, limit]); // Add page and limit to dependency array
 
   return (
-    <Row className="mt-6">
+    <Row className="">
       <Col md={12} xs={12}>
         <Card>
           <Card.Header className="bg-white  py-4">
-            <h4 className="mb-0">List Progress OPD </h4>
+            <h4 className="mb-0">Progress Program OPD </h4>
           </Card.Header>
           <Table responsive className="text-nowrap mb-0">
             <thead className="table-light">
               <tr>
-                <th>Nama OPD</th>
-                <th>Jumlah How</th>
-                <th>Jumlah Do</th>
-                <th>Jumlah Date</th>
-                <th>Aksi</th>
+                <th>#</th>
+                <th>Nama Program</th>
+                <th>Do</th>
+                <th>Progress</th>
               </tr>
             </thead>
             <tbody>
               {data.map((item, index) => {
                 return (
                   <tr key={index}>
-                    <td className="align-middle">
+                    <td>
+                      {(paginationData.page - 1) * paginationData.limit +
+                        index +
+                        1}
+                    </td>
+                    <td className="">
                       <div className="d-flex align-items-center">
                         <div className="">
                           <h5 className=" mb-1">
                             <Link href="#" className="text-inherit">
-                              {getUsernameFromEmail(item.email)}
+                              {item.nama_program}
                             </Link>
                           </h5>
                         </div>
                       </div>
                     </td>
-                    <td className="align-middle">{item.howCount}</td>
-                    <td className="align-middle">{item.doCount}</td>
-                    <td className="align-middle">{item.dateCount}</td>
-                    <td>
-                      <Button
-                        variant="outline-primary"
-                        style={{
-                          '--bs-btn-hover-color': 'white',
-                        }}
-                        href={`/monitoring/${
-                          item._id
-                        }?opdName=${getUsernameFromEmail(item.email)}`}
+                    <td className="">{item.jumlah_do}</td>
+                    <td className="">
+                      <div
+                        className="d-flex align-items-center w-100"
+                        style={{ maxWidth: '250px' }}
                       >
-                        Detail
-                      </Button>
+                        {/* Persentase */}
+                        <span className="me-3 fw-bold">{item.progress}%</span>
+
+                        {/* Progress */}
+                        <ProgressBar
+                          now={item.progress}
+                          style={{ flex: 1, height: '0.5rem' }}
+                          variant="primary"
+                        />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -125,4 +130,4 @@ const ActiveProjects = () => {
   );
 };
 
-export default ActiveProjects;
+export default TableProgresProgram;

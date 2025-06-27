@@ -150,8 +150,12 @@ const HowPage = () => {
                         <tr>
                           <th>#</th>
                           <th>Nama Program</th>
-                          <th>Tujuan</th>
-                          <th>Sasaran</th>
+                          <th style={{ minWidth: '400px', maxWidth: '400px' }}>
+                            Tujuan
+                          </th>
+                          <th style={{ minWidth: '400px', maxWidth: '400px' }}>
+                            Sasaran
+                          </th>
                           <th>Kelurahan</th>
                           <th>Kecamatan</th>
                           <th>Kota</th>
@@ -169,27 +173,49 @@ const HowPage = () => {
                                   index +
                                   1}
                               </td>
-                              <td>{program.nama_program}</td>
-                              <td>
-                                <div
-                                  className="text-wrap"
-                                  style={{ minWidth: '300px' }}
-                                >
-                                  {program.tujuan_program}
-                                </div>
+                              <td>{program.nama_program || '-'}</td>
+                              <td
+                                className="text-wrap"
+                                style={{
+                                  minWidth: '400px',
+                                  maxWidth: '400px',
+                                  whiteSpace: 'normal',
+                                  wordBreak: 'break-word',
+                                  overflowWrap: 'anywhere',
+                                }}
+                              >
+                                {program.tujuan_program.length > 100
+                                  ? `${program.tujuan_program.substring(
+                                      0,
+                                      100
+                                    )}...`
+                                  : program.tujuan_program}
+                              </td>
+                              <td
+                                className="text-wrap"
+                                style={{
+                                  minWidth: '400px',
+                                  maxWidth: '400px',
+                                  whiteSpace: 'normal',
+                                  wordBreak: 'break-word',
+                                  overflowWrap: 'anywhere',
+                                }}
+                              >
+                                {program.sasaran_program.length > 100
+                                  ? `${program.sasaran_program.substring(
+                                      0,
+                                      100
+                                    )}...`
+                                  : program.sasaran_program}
                               </td>
                               <td>
-                                <div
-                                  className="text-wrap"
-                                  style={{ minWidth: '300px' }}
-                                >
-                                  {program.sasaran_program}
-                                </div>
+                                {program.rencana_lokasi?.kelurahan || '-'}
                               </td>
-                              <td>{program.rencana_lokasi?.kelurahan}</td>
-                              <td>{program.rencana_lokasi?.kecamatan}</td>
-                              <td>{program.rencana_lokasi?.kota}</td>
-                              <td>{program.opd_pengusul_utama}</td>
+                              <td>
+                                {program.rencana_lokasi?.kecamatan || '-'}
+                              </td>
+                              <td>{program.rencana_lokasi?.kota || '-'}</td>
+                              <td>{program.opd_pengusul_utama || '-'}</td>
                               <td>
                                 <Button
                                   variant="outline-primary"

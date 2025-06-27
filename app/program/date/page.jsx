@@ -185,7 +185,7 @@ const DatePage = () => {
                                     FINAL
                                   </Badge>
                                 ) : (
-                                  <Badge pill bg="secondary" className="me-1">
+                                  <Badge pill bg="warning" className="me-1">
                                     DRAFT
                                   </Badge>
                                 )}

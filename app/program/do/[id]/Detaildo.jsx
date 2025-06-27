@@ -24,6 +24,7 @@ const initialForm = {
   capaian_output: '',
   dokumentasi_kegiatan: '',
   kendala: '',
+  status: false,
   rekomendasi: '',
 };
 
@@ -64,6 +65,7 @@ export default function DoForm({ id }) {
           dokumentasi_kegiatan,
           kendala,
           rekomendasi,
+          status,
         } = res.data;
 
         setForm({
@@ -75,6 +77,7 @@ export default function DoForm({ id }) {
           capaian_output,
           kendala,
           rekomendasi,
+          status,
         });
         setDefaultFile(dokumentasi_kegiatan);
       }
@@ -98,8 +101,11 @@ export default function DoForm({ id }) {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleKolaboratorChange = (idx, field, value) => {
@@ -140,6 +146,7 @@ export default function DoForm({ id }) {
         capaian_output: form.capaian_output,
         kendala: form.kendala,
         rekomendasi: form.rekomendasi,
+        status: form.status,
       };
 
       const response = await request.put(`/do/${id}`, newData);
@@ -153,7 +160,7 @@ export default function DoForm({ id }) {
       window.location.href = '/program/do';
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Gagal menyimpan data.');
+      setError(err.response.data.message || 'Gagal menyimpan data.');
     } finally {
       setLoading(false);
     }
@@ -169,64 +176,10 @@ export default function DoForm({ id }) {
       return res.data?.urls || [];
     } catch (err) {
       console.error('Gagal mengunggah file:', err);
+      setError(err.response.data.message || 'Gagal menyimpan data.');
       throw err;
     }
   };
-
-  // const handleFileChange = (e) => {
-  //   const files = Array.from(e.target.files);
-  //   setFileError('');
-
-  //   // Calculate available slots for new files
-  //   const availableSlots = MAX_FILE_COUNT - defaultFile.length;
-
-  //   // Validation 1: Check if there are any available slots
-  //   if (availableSlots <= 0) {
-  //     setFileError(`Anda sudah mencapai batas maksimal ${MAX_FILE_COUNT} file`);
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   // Validation 2: Check if new files exceed available slots
-  //   if (files.length > availableSlots) {
-  //     setFileError(
-  //       `Anda hanya dapat menambahkan ${availableSlots} file lagi (total maksimal ${MAX_FILE_COUNT} file)`
-  //     );
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   // Validation 3: Check for oversized files
-  //   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
-  //   if (oversizedFiles.length > 0) {
-  //     setFileError(
-  //       `Ukuran file melebihi batas maksimal 5MB: ${oversizedFiles
-  //         .map((f) => f.name)
-  //         .join(', ')}`
-  //     );
-  //     e.target.value = ''; // Clear the file input
-  //     return;
-  //   }
-
-  //   if (files.length > 0) {
-  //     setUploadedFiles(files);
-
-  //     const processedFiles = files.map((file) => ({
-  //       name: file.name,
-  //       type: file.type,
-  //       size: file.size,
-  //       url: URL.createObjectURL(file),
-  //       fileObject: file,
-  //     }));
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       dokumentasi_kegiatan: [
-  //         ...(prev.dokumentasi_kegiatan || []),
-  //         ...processedFiles,
-  //       ],
-  //     }));
-  //   }
-  // };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -236,9 +189,9 @@ export default function DoForm({ id }) {
     const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
 
     if (totalFiles > MAX_FILE_COUNT) {
-      const availableSlots =
-        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
-      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      // const availableSlots =
+      //   MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan maksimal 3 file`);
       e.target.value = '';
       return;
     }
@@ -278,33 +231,6 @@ export default function DoForm({ id }) {
     e.target.value = ''; // Reset input file setelah diproses
   };
 
-  // const removeFile = async (file, index, isDefault = false) => {
-  //   if (isDefault) {
-  //     try {
-  //       const filename = file.split('/').pop();
-  //       await request.delete(
-  //         `/do/${id}/dokumentasi?filename=${encodeURIComponent(filename)}`
-  //       );
-  //       // Remove from default files
-  //       const updatedDefaultFiles = [...defaultFile];
-  //       updatedDefaultFiles.splice(index, 1);
-  //       setDefaultFile(updatedDefaultFiles);
-  //       alert('File berhasil dihapus');
-  //     } catch (error) {
-  //       console.error('Gagal menghapus file:', error);
-  //       alert('Gagal menghapus file. Silakan coba lagi.');
-  //     }
-  //   } else {
-  //     // Remove from newly uploaded files
-  //     const updatedFiles = [...form.dokumentasi_kegiatan];
-  //     updatedFiles.splice(index, 1);
-  //     setForm((prev) => ({
-  //       ...prev,
-  //       dokumentasi_kegiatan: updatedFiles,
-  //     }));
-  //   }
-  //   setFileError('');
-  // };
   const removeFile = async (file, index, isDefault = false) => {
     if (isDefault) {
       try {
@@ -322,7 +248,7 @@ export default function DoForm({ id }) {
         alert('Gagal menghapus file. Silakan coba lagi.');
       }
     } else {
-      // Remove from newly uploaded files
+      const fileToRemove = file; // karena sudah dikirim sebagai file
       const updatedFiles = [...form.dokumentasi_kegiatan];
       updatedFiles.splice(index, 1);
       setForm((prev) => ({
@@ -330,14 +256,20 @@ export default function DoForm({ id }) {
         dokumentasi_kegiatan: updatedFiles,
       }));
 
-      // Juga hapus dari uploadedFiles state jika perlu
       const updatedUploaded = [...uploadedFiles];
-      updatedUploaded.splice(index, 1);
-      setUploadedFiles(updatedUploaded);
+      const uploadedIndex = updatedUploaded.findIndex(
+        (f) => f.name === fileToRemove.name && f.size === fileToRemove.size
+      );
+
+      if (uploadedIndex !== -1) {
+        updatedUploaded.splice(uploadedIndex, 1);
+        setUploadedFiles(updatedUploaded);
+      }
     }
+
     setFileError('');
   };
-  console.log(programNames);
+  console.log(uploadedFiles);
 
   return (
     <Container fluid className="p-6">
@@ -356,21 +288,6 @@ export default function DoForm({ id }) {
                       Nama Program
                     </Form.Label>
                     <Col md={9}>
-                      {/* <Selection
-                      name="nama_program"
-                      value={form.nama_program}
-                      onChange={handleChange}
-                      placeHolder="Pilih Nama Program"
-                      className="form-select"
-                      required
-                    >
-                      <option value="">Pilih Nama Program</option>
-                      {programNames.map((opt, index) => (
-                        <option key={index} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Selection> */}
                       <Selection
                         name="nama_program"
                         value={form.nama_program} // Pastikan ini adalah ID (misal "68513aab5f4d5cf4feeb87fb")
@@ -392,6 +309,7 @@ export default function DoForm({ id }) {
                       {form.kolaborator.map((item, idx) => (
                         <Row className="mb-2" key={idx}>
                           <Col md={5}>
+                            <Form.Label column>Nama Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Nama Kolaborator"
                               value={item.nama}
@@ -406,6 +324,7 @@ export default function DoForm({ id }) {
                             />
                           </Col>
                           <Col md={5}>
+                            <Form.Label column>Peran Kolaborator</Form.Label>
                             <Form.Control
                               placeholder="Peran Kolaborator"
                               value={item.peran}
@@ -419,21 +338,37 @@ export default function DoForm({ id }) {
                               required
                             />
                           </Col>
-                          <Col md={2} className="d-flex gap-2">
-                            <Button
-                              variant="outline-danger"
-                              onClick={() => removeKolaborator(idx)}
-                              disabled={form.kolaborator.length === 1}
-                            >
-                              -
-                            </Button>
-                            <Button
-                              variant="outline-primary"
-                              onClick={addKolaborator}
-                              disabled={idx !== form.kolaborator.length - 1}
-                            >
-                              +
-                            </Button>
+                          <Col md={2} className="d-flex align-items-end gap-2">
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-danger"
+                                onClick={() => removeKolaborator(idx)}
+                                disabled={form.kolaborator.length === 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                -
+                              </Button>
+                            </div>
+                            <div style={{ width: 38 }}>
+                              <Button
+                                variant="outline-primary"
+                                onClick={addKolaborator}
+                                disabled={idx !== form.kolaborator.length - 1}
+                                style={{
+                                  width: 38,
+                                  minWidth: 38,
+                                  height: 38,
+                                  padding: 0,
+                                }}
+                              >
+                                +
+                              </Button>
+                            </div>
                           </Col>
                         </Row>
                       ))}
@@ -474,22 +409,6 @@ export default function DoForm({ id }) {
                     </Col>
                   </Row>
 
-                  {/* Dokumentasi */}
-                  {/* <Row className="mb-3">
-                  <Form.Label column md={3}>
-                    Dokumentasi Kegiatan
-                  </Form.Label>
-                  <Col md={9}>
-                    <Form.Control
-                      name="dokumentasi_kegiatan"
-                      value={form.dokumentasi_kegiatan}
-                      onChange={handleChange}
-                      placeholder="Link dokumentasi (Google Drive, dsb)"
-                      required
-                    />
-                  </Col>
-                </Row> */}
-
                   <Row className="mb-3">
                     <Form.Label column md={3}>
                       Laporan PDF
@@ -500,27 +419,21 @@ export default function DoForm({ id }) {
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png,.gif"
                         multiple
-                        // onChange={(e) => {
-                        //   const file = e.target.files[0];
-                        //   if (file) {
-                        //     // Simpan nama file atau path relatif ke state
-                        //     setForm((prev) => ({
-                        //       ...prev,
-                        //       dokumentasi_kegiatan: `uploads/${file.name}`, // atau format path lain yang Anda butuhkan
-                        //     }));
-                        //   }
-                        // }}
                         onChange={handleFileChange}
                       />
-                      {fileError ? (
+                      <div className="text-muted small mt-1">
+                        {defaultFile.length + uploadedFiles.length}/
+                        {MAX_FILE_COUNT} file terisi. Maksimal {MAX_FILE_COUNT}{' '}
+                        file (5MB/file)
+                      </div>
+                      <div className="text-muted small mt-1">
+                        Hanya file gambar (jpg, jpeg, png) dan PDF yang
+                        diizinkan!
+                      </div>
+                      {fileError && (
                         <Alert variant="danger" className="mt-2">
                           {fileError}
                         </Alert>
-                      ) : (
-                        <div className="text-muted small mt-1">
-                          {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
-                          Maksimal {MAX_FILE_COUNT} file (5MB/file)
-                        </div>
                       )}
                       {(form.dokumentasi_kegiatan?.length > 0 ||
                         defaultFile.length > 0) && (
@@ -532,26 +445,6 @@ export default function DoForm({ id }) {
                                 <FilePreviewCard
                                   key={index}
                                   file={file}
-                                  // onRemove={async () => {
-                                  //   try {
-                                  //     const filename = file.split('/').pop();
-                                  //     await request.delete(
-                                  //       `/date/${id}/dokumentasi?filename=${encodeURIComponent(
-                                  //         filename
-                                  //       )}`
-                                  //     );
-                                  //     alert('File berhasil dihapus');
-                                  //     fetchData();
-                                  //   } catch (error) {
-                                  //     console.error(
-                                  //       'Gagal menghapus file:',
-                                  //       error
-                                  //     );
-                                  //     alert(
-                                  //       'Gagal menghapus file. Silakan coba lagi.'
-                                  //     );
-                                  //   }
-                                  // }}
                                   onRemove={() => removeFile(file, index, true)}
                                 />
                               ))}
@@ -560,16 +453,9 @@ export default function DoForm({ id }) {
                                 <FilePreviewCard
                                   key={index}
                                   file={file}
-                                  onRemove={() => {
-                                    const updatedFiles = [
-                                      ...form.dokumentasi_kegiatan,
-                                    ];
-                                    updatedFiles.splice(index, 1);
-                                    setForm((prev) => ({
-                                      ...prev,
-                                      dokumentasi_kegiatan: updatedFiles,
-                                    }));
-                                  }}
+                                  onRemove={() =>
+                                    removeFile(file, index, false)
+                                  } // perhatikan argumennya
                                 />
                               ))}
                           </div>
@@ -611,6 +497,28 @@ export default function DoForm({ id }) {
                         placeholder="Masukkan rekomendasi"
                         required
                       />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-4">
+                    <Form.Label column md={3}>
+                      Status Do
+                    </Form.Label>
+                    <Col md={9}>
+                      <div className="d-flex align-items-center p-2 border rounded bg-light">
+                        <Form.Check
+                          type="switch"
+                          id="status-switch"
+                          label={form.status ? 'Selesai' : 'Belum Selesai'}
+                          name="status"
+                          checked={form.status}
+                          onChange={handleChange}
+                          className="form-check-lg"
+                        />
+                      </div>
+                      <small className="text-muted mt-1 d-block">
+                        Nyalakan untuk menandai program selesai dilaksanakan.
+                      </small>
                     </Col>
                   </Row>
 
