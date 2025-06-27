@@ -4,10 +4,7 @@ on:
   push:
     branches:
       - dev
-<<<<<<< HEAD
-
-=======
->>>>>>> b4d3b75a55342a92e225009c4fb017f746c6091c
+      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
