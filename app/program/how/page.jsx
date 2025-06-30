@@ -98,6 +98,29 @@ const HowPage = () => {
     setPage(newPage);
   };
 
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Apakah Anda yakin ingin menghapus program ini?');
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      await request.delete(`/how/${id}`);
+      // Fetch ulang data setelah hapus
+      if (searchQuery.trim() !== '') {
+        await handleSearch();
+      } else {
+        await fetchData();
+      }
+    } catch (err) {
+      console.error('Gagal menghapus program:', err);
+      alert(err.response?.data?.message || 'Gagal menghapus program. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   // if (loading) return <p>Loading...</p>;
 
   return (
@@ -186,9 +209,9 @@ const HowPage = () => {
                               >
                                 {program.tujuan_program.length > 100
                                   ? `${program.tujuan_program.substring(
-                                      0,
-                                      100
-                                    )}...`
+                                    0,
+                                    100
+                                  )}...`
                                   : program.tujuan_program}
                               </td>
                               <td
@@ -203,9 +226,9 @@ const HowPage = () => {
                               >
                                 {program.sasaran_program.length > 100
                                   ? `${program.sasaran_program.substring(
-                                      0,
-                                      100
-                                    )}...`
+                                    0,
+                                    100
+                                  )}...`
                                   : program.sasaran_program}
                               </td>
                               <td>
@@ -217,15 +240,21 @@ const HowPage = () => {
                               <td>{program.rencana_lokasi?.kota || '-'}</td>
                               <td>{program.opd_pengusul_utama || '-'}</td>
                               <td>
-                                <Button
-                                  variant="outline-primary"
-                                  style={{
-                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
-                                  }}
-                                  href={`/program/how/${program._id}`}
-                                >
-                                  Detail
-                                </Button>
+                                <div className="d-flex gap-2">
+                                  <Button
+                                    variant="outline-primary"
+                                    style={{ '--bs-btn-hover-color': 'white' }}
+                                    href={`/program/how/${program._id}`}
+                                  >
+                                    Detail
+                                  </Button>
+                                  <Button
+                                    variant="outline-danger"
+                                    onClick={() => handleDelete(program._id)}
+                                  >
+                                    Hapus
+                                  </Button>
+                                </div>
                               </td>
                             </tr>
                           ))}
