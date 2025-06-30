@@ -43,6 +43,10 @@ export default function DateForm({ id }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [defaultFile, setDefaultFile] = useState([]);
   const [fileError, setFileError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({
+    tanggal_mulai: '',
+    tanggal_selesai: '',
+  });
 
   const fetchData = async () => {
     try {
@@ -105,6 +109,10 @@ export default function DateForm({ id }) {
     setLoading(true);
     setError(null);
 
+    if (!validateBeforeSubmit()) {
+      return;
+    }
+
     // Validasi total file
     const totalFiles = defaultFile.length + uploadedFiles.length;
     if (totalFiles > MAX_FILE_COUNT) {
@@ -133,7 +141,7 @@ export default function DateForm({ id }) {
       window.location.href = '/program/date';
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Gagal menyimpan data.');
+      setError(err.response.data.message || 'Gagal menyimpan data.');
     } finally {
       setLoading(false);
     }
@@ -161,9 +169,24 @@ export default function DateForm({ id }) {
     const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
 
     if (totalFiles > MAX_FILE_COUNT) {
-      const availableSlots =
-        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
-      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      // const availableSlots =
+      //   MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan maksimal 3 file`);
+      e.target.value = '';
+      return;
+    }
+
+    const invalidFiles = files.filter(
+      (file) =>
+        !file.type.startsWith('image/') && file.type !== 'application/pdf'
+    );
+
+    if (invalidFiles.length > 0) {
+      setFileError(
+        `File berikut bukan gambar (jpg, jpeg, png)/PDF: ${invalidFiles
+          .map((f) => f.name)
+          .join(', ')}`
+      );
       e.target.value = '';
       return;
     }
@@ -233,6 +256,80 @@ export default function DateForm({ id }) {
     setFileError('');
   };
 
+  const handleDateChange = (e) => {
+    const { name, value } = e.target;
+
+    // Update form
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    // Validasi tanggal selesai >= tanggal mulai
+    if (name === 'tanggal_mulai' && form.tanggal_selesai) {
+      const startDate = new Date(value);
+      const endDate = new Date(form.tanggal_selesai);
+
+      if (endDate < startDate) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          tanggal_selesai:
+            'Tanggal selesai harus setelah atau sama dengan tanggal mulai',
+        }));
+      } else {
+        setValidationErrors((prev) => ({
+          ...prev,
+          tanggal_selesai: '',
+        }));
+      }
+    }
+
+    if (name === 'tanggal_selesai' && form.tanggal_mulai) {
+      const startDate = new Date(form.tanggal_mulai);
+      const endDate = new Date(value);
+
+      if (endDate < startDate) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          tanggal_selesai:
+            'Tanggal selesai harus setelah atau sama dengan tanggal mulai',
+        }));
+      } else {
+        setValidationErrors((prev) => ({
+          ...prev,
+          tanggal_selesai: '',
+        }));
+      }
+    }
+  };
+
+  // Validasi sebelum submit
+  const validateBeforeSubmit = () => {
+    let isValid = true;
+    const newErrors = { ...validationErrors };
+
+    if (!form.tanggal_mulai) {
+      newErrors.tanggal_mulai = 'Tanggal mulai harus diisi';
+      isValid = false;
+    }
+
+    if (!form.tanggal_selesai) {
+      newErrors.tanggal_selesai = 'Tanggal selesai harus diisi';
+      isValid = false;
+    }
+
+    if (form.tanggal_mulai && form.tanggal_selesai) {
+      const startDate = new Date(form.tanggal_mulai);
+      const endDate = new Date(form.tanggal_selesai);
+
+      if (endDate < startDate) {
+        newErrors.tanggal_selesai =
+          'Tanggal selesai harus setelah atau sama dengan tanggal mulai';
+        isValid = false;
+      }
+    }
+
+    setValidationErrors(newErrors);
+    return isValid;
+  };
+
   console.log(defaultFile);
 
   return (
@@ -263,7 +360,7 @@ export default function DateForm({ id }) {
                       />
                     </Col>
                   </Row>
-                  <Row className="mb-3">
+                  {/* <Row className="mb-3">
                     <Form.Label column md={3}>
                       Tanggal Mulai
                     </Form.Label>
@@ -290,6 +387,46 @@ export default function DateForm({ id }) {
                         required
                       />
                     </Col>
+                  </Row> */}
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Tanggal Mulai
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        type="date"
+                        name="tanggal_mulai"
+                        value={form.tanggal_mulai?.slice(0, 10) || ''}
+                        onChange={handleDateChange}
+                        required
+                      />
+                      {validationErrors.tanggal_mulai && (
+                        <Form.Text className="text-danger">
+                          {validationErrors.tanggal_mulai}
+                        </Form.Text>
+                      )}
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Label column md={3}>
+                      Tanggal Selesai
+                    </Form.Label>
+                    <Col md={9}>
+                      <Form.Control
+                        type="date"
+                        name="tanggal_selesai"
+                        value={form.tanggal_selesai?.slice(0, 10) || ''}
+                        onChange={handleDateChange}
+                        min={form.tanggal_mulai} // Otomatis membatasi tanggal minimum
+                        required
+                      />
+                      {validationErrors.tanggal_selesai && (
+                        <Form.Text className="text-danger">
+                          {validationErrors.tanggal_selesai}
+                        </Form.Text>
+                      )}
+                    </Col>
                   </Row>
                   <Row className="mb-3">
                     <Form.Label column md={3}>
@@ -304,15 +441,19 @@ export default function DateForm({ id }) {
                         onChange={handleFileChange}
                         disabled={!validateFileCount()}
                       />
-                      {fileError ? (
+                      <div className="text-muted small mt-1">
+                        {defaultFile.length + uploadedFiles.length}/
+                        {MAX_FILE_COUNT} file terisi. Maksimal {MAX_FILE_COUNT}{' '}
+                        file (5MB/file)
+                      </div>
+                      <div className="text-muted small mt-1">
+                        Hanya file gambar (jpg, jpeg, png) dan PDF yang
+                        diizinkan!
+                      </div>
+                      {fileError && (
                         <Alert variant="danger" className="mt-2">
                           {fileError}
                         </Alert>
-                      ) : (
-                        <div className="text-muted small mt-1">
-                          {defaultFile.length}/{MAX_FILE_COUNT} file terisi.
-                          Maksimal {MAX_FILE_COUNT} file (5MB/file)
-                        </div>
                       )}
 
                       {(form.link_laporan_pdf?.length > 0 ||
@@ -333,16 +474,9 @@ export default function DateForm({ id }) {
                                 <FilePreviewCard
                                   key={index}
                                   file={file}
-                                  onRemove={() => {
-                                    const updatedFiles = [
-                                      ...form.link_laporan_pdf,
-                                    ];
-                                    updatedFiles.splice(index, 1);
-                                    setForm((prev) => ({
-                                      ...prev,
-                                      link_laporan_pdf: updatedFiles,
-                                    }));
-                                  }}
+                                  onRemove={() =>
+                                    removeFile(file, index, false)
+                                  } // perhatikan argumennya
                                 />
                               ))}
                           </div>

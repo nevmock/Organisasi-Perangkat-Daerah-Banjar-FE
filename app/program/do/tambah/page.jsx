@@ -23,6 +23,7 @@ const initialForm = {
   capaian_output: '',
   dokumentasi_kegiatan: [],
   kendala: '',
+  status: false,
   rekomendasi: '',
 };
 
@@ -70,8 +71,11 @@ export default function DoForm() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleKolaboratorChange = (idx, field, value) => {
@@ -113,6 +117,7 @@ export default function DoForm() {
         capaian_output: form.capaian_output,
         kendala: form.kendala,
         rekomendasi: form.rekomendasi,
+        status: form.status,
       };
 
       const response = await request.post(`/do`, newData);
@@ -120,21 +125,31 @@ export default function DoForm() {
 
       // 2. Jika ada file dokumentasi, upload ke endpoint dokumentasi
       if (uploadedFiles.length > 0) {
-        await uploadFiles(doId);
+        const uploaded = await uploadFiles(doId);
+        if (!uploaded) {
+          // Jika gagal upload file → rollback data utama
+          try {
+            await request.delete(`/do/${doId}`);
+          } catch (deleteErr) {
+            console.error('Gagal rollback data utama:', deleteErr);
+          }
+          setLoading(false);
+          return;
+        }
       }
 
       alert('Data berhasil disimpan!');
       window.location.href = '/program/do';
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Gagal menyimpan data.');
+      setError(err.response.data.message || 'Gagal menyimpan data.');
     } finally {
       setLoading(false);
     }
   };
 
   const uploadFiles = async (doId) => {
-    if (!doId || uploadedFiles.length === 0) return;
+    if (!doId || uploadedFiles.length === 0) return true;
 
     try {
       const res = await request.postMultipart(`/do/${doId}/dokumentasi`, {
@@ -142,8 +157,9 @@ export default function DoForm() {
       });
       return res.data?.urls || [];
     } catch (err) {
+      setFileError(err.response?.data?.message || 'Gagal mengunggah file.');
       console.error('Gagal mengunggah file:', err);
-      throw err;
+      return false; // jangan throw
     }
   };
 
@@ -153,16 +169,31 @@ export default function DoForm() {
 
     // Hitung total file yang akan ada
     const totalFiles = defaultFile.length + uploadedFiles.length + files.length;
-
     if (totalFiles > MAX_FILE_COUNT) {
-      const availableSlots =
-        MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
-      setFileError(`Anda hanya dapat menambahkan ${availableSlots} file lagi`);
+      // const availableSlots =
+      //   MAX_FILE_COUNT - defaultFile.length - uploadedFiles.length;
+      setFileError(`Anda hanya dapat menambahkan maksimal 3 file`);
       e.target.value = '';
       return;
     }
 
-    // Validasi ukuran file
+    // ✅ Validasi tipe file: hanya gambar dan PDF
+    const invalidFiles = files.filter(
+      (file) =>
+        !file.type.startsWith('image/') && file.type !== 'application/pdf'
+    );
+
+    if (invalidFiles.length > 0) {
+      setFileError(
+        `File berikut bukan gambar (jpg, jpeg, png)/PDF: ${invalidFiles
+          .map((f) => f.name)
+          .join(', ')}`
+      );
+      e.target.value = '';
+      return;
+    }
+
+    // ✅ Validasi ukuran file
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       setFileError(
@@ -173,10 +204,10 @@ export default function DoForm() {
     }
 
     if (files.length > 0) {
-      // Tambahkan ke state uploadedFiles (file asli)
+      // Tambahkan ke state uploadedFiles
       setUploadedFiles((prev) => [...prev, ...files]);
 
-      // Tambahkan ke form.dokumentasi_kegiatan (untuk preview)
+      // Tambahkan ke form.dokumentasi_kegiatan untuk preview
       const processedFiles = files.map((file) => ({
         name: file.name,
         type: file.type,
@@ -378,15 +409,18 @@ export default function DoForm() {
                         multiple
                         onChange={handleFileChange}
                       />
-                      {fileError ? (
+                      <div className="text-muted small mt-1">
+                        Maksimal {MAX_FILE_COUNT} file, masing-masing maksimal
+                        5MB
+                      </div>
+                      <div className="text-muted small mt-1">
+                        Hanya file gambar (jpg, jpeg, png) dan PDF yang
+                        diizinkan!
+                      </div>
+                      {fileError && (
                         <Alert variant="danger" className="mt-2">
                           {fileError}
                         </Alert>
-                      ) : (
-                        <div className="text-muted small mt-1">
-                          Maksimal {MAX_FILE_COUNT} file, masing-masing maksimal
-                          5MB (.pdf, .png, .jpg, .jpeg)
-                        </div>
                       )}
 
                       {form.dokumentasi_kegiatan?.length > 0 && (
@@ -437,6 +471,28 @@ export default function DoForm() {
                         onChange={handleChange}
                         required
                       />
+                    </Col>
+                  </Row>
+
+                  <Row className="mb-4">
+                    <Form.Label column md={3}>
+                      Status Do
+                    </Form.Label>
+                    <Col md={9}>
+                      <div className="d-flex align-items-center p-2 border rounded bg-light">
+                        <Form.Check
+                          type="switch"
+                          id="status-switch"
+                          label={form.status ? 'Selesai' : 'Belum Selesai'}
+                          name="status"
+                          checked={form.status}
+                          onChange={handleChange}
+                          className="form-check-lg"
+                        />
+                      </div>
+                      <small className="text-muted mt-1 d-block">
+                        Nyalakan untuk menandai program selesai dilaksanakan.
+                      </small>
                     </Col>
                   </Row>
 

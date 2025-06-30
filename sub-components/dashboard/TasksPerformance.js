@@ -1,11 +1,11 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { Card, Dropdown } from "react-bootstrap";
-import { MoreVertical } from "react-feather";
-import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
-import request from "utils/request";
+'use client';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Card, Dropdown } from 'react-bootstrap';
+import { MoreVertical } from 'react-feather';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+import request from 'utils/request';
 
 const Charts = () => {
   const [data, setData] = useState();
@@ -16,8 +16,8 @@ const Charts = () => {
         const res = await request.get(`/monitoring/summary`);
         setData(res.data);
       } catch (err) {
-        console.error("Gagal fetch data sumary:", err);
-        console.log("Detail error:", err.response?.data || err.message);
+        console.error('Gagal fetch data sumary:', err);
+        console.log('Detail error:', err.response?.data || err.message);
       }
     };
 
@@ -28,25 +28,25 @@ const Charts = () => {
   const perfomanceChartSeries = [data?.persen_selesai];
   const perfomanceChartOptions = {
     dataLabels: { enabled: !1 },
-    labels: ["persen_selesai"],
-    colors: ["#28a745"],
+    labels: ['persen_selesai'],
+    colors: ['#28a745'],
     plotOptions: {
       radialBar: {
         startAngle: 0,
         endAngle: 360,
         hollow: {
-          size: "55%",
+          size: '55%',
         },
         track: {
-          background: "transaprent",
+          background: 'transaprent',
         },
         dataLabels: {
           show: false,
         },
       },
     },
-    chart: { type: "radialBar" },
-    stroke: { lineCap: "round" },
+    chart: { type: 'radialBar' },
+    stroke: { lineCap: 'round' },
     responsive: [
       {
         breakpoint: 480,
@@ -81,7 +81,7 @@ const Charts = () => {
     </Link>
   ));
 
-  CustomToggle.displayName = "CustomToggle";
+  CustomToggle.displayName = 'CustomToggle';
 
   const ActionMenu = () => {
     return (
@@ -89,7 +89,7 @@ const Charts = () => {
         <Dropdown.Toggle as={CustomToggle}>
           <MoreVertical size="15px" className="text-muted" />
         </Dropdown.Toggle>
-        <Dropdown.Menu align={"end"}>
+        <Dropdown.Menu align={'end'}>
           <Dropdown.Item eventKey="1">Action</Dropdown.Item>
           <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
           <Dropdown.Item eventKey="3">Something else here</Dropdown.Item>
@@ -133,7 +133,7 @@ const Charts = () => {
           <div className="text-center">
             <i
               className="fe fe-bar-chart-2 fs-3"
-              style={{ color: "#007bff" }}
+              style={{ color: '#007bff' }}
             ></i>
             <h1 className="mt-3  mb-1 fw-bold">{data?.total_indikator}</h1>
             <p>Total Indikator</p>

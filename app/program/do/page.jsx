@@ -97,6 +97,28 @@ const DoPage = () => {
     setPage(newPage);
   };
 
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Apakah Anda yakin ingin menghapus program Do ini?');
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      await request.delete(`/do/${id}`);
+      // Fetch ulang data setelah hapus
+      if (searchQuery.trim() !== '') {
+        await handleSearch();
+      } else {
+        await fetchData();
+      }
+    } catch (err) {
+      console.error('Gagal menghapus program:', err);
+      alert('Terjadi kesalahan saat menghapus program.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // if (loading) return <p>Loading...</p>;
 
   return (
@@ -167,10 +189,10 @@ const DoPage = () => {
                                   index +
                                   1}
                               </td>
-                              <td>{program.nama_program.nama_program}</td>
+                              <td>{program?.nama_program?.nama_program}</td>
                               <td>
-                                {program.kolaborator
-                                  .map((item) => item.nama)
+                                {program?.kolaborator
+                                  .map((item) => item?.nama)
                                   .join(', ')}
                               </td>
                               <td>
@@ -178,20 +200,26 @@ const DoPage = () => {
                                   className="text-wrap"
                                   style={{ minWidth: '300px' }}
                                 >
-                                  {program.capaian_output}
+                                  {program?.capaian_output}
                                 </div>
                               </td>
-                              <td>{program.rincian_kegiatan}</td>
+                              <td>{program?.rincian_kegiatan}</td>
                               <td>
-                                <Button
-                                  variant="outline-primary"
-                                  style={{
-                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
-                                  }}
-                                  href={`/program/do/${program._id}`}
-                                >
-                                  Detail
-                                </Button>
+                                <div className="d-flex gap-2">
+                                  <Button
+                                    variant="outline-primary"
+                                    style={{ '--bs-btn-hover-color': 'white' }}
+                                    href={`/program/do/${program._id}`}
+                                  >
+                                    Detail
+                                  </Button>
+                                  <Button
+                                    variant="outline-danger"
+                                    onClick={() => handleDelete(program._id)}
+                                  >
+                                    Hapus
+                                  </Button>
+                                </div>
                               </td>
                             </tr>
                           ))}
