@@ -98,6 +98,28 @@ const DatePage = () => {
     setPage(newPage);
   };
 
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Apakah Anda yakin ingin menghapus program date ini?');
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      await request.delete(`/date/${id}`);
+      // Fetch ulang data setelah hapus
+      if (searchQuery.trim() !== '') {
+        await handleSearch();
+      } else {
+        await fetchData();
+      }
+    } catch (err) {
+      console.error('Gagal menghapus program:', err);
+      alert('Terjadi kesalahan saat menghapus program.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // if (loading) return <p>Loading...</p>;
 
   return (
@@ -161,26 +183,26 @@ const DatePage = () => {
                       {hasMounted && (
                         <tbody>
                           {programs.map((program, index) => (
-                            <tr key={program._id || index}>
+                            <tr key={program?._id || index}>
                               <td>
                                 {(paginationData.page - 1) *
                                   paginationData.limit +
                                   index +
                                   1}
                               </td>
-                              <td>{program.nama_program.nama_program}</td>
+                              <td>{program?.nama_program?.nama_program}</td>
                               <td>
-                                {program.tanggal_mulai?.slice(0, 10) || ''}
+                                {program?.tanggal_mulai?.slice(0, 10) || ''}
                               </td>
                               <td>
-                                {program.tanggal_selesai?.slice(0, 10) || ''}
+                                {program?.tanggal_selesai?.slice(0, 10) || ''}
                               </td>
                               <td>
-                                {program.status_laporan == 'revisi' ? (
+                                {program?.status_laporan == 'revisi' ? (
                                   <Badge pill bg="danger" className="me-1">
                                     Revisi
                                   </Badge>
-                                ) : program.status_laporan == 'final' ? (
+                                ) : program?.status_laporan == 'final' ? (
                                   <Badge pill bg="primary" className="me-1">
                                     FINAL
                                   </Badge>
@@ -191,15 +213,21 @@ const DatePage = () => {
                                 )}
                               </td>
                               <td>
-                                <Button
-                                  variant="outline-primary"
-                                  style={{
-                                    '--bs-btn-hover-color': 'white', // Bootstrap v5 var override
-                                  }}
-                                  href={`/program/date/${program._id}`}
-                                >
-                                  Detail
-                                </Button>
+                                <div className="d-flex gap-2">
+                                  <Button
+                                    variant="outline-primary"
+                                    style={{ '--bs-btn-hover-color': 'white' }}
+                                    href={`/program/date/${program?._id}`}
+                                  >
+                                    Detail
+                                  </Button>
+                                  <Button
+                                    variant="outline-danger"
+                                    onClick={() => handleDelete(program?._id)}
+                                  >
+                                    Hapus
+                                  </Button>
+                                </div>
                               </td>
                             </tr>
                           ))}
